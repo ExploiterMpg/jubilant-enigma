@@ -88,9 +88,10 @@ canvas{
 
 #minimap{
     z-index:20;
+    display:none;
     right:15px;
     left:auto;
-    top:15px;
+    top:205px;
     width:240px;
     height:175px;
     border:2px solid #788378;
@@ -102,6 +103,7 @@ canvas{
 #hud{
     position:fixed;
     z-index:30;
+    display:none;
     left:15px;
     top:15px;
     min-width:210px;
@@ -128,18 +130,118 @@ canvas{
 #weaponBar{
     position:fixed;
     z-index:30;
-    bottom:65px;
+    display:none;
+    top:15px;
     left:50%;
     transform:translateX(-50%);
-    padding:8px 14px;
-    background:#0b0f0ddd;
+    gap:5px;
+    padding:6px;
+    background:#080b08e8;
     border:1px solid #69736b;
-    border-radius:6px;
+    border-radius:4px;
+}
+
+body.inventoryOpen #weaponBar{
+    top:auto;
+    bottom:18px;
+}
+
+.hotbarSlot{
+    width:64px;
+    height:48px;
+    border:1px solid #566157;
+    background:#151a16;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:#cfd4c9;
+    font-size:9px;
+    overflow:hidden;
+}
+
+.hotbarSlot.active{
+    border-color:#d8bb68;
+    box-shadow:0 0 12px #d8bb6836;
+}
+
+.hotbarKey{
+    position:absolute;
+    left:4px;
+    top:3px;
+    color:#d8bb68;
+    font-size:10px;
+    font-weight:700;
+}
+
+.hotbarName{
+    width:100%;
+    padding:12px 4px 2px;
+    white-space:normal;
+    line-height:1.05;
+}
+
+.hotbarEmpty{
+    color:#5f685f;
+}
+
+#bodyHud{
+    position:fixed;
+    z-index:30;
+    display:none;
+    top:15px;
+    right:15px;
+    width:126px;
+    padding:10px;
+    background:#080b08e8;
+    border:1px solid #69736b;
+    border-radius:4px;
+}
+
+.bodyHudTitle{
+    margin-bottom:6px;
+    color:#cfd4c9;
+    font-size:10px;
+    letter-spacing:1px;
+}
+
+.bodyGuy{
+    position:relative;
+    width:70px;
+    height:132px;
+    margin:0 auto;
+}
+
+.bodyLimb{
+    position:absolute;
+    border:1px solid #111611;
+    background:#5cc76f;
+}
+
+.bodyLimb.damaged{background:#d6b25c;}
+.bodyLimb.critical{background:#c2574c;}
+.bodyLimb.blacked{background:#272b28;}
+.bodyLimb.bleeding{box-shadow:0 0 0 2px #8f2525 inset;}
+
+.bodyHead{left:24px;top:0;width:22px;height:22px;border-radius:50%;}
+.bodyThorax{left:18px;top:27px;width:34px;height:44px;border-radius:9px 9px 5px 5px;}
+.bodyLeftArm{left:3px;top:31px;width:14px;height:50px;border-radius:8px;}
+.bodyRightArm{right:3px;top:31px;width:14px;height:50px;border-radius:8px;}
+.bodyLeftLeg{left:19px;top:73px;width:15px;height:56px;border-radius:7px;}
+.bodyRightLeg{right:19px;top:73px;width:15px;height:56px;border-radius:7px;}
+
+.bodyHudText{
+    margin-top:6px;
+    color:#aeb7af;
+    font-size:10px;
+    text-align:center;
 }
 
 #help{
     position:fixed;
     z-index:30;
+    display:none;
     bottom:10px;
     left:50%;
     transform:translateX(-50%);
@@ -147,6 +249,19 @@ canvas{
     background:#0b0f0ddd;
     border-radius:6px;
     font-size:12px;
+}
+
+body.raidActive #hud,
+body.raidActive #help{
+    display:block;
+}
+
+body.raidActive #weaponBar{
+    display:flex;
+}
+
+body.raidActive #minimap{
+    display:block;
 }
 
 #message{
@@ -284,6 +399,140 @@ canvas{
     border:2px solid #69e58a;
 }
 
+.slot.searching{
+    background:
+        linear-gradient(135deg, rgba(232,225,177,.08), transparent 42%),
+        repeating-linear-gradient(45deg, #151a15 0 8px, #101410 8px 16px);
+    border-color:#7d806e;
+    overflow:hidden;
+}
+
+.slot.searching:before{
+    content:"?";
+    position:absolute;
+    inset:12px 0 auto;
+    text-align:center;
+    color:#d9d1aa;
+    font-size:26px;
+    font-weight:800;
+    opacity:.78;
+}
+
+.slot.searching:after{
+    content:"UNKNOWN";
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:18px;
+    text-align:center;
+    color:#aeb3a6;
+    font-size:8px;
+    letter-spacing:1px;
+}
+
+.searchProgress{
+    position:absolute;
+    left:5px;
+    right:5px;
+    bottom:5px;
+    height:4px;
+    border:1px solid #545d52;
+    background:#070907;
+}
+
+.searchProgress span{
+    display:block;
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,#9fa97b,#efe6aa);
+    box-shadow:0 0 10px #efe6aa88;
+}
+
+#inspectPanel{
+    position:fixed;
+    z-index:1200;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:360px;
+    max-width:calc(100vw - 30px);
+    background:#111611;
+    border:1px solid #787f6f;
+    box-shadow:0 25px 90px #000d, inset 0 0 0 1px #000;
+    padding:14px;
+}
+
+#inspectPanel .inspectTop{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    cursor:move;
+}
+
+#inspectPanel img{
+    width:86px;
+    height:86px;
+    background:#202720;
+    border:1px solid #4d574d;
+}
+
+#inspectPanel h2{
+    margin:0 0 4px;
+    color:#eee8cc;
+    letter-spacing:1px;
+}
+
+#inspectPanel p{
+    color:#b7bdad;
+    font-size:13px;
+    line-height:1.45;
+}
+
+#inspectPanel .inspectStats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    margin-top:10px;
+    color:#d7d0ad;
+    font-size:11px;
+}
+
+#inspectPanel button{
+    margin-top:12px;
+    width:100%;
+}
+
+#magLoadOverlay{
+    position:fixed;
+    z-index:1250;
+    left:50%;
+    bottom:90px;
+    transform:translateX(-50%);
+    width:280px;
+    background:#0d110d;
+    border:1px solid #777f6e;
+    padding:10px;
+    box-shadow:0 10px 35px #000b;
+    color:#e8e1bd;
+    font-size:12px;
+    letter-spacing:1px;
+}
+
+#magLoadOverlay .magLoadBar{
+    margin-top:8px;
+    height:8px;
+    background:#050705;
+    border:1px solid #4a5448;
+}
+
+#magLoadOverlay .magLoadBar span{
+    display:block;
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,#a9904f,#efe1a0);
+    box-shadow:0 0 12px #efe1a099;
+}
+
 .slot img{
     width:48px;
     height:48px;
@@ -307,6 +556,23 @@ canvas{
     padding:2px 4px;
     font-size:10px;
     border-radius:3px;
+}
+
+.hotbarBadge{
+    position:absolute;
+    left:3px;
+    top:3px;
+    min-width:15px;
+    height:15px;
+    padding:1px 4px;
+    background:#d8bb68;
+    color:#111611;
+    border:1px solid #0c100c;
+    border-radius:2px;
+    font-size:10px;
+    font-weight:700;
+    line-height:13px;
+    text-align:center;
 }
 
 /* RAID INVENTORY */
@@ -397,25 +663,229 @@ canvas{
     position:fixed;
     inset:0;
     z-index:200;
-    background:#111611;
-    padding:25px;
+    background:#080b08;
+    padding:16px;
     overflow:auto;
+}
+
+#traderPanel h1{
+    margin:4px 0 8px;
+    letter-spacing:2px;
+}
+
+.traderTabs{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(120px,1fr));
+    gap:7px;
+    margin:12px 0;
+}
+
+.traderTab{
+    display:grid;
+    grid-template-columns:48px 1fr;
+    gap:8px;
+    align-items:center;
+    min-height:64px;
+    padding:8px;
+    background:#121713;
+    border:1px solid #3d463e;
+    color:#d8d9ce;
+    text-align:left;
+}
+
+.traderTab.active{
+    border-color:#d8bb68;
+    background:#20251d;
+}
+
+.traderPortrait{
+    width:48px;
+    height:48px;
+    background:linear-gradient(135deg,#293127,#111611);
+    border:1px solid #59645a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+}
+
+.traderTabName{
+    font-size:12px;
+    font-weight:700;
+}
+
+.traderTabRep{
+    color:#aeb7a9;
+    font-size:10px;
+}
+
+.traderWorkspace{
+    display:grid;
+    grid-template-columns:minmax(540px,1.15fr) minmax(380px,.85fr);
+    gap:14px;
+}
+
+.traderLeft,
+.traderRight{
+    min-height:520px;
+    padding:14px;
+    background:#101510;
+    border:1px solid #3d463e;
+}
+
+.traderRep{
+    margin:10px 0 14px;
+    color:#cfd4c9;
+    font-size:12px;
+}
+
+.repBar{
+    height:8px;
+    margin-top:5px;
+    background:#242b25;
+    border:1px solid #4d574e;
+}
+
+.repBarInner{
+    height:100%;
+    background:#d8bb68;
 }
 
 .trade{
     display:flex;
     align-items:center;
     gap:12px;
-    max-width:700px;
+    max-width:none;
     margin:7px 0;
     padding:8px;
-    background:#222922;
+    background:#161c17;
     border:1px solid #4d574f;
 }
 
 .trade img{
     width:50px;
     height:50px;
+}
+
+.trade button,
+.taskCard button{
+    min-width:96px;
+    height:34px;
+    background:#263027;
+    border:1px solid #647064;
+    color:#e4e7dd;
+}
+
+.traderMarket{
+    display:grid;
+    grid-template-columns:minmax(230px,.9fr) minmax(280px,1.1fr);
+    gap:12px;
+    margin-top:12px;
+}
+
+.tradeList{
+    max-height:370px;
+    overflow:auto;
+    border:1px solid #303930;
+    background:#0b0f0c;
+}
+
+.tradeItem{
+    width:100%;
+    display:grid;
+    grid-template-columns:42px 1fr auto;
+    gap:8px;
+    align-items:center;
+    padding:7px;
+    background:#121713;
+    border:0;
+    border-bottom:1px solid #2d352e;
+    color:#d9ddd1;
+    text-align:left;
+}
+
+.tradeItem.active{
+    background:#252b20;
+    outline:1px solid #d8bb68;
+}
+
+.tradeItem img{
+    width:42px;
+    height:42px;
+}
+
+.tradeItem small{
+    display:block;
+    color:#9fa797;
+}
+
+.tradeDeal{
+    min-height:260px;
+    padding:14px;
+    border:1px solid #495349;
+    background:
+        linear-gradient(135deg,rgba(216,187,104,.09),transparent 34%),
+        #101510;
+}
+
+.tradeDealTop{
+    display:flex;
+    gap:14px;
+    align-items:center;
+}
+
+.tradeDealTop img{
+    width:76px;
+    height:76px;
+    border:1px solid #566157;
+    background:#202720;
+}
+
+.tradeDeal h3{
+    margin:0 0 4px;
+}
+
+.dealStats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin:12px 0;
+    color:#cfd4c9;
+    font-size:12px;
+}
+
+.dealActions{
+    display:flex;
+    gap:8px;
+}
+
+.dealActions button{
+    flex:1;
+    min-width:0;
+}
+
+.taskCard{
+    margin:9px 0;
+    padding:12px;
+    background:#121713;
+    border:1px solid #3d463e;
+}
+
+.taskCard.done{
+    border-color:#6fbe7a;
+}
+
+.taskNeed{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:8px 0;
+    color:#cfd4c9;
+}
+
+.taskNeed img{
+    width:34px;
+    height:34px;
 }
 
 .grow{
@@ -462,6 +932,278 @@ canvas{
     color:#dca05f;
 }
 
+/* RAID SETUP */
+
+#raidSetupPanel{
+    position:fixed;
+    inset:0;
+    z-index:220;
+    overflow:hidden;
+    background:
+        radial-gradient(ellipse at 48% 8%, rgba(230,231,195,.22), transparent 24%),
+        linear-gradient(90deg, rgba(2,5,4,.98), rgba(13,18,15,.86) 48%, rgba(2,5,4,.98)),
+        repeating-linear-gradient(90deg, rgba(170,185,150,.04) 0 1px, transparent 1px 90px);
+}
+
+#raidSetupPanel:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        radial-gradient(circle at 34% 42%, rgba(200,210,185,.12) 0 1px, transparent 2px),
+        radial-gradient(circle at 42% 34%, rgba(200,210,185,.10) 0 1px, transparent 2px),
+        radial-gradient(circle at 47% 50%, rgba(200,210,185,.10) 0 1px, transparent 2px),
+        linear-gradient(180deg, transparent 0 48%, rgba(0,0,0,.55) 100%);
+    pointer-events:none;
+}
+
+.raidSetupInner{
+    position:relative;
+    z-index:1;
+    width:min(1120px, calc(100vw - 42px));
+    height:min(680px, calc(100vh - 36px));
+    margin:18px auto;
+    display:grid;
+    grid-template-columns:minmax(420px,1fr) 360px;
+    gap:28px;
+    color:#d8d9ce;
+}
+
+.raidSetupHeader{
+    grid-column:1 / -1;
+    text-align:center;
+    letter-spacing:2px;
+}
+
+.raidSetupHeader h1{
+    margin:4px 0 0;
+    font-size:22px;
+}
+
+.raidSetupHeader p{
+    margin:2px 0 0;
+    color:#9ba391;
+    font-size:11px;
+}
+
+.raidMapPane{
+    position:relative;
+    min-height:480px;
+    border:1px solid rgba(176,188,158,.18);
+    background:
+        radial-gradient(ellipse at 46% 44%, rgba(130,150,128,.22), transparent 48%),
+        linear-gradient(135deg, rgba(40,52,43,.3), rgba(5,8,6,.45));
+}
+
+.raidMapRoute{
+    position:absolute;
+    left:15%;
+    top:12%;
+    width:56%;
+    height:70%;
+    border-left:2px solid rgba(211,215,185,.35);
+    border-bottom:2px solid rgba(211,215,185,.2);
+    transform:skew(-10deg) rotate(8deg);
+    opacity:.75;
+}
+
+.mapChoice{
+    position:absolute;
+    padding:4px 8px 4px 14px;
+    background:transparent;
+    border:0;
+    color:#c2c8b9;
+    font-size:12px;
+    letter-spacing:.8px;
+    text-align:left;
+    cursor:pointer;
+}
+
+.mapChoice:before{
+    content:"";
+    position:absolute;
+    left:2px;
+    top:50%;
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:#cfd6c6;
+    transform:translateY(-50%);
+}
+
+.mapChoice.active{
+    background:#d8d9ce;
+    color:#171b16;
+}
+
+.mapChoice.active:before{
+    background:#171b16;
+}
+
+.mapChoice[data-map="ezra"]{left:43%;top:41%;}
+
+.raidMapInfo{
+    padding:18px;
+    align-self:start;
+    border-left:1px solid rgba(183,191,165,.22);
+    background:rgba(5,8,6,.38);
+}
+
+.raidPreview{
+    height:140px;
+    margin-bottom:18px;
+    background:
+        linear-gradient(180deg, rgba(238,207,131,.38), rgba(35,45,38,.34) 42%, rgba(4,7,5,.9)),
+        repeating-linear-gradient(90deg, transparent 0 38px, rgba(0,0,0,.32) 39px 50px);
+    border:1px solid rgba(198,205,174,.18);
+}
+
+.raidMapInfo h2{
+    margin:0 0 8px;
+    font-size:23px;
+    font-weight:400;
+}
+
+.mapSubtitle{
+    margin-top:-3px;
+    margin-bottom:12px;
+    color:#d8bb68;
+    font-size:11px;
+    letter-spacing:1.6px;
+    text-transform:uppercase;
+}
+
+.raidMapInfo p{
+    min-height:62px;
+    color:#b4baaa;
+    font-size:12px;
+    line-height:1.45;
+}
+
+.raidStats{
+    display:flex;
+    gap:16px;
+    color:#d6d9ce;
+    font-size:11px;
+    margin:14px 0;
+}
+
+.timeChooser{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+    margin:18px 0;
+}
+
+.timeButton{
+    height:42px;
+    background:#141a15;
+    border:1px solid #535f54;
+    color:#cfd4c9;
+}
+
+.timeButton.active{
+    border-color:#d6bc6a;
+    background:#2a2f25;
+    color:#fff;
+}
+
+.raidSetupActions{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:12px;
+    display:flex;
+    justify-content:center;
+    gap:80px;
+}
+
+.raidSetupActions button{
+    width:150px;
+    height:44px;
+    background:#101510;
+    border:1px solid #535f54;
+    color:#d8d9ce;
+    letter-spacing:1px;
+}
+
+.loadoutStatus{
+    margin:10px 0 4px;
+    padding:9px 10px;
+    border:1px solid rgba(190,202,170,.2);
+    background:rgba(0,0,0,.22);
+    color:#b8c0b0;
+    font-size:11px;
+    letter-spacing:.7px;
+}
+
+.loadoutStatus.ready{
+    border-color:rgba(111,190,122,.42);
+    color:#c9f0cc;
+}
+
+.loadoutStatus.blocked{
+    border-color:rgba(214,188,106,.48);
+    color:#e8d89f;
+}
+
+#raidSetupPanel .raidSetupInner{
+    grid-template-columns:minmax(560px,1fr) 380px;
+    grid-template-rows:auto 1fr auto;
+    gap:22px 30px;
+}
+
+#raidSetupPanel .raidMapPane{
+    min-height:0;
+    height:100%;
+    grid-row:2 / 4;
+    box-shadow:inset 0 0 80px rgba(0,0,0,.42);
+}
+
+#raidSetupPanel .raidMapInfo{
+    grid-column:2;
+    grid-row:2;
+    min-height:0;
+}
+
+#raidSetupPanel .raidSetupActions{
+    position:static;
+    grid-column:2;
+    grid-row:3;
+    justify-content:space-between;
+    gap:12px;
+}
+
+#raidSetupPanel .raidSetupActions button{
+    flex:1;
+}
+
+#raidSetupPanel .raidPreview{
+    background:
+        linear-gradient(180deg, rgba(238,207,131,.44), rgba(55,67,52,.36) 48%, rgba(3,6,4,.92)),
+        linear-gradient(90deg, transparent 0 64%, rgba(255,255,255,.08) 64% 65%, transparent 65%),
+        repeating-linear-gradient(90deg, transparent 0 43px, rgba(0,0,0,.36) 44px 54px);
+}
+
+@media(max-width:950px){
+    #raidSetupPanel .raidSetupInner{
+        grid-template-columns:1fr;
+        height:auto;
+        overflow:auto;
+    }
+
+    #raidSetupPanel .raidMapPane,
+    #raidSetupPanel .raidMapInfo,
+    #raidSetupPanel .raidSetupActions{
+        grid-column:1;
+        grid-row:auto;
+    }
+
+    .menuIntel{
+        display:none;
+    }
+}
+
 /* RESULT */
 
 #raidResult{
@@ -492,6 +1234,34 @@ body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
 #lootPanel .lootColumn h3{font-size:11px;letter-spacing:1.5px;color:#aeb3a6;margin:0 0 9px;}
 #lootPanel .lootColumn .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:100%;max-width:none;}
 #lootPanel .slot{min-width:0;width:auto;height:72px;}
+#inventoryPanel,
+#stashPanel,
+#traderPanel,
+#lootPanel{
+    background:
+        radial-gradient(circle at 20% 0%,rgba(203,180,101,.07),transparent 34%),
+        linear-gradient(180deg,rgba(18,23,18,.98),rgba(7,10,8,.98));
+    box-shadow:0 30px 90px #000d, inset 0 0 0 1px #222b22;
+}
+
+.storageBox,
+.lootColumn,
+.traderLeft,
+.traderRight{
+    box-shadow:inset 0 0 22px #0008;
+}
+
+.slot{
+    background:
+        linear-gradient(135deg,rgba(255,255,255,.03),transparent 45%),
+        #1b221d;
+    border-color:#465246;
+}
+
+.slot:hover{
+    border-color:#c0a760;
+    box-shadow:0 0 14px rgba(216,187,104,.18);
+}
 @media(max-width:820px){#lootPanel .lootColumns{grid-template-columns:1fr;}#lootPanel .lootColumn .grid{grid-template-columns:repeat(5,1fr)}#mainMenu .menu{left:24px;top:30px;max-width:calc(100% - 48px)}}
 
 /* Main-menu VHS backdrop */
@@ -537,6 +1307,89 @@ body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
     z-index:3;
 }
 
+/* Menu and raid setup revamp */
+#mainMenu .menu{
+    top:52px;
+    width:430px;
+    padding:22px 32px 20px;
+    border-left:2px solid rgba(212,220,190,.35);
+    background:linear-gradient(90deg,rgba(5,8,6,.42),rgba(5,8,6,.08));
+}
+
+#mainMenu .menu h1{
+    font-size:52px;
+    line-height:.95;
+    letter-spacing:9px;
+    text-shadow:0 0 18px rgba(216,217,206,.18);
+}
+
+#mainMenu .menu p{
+    margin-bottom:34px;
+    color:#b8c0b0;
+}
+
+#mainMenu .menu button{
+    height:56px;
+    margin:8px 0;
+    background:rgba(20,27,22,.82);
+    border-left:4px solid #687563;
+    border-bottom:1px solid rgba(207,212,190,.2);
+    box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+
+#mainMenu .menu button:first-of-type{
+    border-left-color:#d8bb68;
+    background:rgba(34,40,30,.9);
+}
+
+.menuIntel{
+    position:absolute;
+    z-index:2;
+    right:72px;
+    bottom:58px;
+    width:330px;
+    padding:20px;
+    background:rgba(7,10,8,.62);
+    border:1px solid rgba(189,204,167,.22);
+    box-shadow:0 20px 70px rgba(0,0,0,.35);
+}
+
+.intelLabel{
+    color:#d8bb68;
+    font-size:10px;
+    letter-spacing:2px;
+}
+
+.menuIntel h2{
+    margin:8px 0 8px;
+    font-size:22px;
+    letter-spacing:2px;
+}
+
+.menuIntel p{
+    color:#aeb7a9;
+    font-size:12px;
+    line-height:1.45;
+}
+
+.intelGrid{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:8px 16px;
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid rgba(189,204,167,.18);
+    font-size:11px;
+}
+
+.intelGrid span{
+    color:#808a7e;
+}
+
+.intelGrid b{
+    color:#d6d9ce;
+}
+
 #mainMenu .menu h1{
     color:#e3e4d8;
     text-shadow:0 2px 0 #000,0 0 18px rgba(0,255,102,.14);
@@ -578,6 +1431,60 @@ body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
         <button id="openTraders">$ &nbsp; TRADERS</button>
 
         <div class="menuMeta">DEPLOYMENT READY &nbsp; • &nbsp; PMC ONLINE<br>VERSION 0.4 &nbsp; • &nbsp; LOCAL RAID SIMULATION</div>
+
+    </div>
+
+    <div class="menuIntel">
+        <div class="intelLabel">ACTIVE CONTRACT</div>
+        <h2>STREETS OF BROWZ</h2>
+        <p>Deploy into Ezra Town at night, clear stairwell buildings, grab upper-floor loot, and extract alive.</p>
+        <div class="intelGrid">
+            <span>INSURANCE</span><b>OFFLINE</b>
+            <span>BLACKSITE</span><b>LOCKED</b>
+            <span>RAID CLOCK</span><b>LIVE</b>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ================= RAID SETUP ================= -->
+
+<div id="raidSetupPanel" class="hidden">
+
+    <div class="raidSetupInner">
+
+        <div class="raidSetupHeader">
+            <h1>PREPARE TO ESCAPE</h1>
+            <p>EZRA TOWN NIGHT DEPLOYMENT</p>
+        </div>
+
+        <div class="raidMapPane">
+            <div class="raidMapRoute"></div>
+            <button class="mapChoice active" data-map="ezra">EZRA TOWN</button>
+        </div>
+
+        <div class="raidMapInfo">
+            <div class="raidPreview"></div>
+            <h2 id="selectedMapName">Ezra Town</h2>
+            <div id="selectedMapSubtitle" class="mapSubtitle">Streets of Browz</div>
+            <p id="selectedMapDescription"></p>
+            <div class="raidStats">
+                <span id="selectedRaidTime">35 MIN</span>
+                <span id="selectedRaidRisk">RISK: HIGH</span>
+                <span id="selectedRaidScavs">SCAVS: 9-12</span>
+            </div>
+            <div id="selectedLoadoutStatus" class="loadoutStatus"></div>
+            <div class="timeChooser">
+                <button class="timeButton" data-time="day">DAY RAID</button>
+                <button class="timeButton active" data-time="night">NIGHT RAID</button>
+            </div>
+        </div>
+
+        <div class="raidSetupActions">
+            <button id="raidSetupBack">BACK</button>
+            <button id="raidSetupReady">READY</button>
+        </div>
 
     </div>
 
@@ -740,23 +1647,23 @@ body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
         Cash: $<span id="cash">2500</span>
     </h2>
 
-    <button onclick="selectTrader('scav')">
-        SCAVENGER
-    </button>
+    <div id="traderTabs" class="traderTabs"></div>
 
-    <button onclick="selectTrader('medic')">
-        FIELD MEDIC
-    </button>
+    <div class="traderWorkspace">
 
-    <button onclick="selectTrader('quartermaster')">
-        QUARTERMASTER
-    </button>
+        <div class="traderLeft">
+            <h2 id="traderName"></h2>
+            <p id="traderDescription"></p>
+            <div id="traderRep" class="traderRep"></div>
+            <div id="trades"></div>
+        </div>
 
-    <h2 id="traderName"></h2>
+        <div class="traderRight">
+            <h2>STASH TURN-INS</h2>
+            <div id="traderTasks"></div>
+        </div>
 
-    <p id="traderDescription"></p>
-
-    <div id="trades"></div>
+    </div>
 
 </div>
 
@@ -834,6 +1741,27 @@ body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
 </div>
 
 
+<!-- ================= ITEM INSPECT ================= -->
+
+<div id="inspectPanel" class="hidden">
+    <div class="inspectTop">
+        <img id="inspectIcon" alt="">
+        <div>
+            <h2 id="inspectName"></h2>
+            <div id="inspectType"></div>
+        </div>
+    </div>
+    <p id="inspectDescription"></p>
+    <div id="inspectStats" class="inspectStats"></div>
+    <button id="closeInspect">CLOSE</button>
+</div>
+
+<div id="magLoadOverlay" class="hidden">
+    <div id="magLoadText">LOADING MAGAZINE</div>
+    <div class="magLoadBar"><span id="magLoadProgress"></span></div>
+</div>
+
+
 <!-- ================= HEALTH ================= -->
 
 <div id="healthPanel" class="hidden">
@@ -856,13 +1784,12 @@ body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
 
 <div id="hud"></div>
 
-<div id="weaponBar">
-    1 Primary &nbsp; 2 Secondary &nbsp; R Reload
-</div>
+<div id="weaponBar"></div>
+<div id="bodyHud"></div>
 
 <div id="help">
     WASD Move • Mouse Aim • Left Click Shoot •
-    E Loot • F Quick Loot • I Inventory • H Health • R Reload •
+    E Loot • F Quick Loot • I Inventory • H Health • R Reload • 2/3 Weapons •
     Right Click Drop
 </div>
 
@@ -1290,11 +2217,38 @@ const player = {
     kills:0,
 
     weapon:"Pistol",
+    weaponSlot:"secondary",
 
     magazine:12,
 
+    floor:0,
+    building:null,
+    walkPhase:0,
+
     spawnProtection:300
 
+};
+
+let selectedRaidMap="ezra";
+let selectedRaidTime="night";
+
+const raidMapData={
+    ezra:{
+        name:"Ezra Town",
+        subtitle:"Streets of Browz",
+        description:"A brutal night raid through the Streets of Browz: tight alleys, apartment blocks, stairwells, rooftops, storefronts and scattered loot rooms.",
+        minutes:45,
+        risk:"INSANE",
+        scavs:"14-20",
+        spawns:[
+            {name:"Canal Underpass",x:280,y:2260},
+            {name:"Old Pawn Alley",x:430,y:1120},
+            {name:"Market Bus Stop",x:1120,y:260},
+            {name:"Depot Wall",x:2780,y:300},
+            {name:"Canal Flats",x:3420,y:950},
+            {name:"South Service Road",x:2180,y:2440}
+        ]
+    }
 };
 
 
@@ -1445,6 +2399,8 @@ function receiveDamage(damage){
         damage
     );
 
+    playSound("hit");
+
     /*
        Thorax/head blacked:
        player dies.
@@ -1474,14 +2430,82 @@ const mouse={
     down:false
 };
 
+let audioCtx=null;
+
+function initAudio(){
+    if(!audioCtx){
+        audioCtx=new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+    }
+
+    if(audioCtx.state==="suspended"){
+        audioCtx.resume();
+    }
+}
+
+function playTone(freq,duration=.08,type="square",gain=.04,slide=0){
+    if(!audioCtx)
+        return;
+
+    const osc=audioCtx.createOscillator();
+    const amp=audioCtx.createGain();
+    const now=audioCtx.currentTime;
+
+    osc.type=type;
+    osc.frequency.setValueAtTime(freq,now);
+
+    if(slide){
+        osc.frequency.exponentialRampToValueAtTime(
+            Math.max(20,freq+slide),
+            now+duration
+        );
+    }
+
+    amp.gain.setValueAtTime(gain,now);
+    amp.gain.exponentialRampToValueAtTime(.001,now+duration);
+
+    osc.connect(amp);
+    amp.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now+duration);
+}
+
+function playSound(name){
+    initAudio();
+
+    if(name==="shot"){
+        playTone(92,.055,"sawtooth",.07,-45);
+        playTone(480,.025,"square",.035,-180);
+    }else if(name==="reload"){
+        playTone(190,.045,"triangle",.035,-45);
+        setTimeout(()=>playTone(260,.04,"triangle",.035,-60),110);
+    }else if(name==="loot"){
+        playTone(320,.04,"triangle",.025,-80);
+    }else if(name==="stair"){
+        playTone(140,.07,"triangle",.035,-20);
+        setTimeout(()=>playTone(115,.07,"triangle",.03,-15),90);
+    }else if(name==="hit"){
+        playTone(70,.08,"sawtooth",.055,-30);
+    }
+}
+
 
 addEventListener(
     "keydown",
     e=>{
+        initAudio();
 
         keys[
             e.key.toLowerCase()
         ]=true;
+
+        if(e.key==="Escape"){
+            document.getElementById("inspectPanel").classList.add("hidden");
+            stopMagLoad();
+            stopTimedAction();
+        }
 
         if(
             e.key.toLowerCase()==="i" &&
@@ -1511,6 +2535,15 @@ addEventListener(
         }
 
         if(
+            e.key.toLowerCase()==="f" &&
+            raidRunning
+        ){
+
+            quickLoot();
+
+        }
+
+        if(
             e.key.toLowerCase()==="r" &&
             raidRunning
         ){
@@ -1524,9 +2557,7 @@ addEventListener(
             raidRunning
         ){
 
-            equipRaidWeapon(
-                "primary"
-            );
+            handleHotbarKey(e.key);
 
         }
 
@@ -1536,8 +2567,36 @@ addEventListener(
         ){
 
             equipRaidWeapon(
+                "primary"
+            );
+
+        }
+
+        if(
+            e.key==="3" &&
+            raidRunning
+        ){
+
+            equipRaidWeapon(
                 "secondary"
             );
+
+        }
+
+        if(
+            (
+                e.key==="4" ||
+                e.key==="5" ||
+                e.key==="6" ||
+                e.key==="7" ||
+                e.key==="8" ||
+                e.key==="9" ||
+                e.key==="0"
+            ) &&
+            raidRunning
+        ){
+
+            handleHotbarKey(e.key);
 
         }
 
@@ -1569,9 +2628,21 @@ canvas.addEventListener(
 canvas.addEventListener(
     "mousedown",
     e=>{
+        initAudio();
 
-        if(e.button===0)
+        if(e.button===0){
             mouse.down=true;
+
+            if(
+                raidRunning &&
+                shootingCooldown<=0
+            ){
+                if(shoot()){
+                    shootingCooldown=
+                        guns[player.weapon]?.fireRate || 10;
+                }
+            }
+        }
 
     }
 );
@@ -1599,7 +2670,8 @@ const guns={
         fireRate:16,
         bulletSpeed:15,
         magazine:12,
-        ammoType:"Ammo9"
+        ammoType:"Ammo9",
+        magType:"Pistol9Mag"
     },
 
     M4:{
@@ -1607,7 +2679,8 @@ const guns={
         fireRate:6,
         bulletSpeed:17,
         magazine:30,
-        ammoType:"Ammo556"
+        ammoType:"Ammo556",
+        magType:"Gen3M4Mag"
     },
 
     Sniper:{
@@ -1615,9 +2688,31 @@ const guns={
         fireRate:55,
         bulletSpeed:24,
         magazine:5,
-        ammoType:"Ammo762"
+        ammoType:"Ammo762",
+        magType:"Sniper762Mag"
     }
 
+};
+
+const magazines={
+    Pistol9Mag:{
+        label:"9mm Pistol Mag",
+        gun:"Pistol",
+        ammoType:"Ammo9",
+        capacity:12
+    },
+    Gen3M4Mag:{
+        label:"M4 Gen 3 PMAG",
+        gun:"M4",
+        ammoType:"Ammo556",
+        capacity:30
+    },
+    Sniper762Mag:{
+        label:"7.62 Sniper Mag",
+        gun:"Sniper",
+        ammoType:"Ammo762",
+        capacity:5
+    }
 };
 
 
@@ -1630,10 +2725,17 @@ const itemValues={
     Ammo9:25,
     Ammo556:45,
     Ammo762:55,
+    Pistol9Mag:180,
+    Gen3M4Mag:420,
+    Sniper762Mag:360,
 
     Bandage:100,
     Medkit:450,
+    SurgicalKit:1200,
     Painkillers:250,
+    Bolts:220,
+    Screws:180,
+    Wires:260,
 
     Food:80,
     Water:60,
@@ -1645,7 +2747,9 @@ const itemValues={
     Battery:150,
     CPU:1800,
     GPU:6500,
+    AdvancedGPU:9800,
     SSD:900,
+    MilitarySSD:2400,
 
     FlashDrive:1200,
     Phone:300,
@@ -1668,10 +2772,17 @@ const itemColors={
     Ammo9:"#c5a769",
     Ammo556:"#b99a58",
     Ammo762:"#a27e45",
+    Pistol9Mag:"#303733",
+    Gen3M4Mag:"#343a32",
+    Sniper762Mag:"#2c302c",
 
     Bandage:"#ddd0aa",
     Medkit:"#e1e1e1",
+    SurgicalKit:"#d8c7aa",
     Painkillers:"#d0d0c4",
+    Bolts:"#9a9f93",
+    Screws:"#b2aa91",
+    Wires:"#b35f54",
 
     Food:"#c38d57",
     Water:"#5d99b0",
@@ -1684,7 +2795,9 @@ const itemColors={
 
     CPU:"#a76ad2",
     GPU:"#51956c",
+    AdvancedGPU:"#46c783",
     SSD:"#777",
+    MilitarySSD:"#6f7782",
 
     FlashDrive:"#bda35a",
     Phone:"#5a6d78",
@@ -1699,6 +2812,43 @@ const itemColors={
     M4:"#242723",
     Sniper:"#20211e"
 
+};
+
+
+const itemDescriptions={
+    Ammo9:"Loose 9x19mm rounds used to top off pistol magazines. Cheap, common, and always welcome when the raid goes sideways.",
+    Ammo556:"5.56 rifle cartridges for M4-pattern magazines. Reliable mid-tier rifle ammo for clearing streets and stairwells.",
+    Ammo762:"Heavy 7.62 rounds for precision rifles. Slow to load, loud to fire, nasty when it connects.",
+    Pistol9Mag:"A compact pistol magazine loaded with 9mm rounds.",
+    Gen3M4Mag:"A polymer Gen 3 magazine built for M4 rifles. Drag 5.56 ammo onto it to load rounds one by one.",
+    Sniper762Mag:"A low-capacity 7.62 rifle magazine for the sniper platform.",
+    Bandage:"Field dressing for stopping bleeding and patching small wounds.",
+    Medkit:"A compact trauma kit with limited durability. It heals damaged body parts over time but cannot repair blacked limbs.",
+    SurgicalKit:"A slow field surgery kit. Takes 10 seconds and restores one blacked body part enough for medkits to heal it.",
+    Painkillers:"Fast pain relief that keeps you moving when your body wants to quit.",
+    Bolts:"Loose hardware scavenged from apartments, shops, and tool boxes. Traders often want these.",
+    Screws:"Small fasteners used for repairs and trader turn-ins.",
+    Wires:"Bundled electrical wiring. Useful for power tasks and barter work.",
+    Food:"Shelf-stable food. Not fancy, but better than starving in Ezra Town.",
+    Water:"A sealed water bottle for hydration during long raids.",
+    Armor:"Basic torso protection. Heavy, ugly, and better than getting folded instantly.",
+    Helmet:"Head protection against lucky fragments and bad decisions.",
+    Backpack:"Storage for raid loot. Bigger bag, bigger greed.",
+    Battery:"A compact battery pack used for electronics and trader jobs.",
+    CPU:"Computer processor pulled from office machines.",
+    GPU:"High-value graphics card prized by tech traders.",
+    AdvancedGPU:"Rare high-end graphics card from protected Blacksite systems.",
+    SSD:"Small data drive with recoverable files.",
+    MilitarySSD:"Rugged encrypted data drive from security terminals.",
+    FlashDrive:"Portable storage with information traders will pay for.",
+    Phone:"A battered smartphone with parts and data value.",
+    Key:"A simple mechanical key for locked rooms.",
+    Keycard:"A Blacksite access card. Risky to carry, valuable if you reach the right door.",
+    GoldWatch:"A luxury watch that still ticks. Traders love this stuff.",
+    Jewelry:"Small valuables that survive even when their owners do not.",
+    Pistol:"A sidearm. Light, dependable, and usually what saves you when the rifle runs dry.",
+    M4:"A modular 5.56 rifle. Uses Gen 3 M4 magazines.",
+    Sniper:"A scoped rifle for long alleys and rooftop angles."
 };
 
 
@@ -1724,22 +2874,61 @@ function makeIcon(name){
         itemColors[name]||"#aaa";
 
 
-    if(
+    if(magazines[name]){
+        const mag=magazines[name];
+
+        x.fillStyle="#151915";
+        x.fillRect(17,9,24,47);
+        x.fillStyle=itemColors[name]||"#333";
+        x.beginPath();
+        x.moveTo(20,9);
+        x.lineTo(42,13);
+        x.lineTo(38,56);
+        x.lineTo(18,53);
+        x.closePath();
+        x.fill();
+        x.fillStyle="#6e796d";
+        x.fillRect(22,17,14,4);
+        x.fillRect(21,28,15,4);
+        x.fillRect(20,39,15,4);
+        x.fillStyle="#d8bb68";
+        x.font="bold 9px Arial";
+        x.textAlign="center";
+        x.fillText(
+            mag.gun==="M4"
+            ?"GEN3"
+            :mag.ammoType.replace("Ammo",""),
+            31,
+            51
+        );
+    }
+
+    else if(
         name.startsWith("Ammo")
     ){
 
+        x.fillStyle="#11140f";
+        x.fillRect(8,10,48,44);
+
         for(
             let i=0;
-            i<4;
+            i<5;
             i++
         ){
 
+            x.fillStyle="#a17b43";
             x.fillRect(
-                13+i*11,
-                13,
-                7,
-                39
+                10+i*9,
+                18,
+                6,
+                30
             );
+            x.fillStyle="#d8c074";
+            x.beginPath();
+            x.moveTo(10+i*9,18);
+            x.lineTo(13+i*9,10);
+            x.lineTo(16+i*9,18);
+            x.fill();
 
         }
 
@@ -1749,13 +2938,17 @@ function makeIcon(name){
         name==="Pistol"
     ){
 
-        x.fillRect(
-            7,25,47,8
-        );
-
-        x.fillRect(
-            20,32,10,21
-        );
+        x.fillStyle="#101310";
+        x.fillRect(9,25,37,9);
+        x.fillRect(42,27,12,4);
+        x.fillStyle="#2f342f";
+        x.fillRect(15,21,30,6);
+        x.fillStyle="#1a1d1a";
+        x.fillRect(22,33,10,20);
+        x.fillStyle="#3d433d";
+        x.fillRect(18,31,18,5);
+        x.fillStyle="#888";
+        x.fillRect(13,24,6,2);
 
     }
 
@@ -1763,17 +2956,23 @@ function makeIcon(name){
         name==="M4"
     ){
 
-        x.fillRect(
-            6,27,52,7
-        );
-
-        x.fillRect(
-            37,23,16,6
-        );
-
-        x.fillRect(
-            20,34,8,20
-        );
+        x.fillStyle="#111511";
+        x.fillRect(5,27,38,8);
+        x.fillRect(41,29,17,4);
+        x.fillRect(2,30,11,5);
+        x.fillStyle="#2f352f";
+        x.fillRect(17,22,26,5);
+        x.fillRect(24,35,7,18);
+        x.fillStyle="#1d221d";
+        x.beginPath();
+        x.moveTo(35,35);
+        x.lineTo(45,38);
+        x.lineTo(43,53);
+        x.lineTo(34,50);
+        x.closePath();
+        x.fill();
+        x.fillStyle="#546054";
+        x.fillRect(8,20,16,5);
 
     }
 
@@ -1781,13 +2980,19 @@ function makeIcon(name){
         name==="Sniper"
     ){
 
-        x.fillRect(
-            4,27,56,6
-        );
-
-        x.fillRect(
-            24,21,30,5
-        );
+        x.fillStyle="#151815";
+        x.fillRect(4,28,42,7);
+        x.fillRect(44,30,17,3);
+        x.fillStyle="#5f4936";
+        x.fillRect(7,35,22,8);
+        x.fillRect(4,24,15,5);
+        x.fillStyle="#202620";
+        x.fillRect(25,21,24,5);
+        x.beginPath();
+        x.arc(35,20,6,0,Math.PI*2);
+        x.strokeStyle="#202620";
+        x.lineWidth=3;
+        x.stroke();
 
     }
 
@@ -1813,6 +3018,67 @@ function makeIcon(name){
 
     }
 
+    else if(name==="SurgicalKit"){
+        x.fillStyle="#cbb991";
+        x.fillRect(11,18,42,30);
+        x.fillStyle="#3a3126";
+        x.fillRect(18,24,28,5);
+        x.fillRect(18,36,28,5);
+        x.strokeStyle="#ece0bf";
+        x.lineWidth=3;
+        x.beginPath();
+        x.moveTo(23,14);
+        x.lineTo(41,14);
+        x.stroke();
+        x.fillStyle="#8d3931";
+        x.fillRect(29,25,6,18);
+        x.fillRect(23,31,18,6);
+    }
+
+    else if(name==="Bandage"){
+        x.fillStyle="#d9d0b6";
+        x.fillRect(13,20,38,25);
+        x.fillStyle="#8d3931";
+        x.fillRect(27,18,10,29);
+        x.fillRect(18,28,28,8);
+        x.strokeStyle="#807967";
+        x.strokeRect(13,20,38,25);
+    }
+
+    else if(name==="Painkillers"){
+        x.fillStyle="#d7d2bd";
+        x.fillRect(18,12,28,42);
+        x.fillStyle="#8f2525";
+        x.fillRect(18,20,28,12);
+        x.fillStyle="#ece7d6";
+        x.fillRect(23,37,18,9);
+        x.fillStyle="#111";
+        x.font="bold 8px Arial";
+        x.textAlign="center";
+        x.fillText("PK",32,29);
+    }
+
+    else if(name==="Food"){
+        x.fillStyle="#7b4c2e";
+        x.fillRect(17,14,30,40);
+        x.fillStyle="#d89d54";
+        x.fillRect(17,14,30,9);
+        x.fillRect(17,43,30,11);
+        x.fillStyle="#f0c76b";
+        x.beginPath();
+        x.arc(32,33,9,0,Math.PI*2);
+        x.fill();
+    }
+
+    else if(name==="Water"){
+        x.fillStyle="#719eb5";
+        x.fillRect(22,15,20,40);
+        x.fillStyle="#d6eef5";
+        x.fillRect(25,24,14,16);
+        x.fillStyle="#3f6170";
+        x.fillRect(25,10,14,7);
+    }
+
     else if(
         name==="Armor"
     ){
@@ -1828,6 +3094,192 @@ function makeIcon(name){
         x.closePath();
         x.fill();
 
+    }
+
+    else if(name==="Helmet"){
+        x.fillStyle="#4a574d";
+        x.beginPath();
+        x.arc(32,31,20,Math.PI,0);
+        x.lineTo(52,39);
+        x.lineTo(12,39);
+        x.closePath();
+        x.fill();
+        x.fillStyle="#222922";
+        x.fillRect(17,37,30,8);
+        x.fillStyle="#788374";
+        x.fillRect(25,18,14,5);
+    }
+
+    else if(name==="Backpack"){
+        x.fillStyle="#4f4638";
+        x.fillRect(16,17,32,38);
+        x.fillStyle="#2d291f";
+        x.fillRect(20,11,24,10);
+        x.fillRect(20,31,24,5);
+        x.strokeStyle="#908062";
+        x.strokeRect(16,17,32,38);
+    }
+
+    else if(name==="Battery"){
+        x.fillStyle="#4d6b3d";
+        x.fillRect(14,18,36,32);
+        x.fillStyle="#26331f";
+        x.fillRect(22,13,8,6);
+        x.fillRect(35,13,8,6);
+        x.fillStyle="#d2d0aa";
+        x.fillRect(22,32,20,5);
+    }
+
+    else if(name==="CPU"){
+        x.fillStyle="#5a356e";
+        x.fillRect(16,16,32,32);
+        x.fillStyle="#b67be0";
+        x.fillRect(23,23,18,18);
+        x.strokeStyle="#d8b6ef";
+        for(let i=0;i<5;i++){
+            x.beginPath();
+            x.moveTo(12,18+i*7);
+            x.lineTo(16,18+i*7);
+            x.moveTo(48,18+i*7);
+            x.lineTo(52,18+i*7);
+            x.stroke();
+        }
+    }
+
+    else if(name==="GPU"){
+        x.fillStyle="#244c34";
+        x.fillRect(8,19,48,26);
+        x.fillStyle="#5fa66d";
+        x.beginPath();
+        x.arc(25,32,9,0,Math.PI*2);
+        x.arc(42,32,9,0,Math.PI*2);
+        x.fill();
+        x.fillStyle="#121812";
+        x.beginPath();
+        x.arc(25,32,4,0,Math.PI*2);
+        x.arc(42,32,4,0,Math.PI*2);
+        x.fill();
+    }
+
+    else if(name==="SSD"){
+        x.fillStyle="#5d6363";
+        x.fillRect(15,16,34,40);
+        x.fillStyle="#9ea3a0";
+        x.fillRect(20,22,24,12);
+        x.fillStyle="#242a27";
+        x.fillRect(22,42,20,5);
+    }
+
+    else if(name==="FlashDrive"){
+        x.fillStyle="#272b26";
+        x.fillRect(17,25,30,15);
+        x.fillStyle="#bda35a";
+        x.fillRect(43,28,10,9);
+        x.fillStyle="#d8c17a";
+        x.fillRect(22,28,13,9);
+    }
+
+    else if(name==="Phone"){
+        x.fillStyle="#20282d";
+        x.fillRect(20,10,24,44);
+        x.fillStyle="#5c7784";
+        x.fillRect(23,15,18,32);
+        x.fillStyle="#111";
+        x.beginPath();
+        x.arc(32,51,2,0,Math.PI*2);
+        x.fill();
+    }
+
+    else if(name==="Key"){
+        x.strokeStyle="#c1a466";
+        x.lineWidth=5;
+        x.beginPath();
+        x.arc(24,26,9,0,Math.PI*2);
+        x.moveTo(32,31);
+        x.lineTo(52,48);
+        x.lineTo(47,51);
+        x.moveTo(43,41);
+        x.lineTo(39,46);
+        x.stroke();
+    }
+
+    else if(name==="Keycard"){
+        x.fillStyle="#cfd2d1";
+        x.fillRect(10,18,44,30);
+        x.fillStyle="#1c221e";
+        x.fillRect(15,24,17,9);
+        x.fillStyle="#b6a05f";
+        x.fillRect(36,36,11,6);
+    }
+
+    else if(name==="GoldWatch"){
+        x.fillStyle="#8a6c24";
+        x.fillRect(28,9,8,14);
+        x.fillRect(28,41,8,14);
+        x.fillStyle="#d0a943";
+        x.beginPath();
+        x.arc(32,32,14,0,Math.PI*2);
+        x.fill();
+        x.fillStyle="#1a1710";
+        x.beginPath();
+        x.arc(32,32,8,0,Math.PI*2);
+        x.fill();
+    }
+
+    else if(name==="Jewelry"){
+        x.strokeStyle="#c4d0d8";
+        x.lineWidth=4;
+        x.beginPath();
+        x.arc(32,35,16,0,Math.PI*2);
+        x.stroke();
+        x.fillStyle="#8bd0f1";
+        x.beginPath();
+        x.moveTo(32,12);
+        x.lineTo(42,25);
+        x.lineTo(22,25);
+        x.closePath();
+        x.fill();
+    }
+
+    else if(name==="Bolts"){
+        x.fillStyle="#9a9f93";
+        for(let i=0;i<3;i++){
+            x.beginPath();
+            x.arc(20+i*12,28+i%2*10,7,0,Math.PI*2);
+            x.fill();
+            x.fillStyle="#313831";
+            x.beginPath();
+            x.arc(20+i*12,28+i%2*10,3,0,Math.PI*2);
+            x.fill();
+            x.fillStyle="#9a9f93";
+        }
+    }
+
+    else if(name==="Screws"){
+        x.strokeStyle="#b2aa91";
+        x.lineWidth=5;
+        for(let i=0;i<3;i++){
+            x.beginPath();
+            x.moveTo(17+i*13,17);
+            x.lineTo(25+i*13,48);
+            x.stroke();
+            x.fillStyle="#b2aa91";
+            x.beginPath();
+            x.arc(17+i*13,17,5,0,Math.PI*2);
+            x.fill();
+        }
+    }
+
+    else if(name==="Wires"){
+        const colors=["#b35f54","#5c7ea0","#c8a95b"];
+        colors.forEach((color,i)=>{
+            x.strokeStyle=color;
+            x.lineWidth=4;
+            x.beginPath();
+            x.moveTo(10,22+i*9);
+            x.bezierCurveTo(25,8+i*12,39,52-i*8,54,27+i*5);
+            x.stroke();
+        });
     }
 
     else{
@@ -1849,6 +3301,136 @@ Object.keys(itemValues)
         icons[n]=makeIcon(n);
     }
 );
+
+function getItemType(name){
+    if(magazines[name])return "Magazine";
+    if(name.startsWith("Ammo"))return "Ammunition";
+    if(guns[name])return "Weapon";
+    if(["Armor","Helmet","Backpack"].includes(name))return "Equipment";
+    if(["Bandage","Medkit","SurgicalKit","Painkillers"].includes(name))return "Medical";
+    if(["Bolts","Screws","Wires","Battery","CPU","GPU","AdvancedGPU","SSD","MilitarySSD"].includes(name))return "Technical loot";
+    if(["GoldWatch","Jewelry","Phone","FlashDrive"].includes(name))return "Valuable";
+    if(["Key","Keycard"].includes(name))return "Access item";
+    return "Loot";
+}
+
+function getInspectStats(item){
+    const stats=[
+        ["Value","$"+(itemValues[item.name] || 0)],
+        ["Stack",item.qty || 1]
+    ];
+
+    if(magazines[item.name]){
+        const mag=magazines[item.name];
+        stats.push(["Weapon",mag.gun]);
+        stats.push(["Ammo",mag.ammoType.replace("Ammo","")]);
+        stats.push(["Loaded",(item.ammo || 0)+"/"+mag.capacity]);
+    }
+
+    if(guns[item.name]){
+        const gun=guns[item.name];
+        stats.push(["Ammo",gun.ammoType.replace("Ammo","")]);
+        stats.push(["Magazine",magazines[gun.magType]?.label || gun.magType]);
+    }
+
+    if(item.name==="Medkit"){
+        stats.push(["Durability",(item.durability || 100)+"%"]);
+    }
+
+    if(item.name==="SurgicalKit"){
+        stats.push(["Use time","10 seconds"]);
+    }
+
+    return stats;
+}
+
+function inspectItem(item){
+    if(!item)
+        return;
+
+    const panel=document.getElementById("inspectPanel");
+    document.getElementById("inspectIcon").src=icons[item.name] || makeIcon(item.name);
+    document.getElementById("inspectName").textContent=item.name;
+    document.getElementById("inspectType").textContent=getItemType(item.name);
+    document.getElementById("inspectDescription").textContent=
+        itemDescriptions[item.name] ||
+        "A recovered raid item. Someone in Ezra Town probably wants it.";
+
+    const stats=document.getElementById("inspectStats");
+    stats.innerHTML="";
+
+    getInspectStats(item).forEach(
+        ([label,value])=>{
+            const stat=document.createElement("div");
+            stat.textContent=label+": "+value;
+            stats.appendChild(stat);
+        }
+    );
+
+    panel.classList.remove("hidden");
+}
+
+let inspectDrag=null;
+
+function setupInspectDrag(){
+    const panel=document.getElementById("inspectPanel");
+    const handle=panel.querySelector(".inspectTop");
+
+    handle.addEventListener(
+        "mousedown",
+        e=>{
+            if(e.button!==0)
+                return;
+
+            const rect=panel.getBoundingClientRect();
+            panel.style.left=rect.left+"px";
+            panel.style.top=rect.top+"px";
+            panel.style.transform="none";
+
+            inspectDrag={
+                offsetX:e.clientX-rect.left,
+                offsetY:e.clientY-rect.top
+            };
+
+            e.preventDefault();
+        }
+    );
+
+    addEventListener(
+        "mousemove",
+        e=>{
+            if(!inspectDrag)
+                return;
+
+            panel.style.left=
+                Math.max(
+                    8,
+                    Math.min(
+                        innerWidth-panel.offsetWidth-8,
+                        e.clientX-inspectDrag.offsetX
+                    )
+                )+"px";
+
+            panel.style.top=
+                Math.max(
+                    8,
+                    Math.min(
+                        innerHeight-panel.offsetHeight-8,
+                        e.clientY-inspectDrag.offsetY
+                    )
+                )+"px";
+        }
+    );
+
+    addEventListener(
+        "mouseup",
+        ()=>{
+            inspectDrag=null;
+        }
+    );
+}
+
+setupInspectDrag();
 
 
 /* =========================================================
@@ -1888,23 +3470,27 @@ stash[1]={
 };
 
 stash[2]={
-    name:"Ammo556",
-    qty:180
+    name:"Gen3M4Mag",
+    qty:1,
+    ammo:30
 };
 
 stash[3]={
-    name:"Ammo9",
-    qty:120
+    name:"Gen3M4Mag",
+    qty:1,
+    ammo:30
 };
 
 stash[4]={
-    name:"Ammo762",
-    qty:60
+    name:"Pistol9Mag",
+    qty:1,
+    ammo:12
 };
 
 stash[5]={
     name:"Medkit",
-    qty:2
+    qty:1,
+    durability:100
 };
 
 stash[6]={
@@ -1927,12 +3513,48 @@ stash[9]={
     qty:1
 };
 
+stash[10]={
+    name:"Bolts",
+    qty:2
+};
+
+stash[11]={
+    name:"Screws",
+    qty:3
+};
+
+stash[12]={
+    name:"SurgicalKit",
+    qty:1,
+    durability:1
+};
+
 
 /* =========================================================
    DRAG SYSTEM
 ========================================================= */
 
 let dragged=null;
+let hoveredHotbarItem=null;
+let hoveredLootSlot=null;
+let magLoadTimer=null;
+let activeActionTimer=null;
+let activeActionName=null;
+
+const hotbarKeys=[
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "0"
+];
+
+const hotbarAssignments={};
 
 
 function createSlot(
@@ -1950,6 +3572,28 @@ function createSlot(
     if(item){
 
         slot.draggable=true;
+
+        slot.addEventListener(
+            "mouseenter",
+            ()=>{
+                if(type==="inventory"){
+                    hoveredHotbarItem={array,index,type};
+                }
+            }
+        );
+
+        slot.addEventListener(
+            "mouseleave",
+            ()=>{
+                if(
+                    hoveredHotbarItem &&
+                    hoveredHotbarItem.array===array &&
+                    hoveredHotbarItem.index===index
+                ){
+                    hoveredHotbarItem=null;
+                }
+            }
+        );
 
         const img=
             document.createElement("img");
@@ -1979,6 +3623,49 @@ function createSlot(
             slot.appendChild(qty);
 
         }
+
+        if(magazines[item.name]){
+            const ammo=
+                document.createElement("div");
+
+            ammo.className="qty";
+            ammo.style.top="auto";
+            ammo.style.bottom="3px";
+            ammo.textContent=
+                (item.ammo || 0)+
+                "/"+
+                magazines[item.name].capacity;
+
+            slot.appendChild(ammo);
+        }
+
+        if(item.name==="Medkit" || item.name==="SurgicalKit"){
+            const dur=document.createElement("div");
+            dur.className="qty";
+            dur.style.top="auto";
+            dur.style.bottom="3px";
+            dur.textContent=
+                item.name==="SurgicalKit"
+                ? "SURG"
+                : (item.durability || 100)+"%";
+            slot.appendChild(dur);
+        }
+
+        if(type==="inventory"){
+            const boundKey=getHotbarKeyForInventoryIndex(index,item.name);
+
+            if(boundKey){
+                const badge=document.createElement("div");
+                badge.className="hotbarBadge";
+                badge.textContent=boundKey;
+                slot.appendChild(badge);
+            }
+        }
+
+        slot.addEventListener(
+            "dblclick",
+            ()=>inspectItem(item)
+        );
 
 
         slot.addEventListener(
@@ -2252,12 +3939,179 @@ function equipItemFromDrag(
 
     renderStorage();
 
+    if(
+        raidRunning &&
+        isRaidInventoryOpen()
+    ){
+        renderRaidInventory();
+    }
+
 }
 
 
 /* =========================================================
    MOVE ITEMS
 ========================================================= */
+
+function stopMagLoad(){
+    if(magLoadTimer){
+        clearInterval(magLoadTimer);
+        magLoadTimer=null;
+    }
+
+    document
+        .getElementById("magLoadOverlay")
+        .classList.add("hidden");
+}
+
+function stopTimedAction(){
+    if(activeActionTimer){
+        clearInterval(activeActionTimer);
+        activeActionTimer=null;
+    }
+
+    activeActionName=null;
+
+    document
+        .getElementById("magLoadOverlay")
+        .classList.add("hidden");
+}
+
+function startTimedAction(name,label,duration,onComplete){
+    if(activeActionTimer || magLoadTimer){
+        showMessage("BUSY");
+        return false;
+    }
+
+    const overlay=document.getElementById("magLoadOverlay");
+    const text=document.getElementById("magLoadText");
+    const progress=document.getElementById("magLoadProgress");
+    const started=performance.now();
+
+    activeActionName=name;
+    overlay.classList.remove("hidden");
+    text.textContent=label;
+    progress.style.width="0%";
+
+    activeActionTimer=setInterval(
+        ()=>{
+            const pct=Math.min(1,(performance.now()-started)/duration);
+            progress.style.width=(pct*100)+"%";
+
+            if(pct>=1){
+                stopTimedAction();
+                onComplete();
+                refreshInventoryViews();
+                renderHotbar();
+                updateBodyHud();
+            }
+        },
+        80
+    );
+
+    return true;
+}
+
+function refreshInventoryViews(){
+    renderStorage();
+
+    if(raidRunning){
+        renderRaidInventory();
+    }
+
+    if(
+        currentBox &&
+        !document.getElementById("lootPanel").classList.contains("hidden")
+    ){
+        renderLoot();
+    }
+}
+
+function startMagLoad(ammoRef,magRef){
+    const ammo=ammoRef.array[ammoRef.index];
+    const mag=magRef.array[magRef.index];
+
+    if(!ammo || !mag || !ammo.name.startsWith("Ammo") || !magazines[mag.name])
+        return;
+
+    const magData=magazines[mag.name];
+
+    if(ammo.name!==magData.ammoType){
+        showMessage("WRONG AMMO FOR "+magData.label);
+        return;
+    }
+
+    if((mag.ammo || 0)>=magData.capacity){
+        showMessage("MAGAZINE FULL");
+        return;
+    }
+
+    if(ammoRef.type==="box" && !isLootRevealed(ammoRef.index)){
+        showMessage("STILL SEARCHING");
+        return;
+    }
+
+    if(magRef.type==="box" && !isLootRevealed(magRef.index)){
+        showMessage("STILL SEARCHING");
+        return;
+    }
+
+    stopMagLoad();
+
+    const overlay=document.getElementById("magLoadOverlay");
+    const text=document.getElementById("magLoadText");
+    const progress=document.getElementById("magLoadProgress");
+    const total=Math.min(ammo.qty,magData.capacity-(mag.ammo || 0));
+    let loaded=0;
+
+    overlay.classList.remove("hidden");
+
+    magLoadTimer=setInterval(
+        ()=>{
+            const currentAmmo=ammoRef.array[ammoRef.index];
+            const currentMag=magRef.array[magRef.index];
+
+            if(
+                !currentAmmo ||
+                !currentMag ||
+                currentAmmo.name!==ammo.name ||
+                currentMag.name!==mag.name ||
+                (currentMag.ammo || 0)>=magData.capacity ||
+                currentAmmo.qty<=0
+            ){
+                stopMagLoad();
+                refreshInventoryViews();
+                return;
+            }
+
+            currentMag.ammo=(currentMag.ammo || 0)+1;
+            currentAmmo.qty-=1;
+            loaded+=1;
+
+            text.textContent=
+                "LOADING "+
+                magData.label+
+                "  "+
+                currentMag.ammo+
+                "/"+
+                magData.capacity;
+
+            progress.style.width=(loaded/total*100)+"%";
+
+            if(currentAmmo.qty<=0){
+                ammoRef.array[ammoRef.index]=null;
+            }
+
+            refreshInventoryViews();
+
+            if(loaded>=total || (currentMag.ammo || 0)>=magData.capacity){
+                showMessage("MAG LOADED: "+currentMag.ammo+"/"+magData.capacity);
+                stopMagLoad();
+            }
+        },
+        180
+    );
+}
 
 function moveItem(
     from,
@@ -2270,6 +4124,24 @@ function moveItem(
         ];
 
     if(!source)return;
+
+    if(
+        from.type==="box" &&
+        currentBox &&
+        !isLootRevealed(from.index)
+    ){
+        showMessage("STILL SEARCHING");
+        return;
+    }
+
+    if(
+        to.type==="box" &&
+        currentBox &&
+        !isLootRevealed(to.index)
+    ){
+        showMessage("STILL SEARCHING");
+        return;
+    }
 
 
     /* EQUIPMENT DESTINATION */
@@ -2305,6 +4177,24 @@ function moveItem(
         to.array[
             to.index
         ];
+
+    if(
+        destination &&
+        source.name.startsWith("Ammo") &&
+        magazines[destination.name]
+    ){
+        startMagLoad(from,to);
+        return;
+    }
+
+    if(
+        destination &&
+        magazines[source.name] &&
+        destination.name.startsWith("Ammo")
+    ){
+        startMagLoad(to,from);
+        return;
+    }
 
 
     /* STACK AMMO */
@@ -2345,6 +4235,12 @@ function moveItem(
             renderLoot();
         }else{
             renderStorage();
+            if(
+                raidRunning &&
+                isRaidInventoryOpen()
+            ){
+                renderRaidInventory();
+            }
         }
 
         return;
@@ -2388,6 +4284,12 @@ function moveItem(
         renderLoot();
     }else{
         renderStorage();
+        if(
+            raidRunning &&
+            isRaidInventoryOpen()
+        ){
+            renderRaidInventory();
+        }
     }
 
 }
@@ -2480,6 +4382,8 @@ function renderStorage(){
         "backpack"
     );
 
+    renderHotbar();
+
 }
 
 
@@ -2512,7 +4416,9 @@ function dropItem(index){
 
         item:{
             name:item.name,
-            qty:item.qty
+            qty:item.qty,
+            ammo:item.ammo,
+            durability:item.durability
         }
 
     });
@@ -2521,6 +4427,13 @@ function dropItem(index){
     inventory[index]=null;
 
     renderStorage();
+
+    if(
+        raidRunning &&
+        isRaidInventoryOpen()
+    ){
+        renderRaidInventory();
+    }
 
     showMessage(
         "DROPPED "+item.name
@@ -2554,15 +4467,357 @@ function equipRaidWeapon(slot){
     player.weapon=
         weapon.name;
 
-    player.magazine=
-        guns[
-            player.weapon
-        ].magazine;
+    player.weaponSlot=slot;
+
+    if(typeof weapon.magazine!=="number"){
+        weapon.magazine=
+            guns[
+                player.weapon
+            ].magazine;
+    }
+
+    if(!weapon.magType){
+        weapon.magType=
+            guns[
+                player.weapon
+            ].magType;
+    }
+
+    player.magazine=weapon.magazine;
 
     showMessage(
         "EQUIPPED "+
         player.weapon
     );
+
+    renderHotbar();
+
+}
+
+
+function getEquippedWeaponItem(){
+
+    const item=equipment[player.weaponSlot];
+
+    if(
+        item &&
+        item.name===player.weapon
+    ){
+        return item;
+    }
+
+    if(
+        equipment.primary?.name===player.weapon
+    ){
+        player.weaponSlot="primary";
+        return equipment.primary;
+    }
+
+    if(
+        equipment.secondary?.name===player.weapon
+    ){
+        player.weaponSlot="secondary";
+        return equipment.secondary;
+    }
+
+    return null;
+
+}
+
+
+function syncCurrentMagazine(){
+
+    const weapon=getEquippedWeaponItem();
+
+    if(weapon){
+        weapon.magazine=player.magazine;
+    }
+
+}
+
+
+function isRaidInventoryOpen(){
+
+    return !document
+        .getElementById("inventoryPanel")
+        .classList
+        .contains("hidden");
+
+}
+
+
+function getHotbarItem(key){
+
+    const assigned=hotbarAssignments[key];
+
+    if(!assigned)
+        return null;
+
+    const item=inventory[assigned.index];
+
+    if(
+        !item ||
+        item.name!==assigned.name
+    ){
+        delete hotbarAssignments[key];
+        return null;
+    }
+
+    return {
+        item,
+        index:assigned.index
+    };
+
+}
+
+
+function getHotbarKeyForInventoryIndex(index,name){
+
+    return hotbarKeys.find(
+        key=>{
+            const assigned=hotbarAssignments[key];
+            return (
+                assigned &&
+                assigned.index===index &&
+                assigned.name===name
+            );
+        }
+    );
+
+}
+
+
+function assignHotbarItem(key){
+
+    if(key==="2" || key==="3"){
+        showMessage("2 AND 3 ARE WEAPON SLOTS");
+        return;
+    }
+
+    if(
+        !hoveredHotbarItem ||
+        hoveredHotbarItem.array!==inventory
+    ){
+        showMessage("HOVER A BACKPACK ITEM");
+        return;
+    }
+
+    const item=
+        inventory[hoveredHotbarItem.index];
+
+    if(!item){
+        showMessage("HOVER A BACKPACK ITEM");
+        return;
+    }
+
+    hotbarAssignments[key]={
+        index:hoveredHotbarItem.index,
+        name:item.name
+    };
+
+    renderHotbar();
+
+    if(isRaidInventoryOpen()){
+        renderRaidInventory();
+    }
+
+    showMessage(
+        "BOUND "+item.name+" TO "+key
+    );
+
+}
+
+
+function handleHotbarKey(key){
+
+    if(isRaidInventoryOpen()){
+        assignHotbarItem(key);
+        return;
+    }
+
+    useHotbarItem(key);
+
+}
+
+
+function consumeInventoryItem(index){
+
+    const item=inventory[index];
+
+    if(!item)
+        return;
+
+    item.qty=(item.qty || 1)-1;
+
+    if(item.qty<=0)
+        inventory[index]=null;
+
+}
+
+
+function getBleedingPart(){
+
+    return Object.keys(bodyParts).find(
+        part=>bodyParts[part].bleeding
+    );
+
+}
+
+
+function getMostInjuredPart(){
+
+    let best=null;
+    let missing=0;
+
+    for(const part in bodyParts){
+        const p=bodyParts[part];
+        const partMissing=p.max-p.hp;
+
+        if(partMissing>missing && !p.blacked){
+            missing=partMissing;
+            best=part;
+        }
+    }
+
+    return best;
+
+}
+
+function getBlackedPart(){
+    return Object.keys(bodyParts).find(
+        part=>
+            bodyParts[part].blacked &&
+            part!=="head" &&
+            part!=="thorax"
+    );
+}
+
+
+function useHotbarItem(key){
+
+    const hotbarItem=getHotbarItem(key);
+
+    if(!hotbarItem){
+        showMessage("NO QUICK ITEM ON "+key);
+        return;
+    }
+
+    const item=hotbarItem.item;
+    const gun=guns[player.weapon];
+
+    if(item.name.startsWith("Ammo")){
+        if(gun && gun.ammoType===item.name){
+            reload();
+        }else{
+            showMessage("WRONG AMMO FOR "+player.weapon);
+        }
+        return;
+    }
+
+    if(magazines[item.name]){
+        if(gun && magazines[item.name].gun===player.weapon){
+            reload();
+        }else{
+            showMessage("WRONG MAG FOR "+player.weapon);
+        }
+        return;
+    }
+
+    if(item.name==="Bandage"){
+        const part=getBleedingPart();
+
+        if(!part){
+            showMessage("NO BLEEDING");
+            return;
+        }
+
+        startTimedAction(
+            "heal",
+            "BANDAGING "+part.toUpperCase(),
+            2000,
+            ()=>{
+                bodyParts[part].bleeding=false;
+                consumeInventoryItem(hotbarItem.index);
+                showMessage("BANDAGED "+part.toUpperCase());
+            }
+        );
+    }
+
+    else if(item.name==="Medkit"){
+        if(getBlackedPart()){
+            showMessage("SURGICAL KIT REQUIRED");
+            return;
+        }
+
+        const part=getMostInjuredPart();
+
+        if(!part){
+            showMessage("ALREADY HEALTHY");
+            return;
+        }
+
+        startTimedAction(
+            "heal",
+            "HEALING "+part.toUpperCase(),
+            4000,
+            ()=>{
+                const p=bodyParts[part];
+                const available=item.durability || 100;
+                const heal=Math.min(45,available,p.max-p.hp);
+                p.hp=Math.min(p.max,p.hp+heal);
+                p.bleeding=false;
+                item.durability=available-heal;
+
+                if(item.durability<=0){
+                    inventory[hotbarItem.index]=null;
+                }
+
+                showMessage("TREATED "+part.toUpperCase());
+            }
+        );
+    }
+
+    else if(item.name==="SurgicalKit"){
+        const part=getBlackedPart();
+
+        if(!part){
+            showMessage("NO BLACKED LIMB");
+            return;
+        }
+
+        startTimedAction(
+            "heal",
+            "SURGERY "+part.toUpperCase(),
+            10000,
+            ()=>{
+                const p=bodyParts[part];
+                p.blacked=false;
+                p.hp=1;
+                p.bleeding=false;
+                consumeInventoryItem(hotbarItem.index);
+                showMessage("SURGERY COMPLETE: "+part.toUpperCase());
+            }
+        );
+    }
+
+    else if(
+        item.name==="Food" ||
+        item.name==="Water" ||
+        item.name==="Painkillers"
+    ){
+        consumeInventoryItem(hotbarItem.index);
+        showMessage("USED "+item.name.toUpperCase());
+    }
+
+    else{
+        showMessage(item.name+" IS NOT A QUICK USE ITEM");
+        return;
+    }
+
+    renderRaidInventory();
+    renderStorage();
+    renderHotbar();
+    updateBodyHud();
 
 }
 
@@ -2585,6 +4840,14 @@ function getAmmoCount(type){
 
                 count+=item.qty;
 
+            }
+
+            if(
+                item &&
+                magazines[item.name] &&
+                magazines[item.name].ammoType===type
+            ){
+                count+=item.ammo || 0;
             }
 
         }
@@ -2646,60 +4909,133 @@ function reload(){
 
     const gun=
         guns[player.weapon];
+    const weaponItem=getEquippedWeaponItem();
 
-    if(!gun)return;
+    if(!gun || !weaponItem)return;
 
-    const needed=
-        gun.magazine-
-        player.magazine;
+    const magIndex=inventory.findIndex(
+        item=>
+            item &&
+            magazines[item.name] &&
+            magazines[item.name].gun===player.weapon &&
+            (item.ammo || 0)>0
+    );
 
-    if(needed<=0){
+    if(magIndex===-1){
 
         showMessage(
-            "MAGAZINE FULL"
+            "NO LOADED "+
+            gun.magType
         );
 
         return;
 
     }
 
+    const newMag=inventory[magIndex];
+    const oldAmmo=weaponItem.magazine || 0;
+    const oldMagName=weaponItem.magType || gun.magType;
 
-    const available=
-        getAmmoCount(
-            gun.ammoType
-        );
+    playSound("reload");
 
-    if(available<=0){
+    startTimedAction(
+        "reload",
+        "RELOADING "+magazines[newMag.name].label,
+        3000,
+        ()=>{
+            if(inventory[magIndex]!==newMag){
+                showMessage("RELOAD CANCELLED");
+                return;
+            }
 
-        showMessage(
-            "NO AMMO"
-        );
+            inventory[magIndex]=null;
 
-        return;
+            weaponItem.magType=newMag.name;
+            weaponItem.magazine=newMag.ammo || 0;
+            player.magazine=
+                weaponItem.magazine;
 
-    }
+            if(oldMagName){
+                inventory[magIndex]={
+                    name:oldMagName,
+                    qty:1,
+                    ammo:oldAmmo
+                };
+            }
 
+            showMessage(
+                "LOADED "+
+                magazines[newMag.name].label
+            );
+        }
+    );
 
+}
+
+function moveOneStashItemToInventory(name){
+    const stashIndex=stash.findIndex(
+        item=>item && item.name===name
+    );
+
+    if(stashIndex===-1)
+        return false;
+
+    const item=stash[stashIndex];
     const amount=
-        Math.min(
-            needed,
-            available
-        );
-
-    removeAmmo(
-        gun.ammoType,
-        amount
+        item.name.startsWith("Ammo")
+        ? item.qty
+        : 1;
+    const added=addInventoryItem(
+        item.name,
+        amount,
+        {ammo:item.ammo}
     );
 
-    player.magazine+=
-        amount;
+    if(!added)
+        return false;
 
-    renderStorage();
+    if(item.qty>amount && !magazines[item.name]){
+        item.qty-=amount;
+    }else if(item.qty>1 && !magazines[item.name] && amount===1){
+        item.qty-=1;
+    }else{
+        stash[stashIndex]=null;
+    }
 
-    showMessage(
-        "RELOADED"
+    return true;
+}
+
+function autoPackDeploymentItems(){
+    if(inventory.some(Boolean))
+        return;
+
+    const wanted=[];
+
+    ["primary","secondary"].forEach(
+        slot=>{
+            const weapon=equipment[slot];
+
+            if(!weapon || !guns[weapon.name])
+                return;
+
+            const gun=guns[weapon.name];
+
+            wanted.push(gun.magType);
+            wanted.push(gun.magType);
+            wanted.push(gun.ammoType);
+        }
     );
 
+    wanted.push("Bandage","Medkit","SurgicalKit","Painkillers");
+
+    wanted.forEach(
+        name=>{
+            if(inventory.findIndex(item=>!item)===-1)
+                return;
+
+            moveOneStashItemToInventory(name);
+        }
+    );
 }
 
 
@@ -2712,11 +5048,18 @@ const lootTable=[
     ["Ammo9",30],
     ["Ammo556",25],
     ["Ammo762",18],
+    ["Pistol9Mag",8],
+    ["Gen3M4Mag",6],
+    ["Sniper762Mag",3],
     ["Bandage",25],
     ["Food",22],
     ["Water",22],
+    ["Bolts",13],
+    ["Screws",14],
+    ["Wires",8],
 
     ["Medkit",12],
+    ["SurgicalKit",4],
     ["Painkillers",10],
     ["Battery",10],
     ["SSD",7],
@@ -2741,20 +5084,87 @@ const lootTable=[
 ];
 
 
+function makeLootItem(name,amount=1){
+    if(magazines[name]){
+        const mag=magazines[name];
+        return {
+            name,
+            qty:1,
+            ammo:Math.max(
+                1,
+                Math.floor(
+                    mag.capacity*
+                    (
+                        .45+
+                        Math.random()*.55
+                    )
+                )
+            )
+        };
+    }
+
+    if(name==="Medkit"){
+        return {
+            name,
+            qty:1,
+            durability:75+Math.floor(Math.random()*26)
+        };
+    }
+
+    if(name==="SurgicalKit"){
+        return {
+            name,
+            qty:1,
+            durability:1
+        };
+    }
+
+    return {
+        name,
+        qty:amount
+    };
+}
+
 function generateHighTierLoot(){
-    const pool=["M4","Sniper","GPU","AdvancedGPU","MilitarySSD","Armor","Helmet","Keycard","GoldWatch","Jewelry","Ammo556","Ammo762"];
+    const pool=["M4","Sniper","GPU","AdvancedGPU","MilitarySSD","Armor","Helmet","Keycard","GoldWatch","Jewelry","Ammo556","Ammo762","Gen3M4Mag","Sniper762Mag","SurgicalKit","Medkit","Bolts","Screws","Wires"];
     const out=[];
     const count=4+Math.floor(Math.random()*4);
     for(let i=0;i<count;i++){
         const name=pool[Math.floor(Math.random()*pool.length)];
-        out.push({name,qty:name.startsWith("Ammo")?(60+Math.floor(Math.random()*121)):1});
+        out.push(makeLootItem(name,name.startsWith("Ammo")?(60+Math.floor(Math.random()*121)):1));
     }
     return out;
 }
 
-function generateLoot(){
+function generateLoot(type="mixed"){
 
     const loot=[];
+    const tables={
+        wooden:[
+            ["Food",18],["Water",18],["Bolts",18],["Screws",18],["Wires",10],
+            ["Bandage",10],["Ammo9",8],["Pistol9Mag",4],["Keycard",.25]
+        ],
+        supply:[
+            ["Bandage",18],["Medkit",12],["SurgicalKit",4],["Painkillers",12],
+            ["Food",10],["Water",10],["Wires",8],["Keycard",.35]
+        ],
+        metal:[
+            ["Bolts",15],["Screws",15],["Wires",13],["Battery",11],["SSD",8],
+            ["Phone",8],["FlashDrive",4],["CPU",4],["Keycard",.55]
+        ],
+        military:[
+            ["Ammo556",18],["Ammo762",14],["Gen3M4Mag",9],["Sniper762Mag",6],
+            ["Armor",5],["Helmet",5],["M4",1.2],["Keycard",.8]
+        ],
+        hightech:[
+            ["GPU",8],["AdvancedGPU",4],["MilitarySSD",5],["Keycard",5],
+            ["FlashDrive",8],["CPU",8],["GoldWatch",3],["Jewelry",3],
+            ["M4",2],["Sniper",1.2],["SurgicalKit",4]
+        ],
+        mixed:lootTable
+    };
+
+    const table=tables[type] || lootTable;
 
     const count=
         1+
@@ -2769,15 +5179,21 @@ function generateLoot(){
         i++
     ){
 
+        const totalWeight=
+            table.reduce(
+                (sum,entry)=>sum+entry[1],
+                0
+            );
+
         const roll=
-            Math.random()*100;
+            Math.random()*totalWeight;
 
         let total=0;
         let selected=null;
 
 
         for(
-            const entry of lootTable
+            const entry of table
         ){
 
             total+=entry[1];
@@ -2799,9 +5215,9 @@ function generateLoot(){
         if(!selected){
 
             selected=
-                lootTable[
+                table[
                     Math.floor(
-                        Math.random()*10
+                        Math.random()*Math.min(10,table.length)
                     )
                 ][0];
 
@@ -2825,12 +5241,12 @@ function generateLoot(){
         }
 
 
-        loot.push({
-
-            name:selected,
-            qty:amount
-
-        });
+        loot.push(
+            makeLootItem(
+                selected,
+                amount
+            )
+        );
 
     }
 
@@ -2844,89 +5260,104 @@ function generateLoot(){
 ========================================================= */
 
 const buildings=[
-
-    {
-        x:600,
-        y:350,
-        w:500,
-        h:330
-    },
-
-    {
-        x:1350,
-        y:250,
-        w:650,
-        h:420
-    },
-
-    {
-        x:2450,
-        y:350,
-        w:700,
-        h:500
-    },
-
-    {
-        x:550,
-        y:1650,
-        w:650,
-        h:420
-    },
-
-    {
-        x:1600,
-        y:1450,
-        w:550,
-        h:500
-    },
-
-    {
-        x:2700,
-        y:1450,
-        w:550,
-        h:550
-    }
-
+    {x:430,y:270,w:360,h:520,name:"Browz Row Apartments",floors:3},
+    {x:980,y:250,w:430,h:420,name:"Ezra Market",floors:2},
+    {x:1650,y:220,w:520,h:540,name:"Municipal Offices",floors:4},
+    {x:2450,y:270,w:580,h:440,name:"Transit Depot",floors:2},
+    {x:3050,y:230,w:360,h:660,name:"Canal Flats",floors:3},
+    {x:330,y:1050,w:480,h:460,name:"Pawn Block",floors:2},
+    {x:1040,y:1030,w:470,h:600,name:"The Ezra Hotel",floors:5},
+    {x:1740,y:1020,w:430,h:490,name:"Clinic Browz",floors:3},
+    {x:2420,y:1040,w:500,h:540,name:"Old Bank",floors:4},
+    {x:3050,y:1120,w:360,h:470,name:"Metro Offices",floors:3},
+    {x:460,y:1760,w:560,h:540,name:"South Tenements",floors:3},
+    {x:1270,y:1780,w:520,h:470,name:"Browz Cinema",floors:2},
+    {x:2040,y:1740,w:460,h:600,name:"Parking Structure",floors:4},
+    {x:2760,y:1800,w:560,h:470,name:"Blacksite Annex",floors:3,futuristic:true,locked:true}
 ];
 
-
-// Locked high-tier research facility. Requires a KEYCARD at its entrance.
-buildings.push({x:2050,y:650,w:420,h:360,futuristic:true,locked:true,name:"BLACKSITE LAB"});
-
 const doors=[
-    {building:0, side:"left",  x:600,  y:515, width:90},
-    {building:1, side:"bottom",x:1675, y:670,  width:90},
-    {building:2, side:"left",  x:2450, y:600,  width:90},
-    {building:3, side:"top",   x:875,  y:1650, width:90},
-    {building:4, side:"right",  x:2150, y:1700, width:90},
-    {building:5, side:"bottom",x:2975, y:2000, width:90},
-    {building:6, side:"bottom",x:2260, y:1010, width:100, locked:true}
+    {building:0, side:"bottom",x:610, y:790, width:90},
+    {building:1, side:"left",x:980, y:460, width:90},
+    {building:2, side:"bottom",x:1910, y:760, width:100},
+    {building:3, side:"left",x:2450, y:480, width:90},
+    {building:4, side:"bottom",x:3230, y:890, width:90},
+    {building:5, side:"right",x:810, y:1280, width:90},
+    {building:6, side:"bottom",x:1275, y:1630, width:100},
+    {building:7, side:"left",x:1740, y:1265, width:80},
+    {building:8, side:"right",x:2920, y:1310, width:90},
+    {building:9, side:"left",x:3050, y:1355, width:80},
+    {building:10, side:"top",x:740, y:1760, width:100},
+    {building:11, side:"top",x:1530, y:1780, width:90},
+    {building:12, side:"right",x:2500, y:2040, width:90},
+    {building:13, side:"left",x:2760, y:2035, width:100, locked:true}
 ];
 
 
 const roads=[
+    {x:0,y:900,w:3600,h:160,name:"North Browz Ave"},
+    {x:0,y:1620,w:3600,h:170,name:"Ezra Main"},
+    {x:0,y:2350,w:3600,h:140,name:"South Service"},
+    {x:830,y:0,w:150,h:2600,name:"Canal Street"},
+    {x:1530,y:0,w:160,h:2600,name:"Market Cut"},
+    {x:2220,y:0,w:150,h:2600,name:"Bank Lane"},
+    {x:3380,y:0,w:120,h:2600,name:"East Wall"},
+    {x:250,y:760,w:900,h:85,name:"Apartment Alley"},
+    {x:1840,y:780,w:1450,h:85,name:"Depot Cut"},
+    {x:420,y:1510,w:760,h:80,name:"Pawn Alley"},
+    {x:1860,y:1510,w:1220,h:80,name:"Clinic Alley"}
+];
 
-    {
-        x:0,
-        y:1050,
-        w:3600,
-        h:150
-    },
+const gardens=[
+    {x:1180,y:820,w:260,h:90},
+    {x:420,y:1560,w:290,h:70},
+    {x:1760,y:850,w:330,h:85},
+    {x:3020,y:930,w:240,h:90},
+    {x:1120,y:1660,w:280,h:70},
+    {x:2550,y:1650,w:310,h:75}
+];
 
-    {
-        x:1500,
-        y:0,
-        w:180,
-        h:2600
-    },
+const smallStructures=[
+    {x:1180,y:860,w:95,h:70,name:"Kiosk"},
+    {x:1460,y:850,w:130,h:80,name:"Checkpoint"},
+    {x:2650,y:900,w:120,h:80,name:"Bus Stop"},
+    {x:540,y:1580,w:110,h:70,name:"Shed"},
+    {x:930,y:1600,w:120,h:80,name:"Garage"},
+    {x:3370,y:1710,w:140,h:90,name:"Guard Hut"},
+    {x:1860,y:2310,w:260,h:120,name:"Hidden Crew Hideout"}
+];
 
-    {
-        x:2250,
-        y:800,
-        w:1000,
-        h:120
-    }
+const deskLootSpawns=[
+    {x:610,y:430,floor:0,building:0,chance:.45},
+    {x:1200,y:430,floor:0,building:1,chance:.5},
+    {x:1840,y:430,floor:0,building:2,chance:.42},
+    {x:2030,y:600,floor:1,building:2,chance:.55},
+    {x:1320,y:1240,floor:0,building:6,chance:.45},
+    {x:1420,y:1450,floor:1,building:6,chance:.5},
+    {x:1940,y:1185,floor:0,building:7,chance:.5},
+    {x:2760,y:1210,floor:0,building:8,chance:.45},
+    {x:2825,y:1435,floor:1,building:8,chance:.55},
+    {x:3135,y:1325,floor:0,building:9,chance:.42},
+    {x:1600,y:1940,floor:0,building:11,chance:.4},
+    {x:3120,y:1910,floor:0,building:13,chance:.62},
+    {x:3160,y:2120,floor:1,building:13,chance:.7}
+];
 
+const staircases=[
+    {building:0,x:735,y:720,targetFloor:1},
+    {building:1,x:1045,y:330,targetFloor:1},
+    {building:2,x:2075,y:675,targetFloor:1},
+    {building:3,x:2520,y:380,targetFloor:1},
+    {building:4,x:3360,y:820,targetFloor:1},
+    {building:5,x:725,y:1130,targetFloor:1},
+    {building:6,x:1420,y:1540,targetFloor:1},
+    {building:7,x:1815,y:1125,targetFloor:1},
+    {building:8,x:2835,y:1135,targetFloor:1},
+    {building:9,x:3115,y:1500,targetFloor:1},
+    {building:10,x:920,y:1845,targetFloor:1},
+    {building:11,x:1365,y:1860,targetFloor:1},
+    {building:12,x:2380,y:1865,targetFloor:1},
+    {building:13,x:2860,y:1910,targetFloor:1,locked:true}
 ];
 
 
@@ -2977,43 +5408,65 @@ for(
 const extractions=[
 
     {
-        x:3300,
-        y:2250,
+        x:3420,
+        y:2380,
         radius:150,
-        name:"SOUTH GATE"
+        name:"EAST BARRICADE"
     },
 
     {
-        x:3200,
-        y:1200,
+        x:250,
+        y:2440,
         radius:140,
-        name:"NORTH ROAD"
+        name:"CANAL UNDERPASS"
     },
 
     {
-        x:450,
-        y:2350,
+        x:3340,
+        y:240,
         radius:140,
-        name:"WEST GATE"
+        name:"METRO FENCE"
     }
 
 ];
 
 
 const fixedBoxes=[
-    {x:760,y:520,type:"wooden",name:"WOODEN CRATE"},
-    {x:980,y:520,type:"military",name:"MILITARY CASE"},
-    {x:1500,y:430,type:"metal",name:"METAL LOCKER"},
-    {x:1800,y:430,type:"supply",name:"SUPPLY CACHE"},
-    {x:2700,y:500,type:"military",name:"MILITARY CASE"},
-    {x:3020,y:600,type:"wooden",name:"WOODEN CRATE"},
-    {x:720,y:1850,type:"supply",name:"SUPPLY CACHE"},
-    {x:1030,y:1900,type:"metal",name:"METAL LOCKER"},
-    {x:1750,y:1650,type:"wooden",name:"WOODEN CRATE"},
-    {x:1960,y:1760,type:"military",name:"MILITARY CASE"},
-    {x:2870,y:1650,type:"metal",name:"METAL LOCKER"},
-    {x:3120,y:1840,type:"supply",name:"SUPPLY CACHE"},
-    {x:2260,y:900,type:"hightech",name:"BLACKSITE CACHE",highTier:true}
+    {x:560,y:380,type:"wooden",name:"APARTMENT CRATE",floor:0},
+    {x:735,y:505,type:"supply",name:"UPSTAIRS MED BAG",floor:1},
+    {x:1210,y:360,type:"metal",name:"MARKET LOCKER",floor:0},
+    {x:1315,y:560,type:"supply",name:"ROOF STASH",floor:1},
+    {x:1810,y:390,type:"metal",name:"OFFICE SAFE",floor:0},
+    {x:2060,y:610,type:"military",name:"ARCHIVE CASE",floor:1},
+    {x:2650,y:430,type:"military",name:"DEPOT WEAPON BOX",floor:0},
+    {x:2900,y:625,type:"wooden",name:"PLATFORM CRATE",floor:1},
+    {x:3300,y:515,type:"supply",name:"CANAL FLATS CACHE",floor:0},
+    {x:500,y:1215,type:"wooden",name:"PAWN COUNTER",floor:0},
+    {x:700,y:1400,type:"metal",name:"PAWN LOCKER",floor:1},
+    {x:1160,y:1210,type:"supply",name:"HOTEL DUFFEL",floor:0},
+    {x:1430,y:1440,type:"metal",name:"ROOM SAFE",floor:1},
+    {x:1910,y:1170,type:"supply",name:"CLINIC MEDS",floor:0},
+    {x:2100,y:1350,type:"metal",name:"SURGERY CABINET",floor:1},
+    {x:2560,y:1180,type:"military",name:"BANK GUARD CASE",floor:0},
+    {x:2810,y:1420,type:"metal",name:"VAULT DRAWER",floor:1},
+    {x:3140,y:1310,type:"wooden",name:"METRO OFFICE BOX",floor:0},
+    {x:3320,y:1490,type:"supply",name:"DISPATCH CACHE",floor:1},
+    {x:640,y:1900,type:"wooden",name:"TENEMENT BOX",floor:0},
+    {x:905,y:2100,type:"supply",name:"LAUNDRY STASH",floor:1},
+    {x:1410,y:1905,type:"metal",name:"CINEMA REGISTER",floor:0},
+    {x:1650,y:2070,type:"supply",name:"PROJECTION ROOM",floor:1},
+    {x:2180,y:1920,type:"wooden",name:"PARKING TOOLBOX",floor:0},
+    {x:2380,y:2170,type:"military",name:"ROOFTOP CASE",floor:1},
+    {x:2920,y:1930,type:"hightech",name:"BLACKSITE ANNEX CACHE",floor:0,highTier:true},
+    {x:3160,y:2120,type:"hightech",name:"ANNEX SERVER CRATE",floor:1,highTier:true},
+    {x:1220,y:875,type:"wooden",name:"GARDEN TOOLBOX",floor:0},
+    {x:1510,y:875,type:"military",name:"CHECKPOINT CASE",floor:0},
+    {x:2665,y:935,type:"supply",name:"BUS STOP DUFFEL",floor:0},
+    {x:585,y:1605,type:"wooden",name:"SHED SUPPLIES",floor:0},
+    {x:960,y:1645,type:"metal",name:"GARAGE LOCKER",floor:0},
+    {x:3425,y:1750,type:"military",name:"GUARD HUT CRATE",floor:0},
+    {x:1965,y:2360,type:"supply",name:"HIDEOUT STASH",floor:0},
+    {x:3010,y:2025,type:"hightech",name:"BLACKSITE VAULT CRATE",floor:0,highTier:true,special:true}
 ];
 
 
@@ -3029,6 +5482,7 @@ let bullets=[];
 let enemyBullets=[];
 
 let currentBox=null;
+let lootSearchTimer=null;
 
 let currentExtraction=null;
 let extractionStart=0;
@@ -3036,6 +5490,8 @@ let extractionStart=0;
 let shootingCooldown=0;
 let scavTimer=3600;
 let muzzleFlash=0;
+let muzzleFlashSeed=0;
+let lastGunshot=null;
 
 
 /* =========================================================
@@ -3044,28 +5500,12 @@ let muzzleFlash=0;
 
 function startRaid(){
 
-    /*
-       Make START RAID work even when the player has
-       not manually equipped a weapon yet. Pull the
-       first weapon from the existing stash into the
-       character loadout.
-    */
     if(
         !equipment.primary &&
         !equipment.secondary
     ){
-        const weaponIndex=stash.findIndex(
-            item=>item && guns[item.name]
-        );
-
-        if(weaponIndex!==-1){
-            equipment.primary=stash[weaponIndex];
-            stash[weaponIndex]=null;
-            renderStorage();
-        }else{
-            showMessage("NO WEAPON IN STASH");
-            return;
-        }
+        showMessage("EQUIP A PRIMARY OR SECONDARY WEAPON");
+        return;
     }
 
     document
@@ -3079,13 +5519,27 @@ function startRaid(){
     closePanels();
 
     raidRunning=true;
+    document.body.classList.add(
+        "raidActive"
+    );
 
-    player.x=300;
-    player.y=1250;
+    const raidData=raidMapData[selectedRaidMap];
+    const raidSpawn=
+        raidData.spawns[
+            Math.floor(
+                Math.random()*raidData.spawns.length
+            )
+        ];
+
+    player.x=raidSpawn.x;
+    player.y=raidSpawn.y;
 
     player.kills=0;
+    player.floor=0;
+    player.building=null;
 
     resetHealth();
+    autoPackDeploymentItems();
 
 
     /*
@@ -3096,23 +5550,35 @@ function startRaid(){
         equipment.primary
     ){
 
-        player.weapon=
-            equipment.primary.name;
+        if(typeof equipment.primary.magazine!=="number"){
+            equipment.primary.magazine=
+                guns[equipment.primary.name].magazine;
+        }
+
+        if(!equipment.primary.magType){
+            equipment.primary.magType=
+                guns[equipment.primary.name].magType;
+        }
+
+        equipRaidWeapon("primary");
 
     }
 
     else{
 
-        player.weapon=
-            equipment.secondary.name;
+        if(typeof equipment.secondary.magazine!=="number"){
+            equipment.secondary.magazine=
+                guns[equipment.secondary.name].magazine;
+        }
+
+        if(!equipment.secondary.magType){
+            equipment.secondary.magType=
+                guns[equipment.secondary.name].magType;
+        }
+
+        equipRaidWeapon("secondary");
 
     }
-
-
-    player.magazine=
-        guns[
-            player.weapon
-        ].magazine;
 
 
     player.spawnProtection=300;
@@ -3122,13 +5588,23 @@ function startRaid(){
         fixedBoxes.map(
             p=>({
 
-                x:p[0],
-                y:p[1],
+                x:p.x,
+                y:p.y,
+                type:p.type,
+                name:p.name,
+                floor:p.floor || 0,
+                highTier:!!p.highTier,
 
                 opened:false,
 
                 loot:
-                    generateLoot()
+                    p.highTier
+                    ? (
+                        p.special
+                        ? generateHighTierLoot().concat(generateHighTierLoot().slice(0,3))
+                        : generateHighTierLoot()
+                    )
+                    : generateLoot(p.type)
 
             })
         );
@@ -3139,6 +5615,35 @@ function startRaid(){
     enemyBullets=[];
     groundLoot=[];
 
+    deskLootSpawns.forEach(
+        spawn=>{
+            if(Math.random()>spawn.chance)
+                return;
+
+            const roll=Math.random();
+            let name=
+                roll>.94
+                ? "Keycard"
+                : roll>.72
+                ? "FlashDrive"
+                : roll>.5
+                ? "Phone"
+                : roll>.32
+                ? "Screws"
+                : roll>.16
+                ? "Bolts"
+                : "Wires";
+
+            groundLoot.push({
+                x:spawn.x,
+                y:spawn.y,
+                floor:spawn.floor || 0,
+                building:spawn.building,
+                item:makeLootItem(name,1)
+            });
+        }
+    );
+
 
     spawnStartingScavs();
 
@@ -3147,9 +5652,11 @@ function startRaid(){
 
     renderRaidInventory();
     renderStorage();
+    renderHotbar();
+    updateBodyHud();
 
     showMessage(
-        "RAID STARTED"
+        "RAID STARTED — "+raidSpawn.name.toUpperCase()
     );
 
 }
@@ -3163,11 +5670,13 @@ function spawnStartingScavs(){
 
     const points=[
 
-        {x:850,y:850},
-        {x:1250,y:950},
-        {x:2200,y:850},
-        {x:2900,y:1050},
-        {x:2350,y:1900}
+        {x:980,y:930},
+        {x:1510,y:900},
+        {x:2250,y:980},
+        {x:3100,y:1520},
+        {x:1380,y:1700},
+        {x:2520,y:1730},
+        {x:3220,y:2300}
 
     ];
 
@@ -3201,10 +5710,83 @@ function spawnScav(x,y){
         dead:false,
         opened:false,
         loot:[],
+        floor:0,
+        building:null,
+        investigate:null,
+        walkPhase:0,
 
         angle:0
 
     });
+
+}
+
+
+function spawnScavs(){
+
+    cleanupScavs();
+
+    const wavePoints=[
+        {x:840,y:920},
+        {x:1510,y:920},
+        {x:2235,y:920},
+        {x:3380,y:920},
+        {x:1520,y:1630},
+        {x:2230,y:1630},
+        {x:3380,y:2360},
+        {x:430,y:2360}
+    ];
+
+    for(let i=0;i<3;i++){
+        const point=
+            wavePoints[
+                Math.floor(
+                    Math.random()*wavePoints.length
+                )
+            ];
+
+        spawnScav(
+            point.x+
+            Math.random()*180-
+            90,
+
+            point.y+
+            Math.random()*180-
+            90
+        );
+    }
+
+}
+
+
+function cleanupScavs(){
+
+    enemies=enemies.filter(
+        enemy=>!enemy.dead || !enemy.opened
+    );
+
+    const dead=enemies.filter(
+        enemy=>enemy.dead
+    );
+
+    if(dead.length<=12)
+        return;
+
+    let remove=dead.length-12;
+
+    enemies=enemies.filter(
+        enemy=>{
+            if(!enemy.dead)
+                return true;
+
+            if(remove>0){
+                remove--;
+                return false;
+            }
+
+            return true;
+        }
+    );
 
 }
 
@@ -3214,27 +5796,32 @@ function spawnScav(x,y){
 ========================================================= */
 
 function shoot(){
+    if(activeActionName==="reload" || activeActionName==="heal"){
+        return false;
+    }
 
     const gun=
         guns[player.weapon];
+    const weaponItem=getEquippedWeaponItem();
 
-    if(!gun)return;
+    if(!gun || !weaponItem)return false;
 
 
     if(
-        player.magazine<=0
+        weaponItem.magazine<=0
     ){
 
         showMessage(
             "RELOAD"
         );
 
-        return;
+        return false;
 
     }
 
 
-    player.magazine--;
+    weaponItem.magazine--;
+    player.magazine=weaponItem.magazine;
 
 
     const angle=
@@ -3273,11 +5860,24 @@ function shoot(){
             gun.damage,
 
         life:120
+        ,
+        angle
 
     });
 
 
-    muzzleFlash=5;
+    muzzleFlash=4;
+    muzzleFlashSeed=Math.random();
+    lastGunshot={
+        x:player.x,
+        y:player.y,
+        floor:player.floor,
+        building:player.building,
+        timer:420
+    };
+
+    playSound("shot");
+    return true;
 
 }
 
@@ -3324,8 +5924,12 @@ function getHoveredLoot(){
     let best=null, bestScore=Infinity;
     const consider=(kind,obj,radius,requiresProximity=true)=>{
         if(!obj)return;
-        if(kind==="box"&&obj.opened)return;
-        if(kind==="corpse"&&(!obj.dead||obj.opened))return;
+        if(kind==="box"&&obj.opened&&!hasContainerLoot(obj))return;
+        if(kind==="box"&&(obj.floor || 0)!==player.floor)return;
+        if(kind==="corpse"&&(!obj.dead||(obj.opened&&!hasContainerLoot(obj))))return;
+        if(kind==="corpse"&&(obj.floor || 0)!==player.floor)return;
+        if(kind==="ground"&&(obj.floor || 0)!==player.floor)return;
+        if(kind==="ground"&&obj.building!==undefined&&player.building!==obj.building)return;
         const cursorDist=Math.hypot(obj.x-wx,obj.y-wy);
         const playerDist=Math.hypot(obj.x-player.x,obj.y-player.y);
         if(cursorDist>radius)return;
@@ -3339,11 +5943,210 @@ function getHoveredLoot(){
     return best;
 }
 
+function hasContainerLoot(box){
+    return !!(box && box.loot && box.loot.some(Boolean));
+}
+
+function getLootSearchDuration(box,index){
+    if(box.searchState?.durations){
+        return box.searchState.durations[index] || 700;
+    }
+
+    const base=
+        box.highTier
+        ? 1450
+        : box.dead
+        ? 1050
+        : box.type==="military" || box.type==="metal"
+        ? 1150
+        : 850;
+
+    return base+Math.min(index,3)*90;
+}
+
+function getLootSearchOffset(box,index){
+    if(box.searchState?.offsets){
+        return box.searchState.offsets[index] || 0;
+    }
+
+    let offset=0;
+
+    for(let i=0;i<index;i++){
+        if(box.loot[i]){
+            offset+=getLootSearchDuration(box,i);
+        }
+    }
+
+    return offset;
+}
+
+function stopLootSearchTimer(){
+    if(lootSearchTimer){
+        clearInterval(lootSearchTimer);
+        lootSearchTimer=null;
+    }
+}
+
+function prepareLootSearch(box){
+    if(!box.searchState){
+        const durations=[];
+        const offsets=[];
+        let offset=0;
+
+        box.loot.forEach(
+            (item,index)=>{
+                offsets[index]=offset;
+                durations[index]=
+                    item
+                    ? getLootSearchDuration({...box,searchState:null},index)
+                    : 0;
+
+                if(item){
+                    offset+=durations[index];
+                }
+            }
+        );
+
+        box.searchState={
+            started:performance.now(),
+            revealed:box.loot.map(item=>!item),
+            durations,
+            offsets
+        };
+    }else{
+        while(box.searchState.revealed.length<box.loot.length){
+            box.searchState.revealed.push(!box.loot[box.searchState.revealed.length]);
+            box.searchState.offsets.push(
+                box.searchState.offsets.length
+                ? box.searchState.offsets[box.searchState.offsets.length-1]+
+                    box.searchState.durations[box.searchState.durations.length-1]
+                : 0
+            );
+            box.searchState.durations.push(
+                box.loot[box.searchState.durations.length]
+                ? getLootSearchDuration({...box,searchState:null},box.searchState.durations.length)
+                : 0
+            );
+        }
+    }
+
+    stopLootSearchTimer();
+
+    lootSearchTimer=setInterval(
+        ()=>{
+            if(
+                !currentBox ||
+                document.getElementById("lootPanel").classList.contains("hidden")
+            ){
+                stopLootSearchTimer();
+                return;
+            }
+
+            let changed=false;
+            let allSearched=true;
+            const now=performance.now();
+
+            currentBox.loot.forEach(
+                (item,index)=>{
+                    if(!item){
+                        currentBox.searchState.revealed[index]=true;
+                        return;
+                    }
+
+                    if(!currentBox.searchState.revealed[index]){
+                        allSearched=false;
+
+                        const elapsed=now-currentBox.searchState.started;
+                        const offset=getLootSearchOffset(currentBox,index);
+
+                        if(elapsed>=offset+getLootSearchDuration(currentBox,index)){
+                            currentBox.searchState.revealed[index]=true;
+                            changed=true;
+                        }
+                    }
+                }
+            );
+
+            if(changed || !allSearched){
+                renderLoot();
+            }
+
+            if(allSearched){
+                stopLootSearchTimer();
+            }
+        },
+        120
+    );
+}
+
+function isLootRevealed(index){
+    if(!currentBox || !currentBox.searchState)
+        return true;
+
+    return !!currentBox.searchState.revealed[index];
+}
+
+function quickTakeLootIndex(index){
+    if(!currentBox)
+        return false;
+
+    const loot=currentBox.loot;
+    const item=loot[index];
+
+    if(!item){
+        showMessage("EMPTY SLOT");
+        return true;
+    }
+
+    if(!isLootRevealed(index)){
+        showMessage("STILL SEARCHING");
+        return true;
+    }
+
+    if(addInventoryItem(item.name,item.qty,{ammo:item.ammo,durability:item.durability})){
+        loot[index]=null;
+        if(currentBox.searchState){
+            currentBox.searchState.revealed[index]=true;
+        }
+        renderLoot();
+        renderRaidInventory();
+        showMessage("QUICK LOOT: "+item.name);
+        return true;
+    }
+
+    showMessage("BACKPACK FULL");
+    return true;
+}
+
+function quickTakeHoveredLoot(){
+    if(!currentBox)
+        return false;
+
+    if(
+        hoveredLootSlot &&
+        hoveredLootSlot.type==="box" &&
+        hoveredLootSlot.box===currentBox
+    ){
+        return quickTakeLootIndex(hoveredLootSlot.index);
+    }
+
+    showMessage("HOVER AN ITEM");
+    return true;
+}
+
 function quickLoot(){
+    if(
+        currentBox &&
+        !document.getElementById("lootPanel").classList.contains("hidden")
+    ){
+        quickTakeHoveredLoot();
+        return;
+    }
+
     const target=getHoveredLoot();
     if(!target)return;
     if(target.kind==="ground"){
-        if(addInventoryItem(target.obj.item.name,target.obj.item.qty)){
+        if(addInventoryItem(target.obj.item.name,target.obj.item.qty,{ammo:target.obj.item.ammo,durability:target.obj.item.durability})){
             const i=groundLoot.indexOf(target.obj); if(i!==-1)groundLoot.splice(i,1);
             renderRaidInventory(); showMessage("QUICK LOOT: "+target.obj.item.name);
         }else showMessage("BACKPACK FULL");
@@ -3355,14 +6158,53 @@ function quickLoot(){
 
 function updateLootHoverPrompt(){
     const prompt=document.getElementById("lootHoverPrompt");
-    if(!raidRunning||!document.getElementById("lootPanel").classList.contains("hidden")){prompt.style.display="none";return;}
-    const target=getHoveredLoot();
-    if(!target){prompt.style.display="none";return;}
-    const label=target.kind==="ground" ? ("F  QUICK LOOT  •  "+target.obj.item.name) : "F  QUICK LOOT";
-    prompt.textContent=label; prompt.style.left=(mouse.x+14)+"px"; prompt.style.top=(mouse.y+14)+"px"; prompt.style.display="block";
+    prompt.style.display="none";
 }
 
 function interact(){
+    for(const stairs of staircases){
+        const building=buildings[stairs.building];
+
+        if(
+            stairs.locked &&
+            building.locked
+        ){
+            continue;
+        }
+
+        if(
+            Math.hypot(
+                stairs.x-player.x,
+                stairs.y-player.y
+            )<70
+        ){
+            const goingUp=player.floor===0;
+
+            player.floor=
+                goingUp
+                ? stairs.targetFloor
+                : 0;
+
+            player.building=
+                goingUp
+                ? stairs.building
+                : null;
+
+            player.x=stairs.x;
+            player.y=stairs.y;
+
+            showMessage(
+                player.floor>0
+                ? "UPSTAIRS — FLOOR "+(player.floor+1)
+                : "STREET LEVEL"
+            );
+
+            playSound("stair");
+
+            return;
+        }
+    }
+
     for(const d of doors){
         if(!d.locked) continue;
         const b=buildings[d.building];
@@ -3382,7 +6224,10 @@ function interact(){
 
     enemies.forEach(
         enemy=>{
-            if(!enemy.dead || enemy.opened)
+            if(!enemy.dead || (enemy.opened && !hasContainerLoot(enemy)))
+                return;
+
+            if((enemy.floor || 0)!==player.floor)
                 return;
 
             const d=Math.hypot(
@@ -3410,7 +6255,8 @@ function interact(){
     boxes.forEach(
         box=>{
 
-            if(box.opened)return;
+            if(box.opened && !hasContainerLoot(box))return;
+            if((box.floor || 0)!==player.floor)return;
 
             const d=
                 Math.hypot(
@@ -3450,6 +6296,15 @@ function interact(){
         const loot=
             groundLoot[i];
 
+        if((loot.floor || 0)!==player.floor)
+            continue;
+
+        if(
+            loot.building!==undefined &&
+            player.building!==loot.building
+        ){
+            continue;
+        }
 
         if(
             Math.hypot(
@@ -3461,7 +6316,11 @@ function interact(){
             if(
                 addInventoryItem(
                     loot.item.name,
-                    loot.item.qty
+                    loot.item.qty,
+                    {
+                        ammo:loot.item.ammo,
+                        durability:loot.item.durability
+                    }
                 )
             ){
 
@@ -3504,6 +6363,8 @@ function openLootBox(box){
     currentBox=box;
 
     box.opened=true;
+    prepareLootSearch(box);
+    playSound("loot");
 
     document
         .getElementById(
@@ -3526,7 +6387,8 @@ function openLootBox(box){
 
 function addInventoryItem(
     name,
-    amount=1
+    amount=1,
+    extra={}
 ){
 
     if(
@@ -3606,7 +6468,8 @@ function addInventoryItem(
 
     inventory[slot]={
         name,
-        qty:amount
+        qty:amount,
+        ...extra
     };
 
 
@@ -3642,11 +6505,28 @@ function renderLoot(){
 
     currentBox.loot.forEach(
         (item,index)=>{
+            const revealed=isLootRevealed(index);
+            const elapsed=performance.now()-currentBox.searchState.started;
+            const offset=getLootSearchOffset(currentBox,index);
+            const progress=
+                revealed
+                ? 1
+                : Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        (elapsed-offset)/
+                        getLootSearchDuration(currentBox,index)
+                    )
+                );
 
             boxGrid.appendChild(
                 createLootSlot(
                     item,
-                    index
+                    index,
+                    false,
+                    !revealed,
+                    progress
                 )
             );
 
@@ -3674,7 +6554,9 @@ function renderLoot(){
 function createLootSlot(
     item,
     index,
-    inventorySide=false
+    inventorySide=false,
+    searching=false,
+    searchProgress=0
 ){
 
     const slot=
@@ -3682,12 +6564,64 @@ function createLootSlot(
             "div"
         );
 
-    slot.className="slot";
+    slot.className=
+        searching
+        ? "slot searching"
+        : "slot";
 
+    if(searching){
+        slot.onmouseenter=()=>{
+            hoveredLootSlot={
+                box:currentBox,
+                index,
+                type:"box"
+            };
+        };
 
-    if(item){
+        slot.onmouseleave=()=>{
+            if(
+                hoveredLootSlot &&
+                hoveredLootSlot.box===currentBox &&
+                hoveredLootSlot.index===index
+            ){
+                hoveredLootSlot=null;
+            }
+        };
+
+        const progress=document.createElement("div");
+        progress.className="searchProgress";
+
+        const bar=document.createElement("span");
+        bar.style.width=(searchProgress*100)+"%";
+
+        progress.appendChild(bar);
+        slot.appendChild(progress);
+    }
+
+    if(item && !searching){
 
         slot.draggable=true;
+
+        slot.onmouseenter=()=>{
+            hoveredLootSlot={
+                box:currentBox,
+                index,
+                type:
+                    inventorySide
+                    ? "inventory"
+                    : "box"
+            };
+        };
+
+        slot.onmouseleave=()=>{
+            if(
+                hoveredLootSlot &&
+                hoveredLootSlot.box===currentBox &&
+                hoveredLootSlot.index===index
+            ){
+                hoveredLootSlot=null;
+            }
+        };
 
 
         const img=
@@ -3724,6 +6658,39 @@ function createLootSlot(
             slot.appendChild(q);
 
         }
+
+        if(magazines[item.name]){
+            const ammo=
+                document.createElement(
+                    "div"
+                );
+
+            ammo.className="qty";
+            ammo.style.top="auto";
+            ammo.style.bottom="3px";
+            ammo.textContent=
+                (item.ammo || 0)+
+                "/"+
+                magazines[item.name].capacity;
+
+            slot.appendChild(ammo);
+        }
+
+        if(item.name==="Medkit" || item.name==="SurgicalKit"){
+            const dur=document.createElement("div");
+            dur.className="qty";
+            dur.style.top="auto";
+            dur.style.bottom="3px";
+            dur.textContent=
+                item.name==="SurgicalKit"
+                ? "SURG"
+                : (item.durability || 100)+"%";
+            slot.appendChild(dur);
+        }
+
+        slot.ondblclick=()=>{
+            inspectItem(item);
+        };
 
 
         slot.ondragstart=()=>{
@@ -3825,6 +6792,82 @@ function isInsideBuilding(x,y,buildingIndex){
     );
 }
 
+function getBuildingAt(x,y){
+    return buildings.findIndex(
+        b=>
+            x>b.x &&
+            x<b.x+b.w &&
+            y>b.y &&
+            y<b.y+b.h
+    );
+}
+
+function getNearestStairForBuilding(buildingIndex,x,y){
+    let best=null;
+    let bestDistance=Infinity;
+
+    staircases.forEach(
+        stairs=>{
+            if(stairs.building!==buildingIndex)
+                return;
+
+            const building=buildings[stairs.building];
+
+            if(stairs.locked && building.locked)
+                return;
+
+            const distance=Math.hypot(stairs.x-x,stairs.y-y);
+
+            if(distance<bestDistance){
+                bestDistance=distance;
+                best=stairs;
+            }
+        }
+    );
+
+    return best;
+}
+
+function getDoorPoint(door){
+    const b=buildings[door.building];
+
+    if(door.side==="left"){
+        return {x:b.x-8,y:door.y};
+    }
+
+    if(door.side==="right"){
+        return {x:b.x+b.w+8,y:door.y};
+    }
+
+    if(door.side==="top"){
+        return {x:door.x,y:b.y-8};
+    }
+
+    return {x:door.x,y:b.y+b.h+8};
+}
+
+function getNearestDoorForBuilding(buildingIndex,x,y){
+    let best=null;
+    let bestDistance=Infinity;
+
+    doors.forEach(
+        door=>{
+            if(door.building!==buildingIndex || door.locked)
+                return;
+
+            const point=getDoorPoint(door);
+            const distance=Math.hypot(point.x-x,point.y-y);
+
+            if(distance<bestDistance){
+                bestDistance=distance;
+                best=point;
+            }
+        }
+    );
+
+    return best;
+}
+
 function hasBlacksiteKeycard(){
     return !!(equipment.primary?.name==="Keycard" || equipment.secondary?.name==="Keycard" || inventory.some(i=>i?.name==="Keycard"));
 }
@@ -3882,9 +6925,38 @@ function blockedByBuilding(x,y){
     return false;
 }
 
+function hasLineOfSight(x1,y1,x2,y2){
+    const distance=Math.hypot(x2-x1,y2-y1);
+    const steps=Math.max(1,Math.ceil(distance/22));
+
+    for(let i=1;i<steps;i++){
+        const t=i/steps;
+        const x=x1+(x2-x1)*t;
+        const y=y1+(y2-y1)*t;
+
+        if(blockedByBuilding(x,y)){
+            return false;
+        }
+    }
+
+    return true;
+}
+
 function tryMovePlayer(dx,dy){
     const nx=player.x+dx;
     const ny=player.y+dy;
+
+    if(player.floor>0 && player.building!==null){
+        if(isInsideBuilding(nx,player.y,player.building)){
+            player.x=nx;
+        }
+
+        if(isInsideBuilding(player.x,ny,player.building)){
+            player.y=ny;
+        }
+
+        return;
+    }
 
     if(!blockedByBuilding(nx,player.y))
         player.x=nx;
@@ -3936,6 +7008,8 @@ function update(){
             dy/len*player.speed
         );
 
+        player.walkPhase+=.22;
+
     }
 
 
@@ -3958,6 +7032,13 @@ function update(){
             )
         );
 
+    if(player.floor===0){
+        const currentBuilding=getBuildingAt(player.x,player.y);
+        player.building=
+            currentBuilding===-1
+            ? null
+            : currentBuilding;
+    }
 
     camera.x=
         Math.max(
@@ -3990,12 +7071,12 @@ function update(){
         shootingCooldown<=0
     ){
 
-        shoot();
-
-        shootingCooldown=
-            guns[
-                player.weapon
-            ].fireRate;
+        if(shoot()){
+            shootingCooldown=
+                guns[
+                    player.weapon
+                ].fireRate;
+        }
 
     }
 
@@ -4006,6 +7087,14 @@ function update(){
 
         shootingCooldown--;
 
+    }
+
+    if(lastGunshot){
+        lastGunshot.timer--;
+
+        if(lastGunshot.timer<=0){
+            lastGunshot=null;
+        }
     }
 
 
@@ -4019,11 +7108,19 @@ function update(){
 
             b.life--;
 
+            if(blockedByBuilding(b.x,b.y)){
+                b.life=0;
+                return;
+            }
+
 
             enemies.forEach(
                 enemy=>{
 
                     if(enemy.dead)
+                        return;
+
+                    if(enemy.floor!==player.floor)
                         return;
 
 
@@ -4055,6 +7152,7 @@ function update(){
                             showMessage(
                                 "SCAV ELIMINATED — LOOTABLE"
                             );
+                            playSound("hit");
 
                         }
 
@@ -4081,13 +7179,130 @@ function update(){
             if(enemy.dead)
                 return;
 
+            const playerDistance=Math.hypot(
+                player.x-enemy.x,
+                player.y-enemy.y
+            );
+
+            if(
+                lastGunshot &&
+                lastGunshot.timer>0 &&
+                Math.hypot(lastGunshot.x-enemy.x,lastGunshot.y-enemy.y)<1400
+            ){
+                enemy.investigate={
+                    x:lastGunshot.x,
+                    y:lastGunshot.y,
+                    floor:lastGunshot.floor,
+                    building:lastGunshot.building,
+                    timer:lastGunshot.timer
+                };
+            }
+
+            const aware=
+                playerDistance<780 ||
+                (
+                    enemy.investigate &&
+                    enemy.investigate.timer>0
+                );
+
+            if(enemy.investigate){
+                enemy.investigate.timer--;
+            }
+
+            let target={
+                x:player.x,
+                y:player.y,
+                floor:player.floor,
+                building:
+                    player.floor>0
+                    ? player.building
+                    : getBuildingAt(player.x,player.y)
+            };
+
+            if(target.building===-1){
+                target.building=null;
+                target.floor=0;
+            }
+
+            if(!aware && enemy.investigate){
+                target=enemy.investigate;
+            }
+
+            if(
+                enemy.floor>0 &&
+                target.floor===0 &&
+                enemy.building!==null
+            ){
+                const stairs=getNearestStairForBuilding(
+                    enemy.building,
+                    enemy.x,
+                    enemy.y
+                );
+
+                if(stairs){
+                    target={
+                        x:stairs.x,
+                        y:stairs.y,
+                        floor:enemy.floor,
+                        building:enemy.building,
+                        stair:stairs,
+                        finalFloor:0
+                    };
+                }
+            }
+
+            else if(
+                enemy.floor!==target.floor &&
+                target.building!==null
+            ){
+                const stairs=getNearestStairForBuilding(
+                    target.building,
+                    enemy.x,
+                    enemy.y
+                );
+
+                if(stairs){
+                    target={
+                        x:stairs.x,
+                        y:stairs.y,
+                        floor:enemy.floor,
+                        building:target.building,
+                        stair:stairs,
+                        finalFloor:target.floor
+                    };
+                }
+            }
+
+            else if(
+                target.building!==-1 &&
+                target.building!==null &&
+                enemy.floor===0 &&
+                !isInsideBuilding(enemy.x,enemy.y,target.building)
+            ){
+                const doorPoint=getNearestDoorForBuilding(
+                    target.building,
+                    enemy.x,
+                    enemy.y
+                );
+
+                if(doorPoint){
+                    if(Math.hypot(enemy.x-doorPoint.x,enemy.y-doorPoint.y)>55){
+                        target={
+                            x:doorPoint.x,
+                            y:doorPoint.y,
+                            floor:0,
+                            building:target.building
+                        };
+                    }
+                }
+            }
 
             const dx=
-                player.x-
+                target.x-
                 enemy.x;
 
             const dy=
-                player.y-
+                target.y-
                 enemy.y;
 
             const d=
@@ -4105,16 +7320,43 @@ function update(){
 
 
             if(
-                d<700 &&
-                d>250
+                aware &&
+                d<1100 &&
+                d>42
             ){
 
-                enemy.x+=
-                    dx/d*.45;
+                const step=1.15;
+                const nx=enemy.x+dx/d*step;
+                const ny=enemy.y+dy/d*step;
+                enemy.walkPhase=(enemy.walkPhase || 0)+.18;
 
-                enemy.y+=
-                    dy/d*.45;
+                if(enemy.floor>0 && enemy.building!==null){
+                    if(isInsideBuilding(nx,enemy.y,enemy.building))
+                        enemy.x=nx;
 
+                    if(isInsideBuilding(enemy.x,ny,enemy.building))
+                        enemy.y=ny;
+                }else{
+                    if(!blockedByBuilding(nx,enemy.y))
+                        enemy.x=nx;
+
+                    if(!blockedByBuilding(enemy.x,ny))
+                        enemy.y=ny;
+                }
+
+            }
+
+            if(
+                target.stair &&
+                Math.hypot(enemy.x-target.stair.x,enemy.y-target.stair.y)<95
+            ){
+                enemy.floor=target.finalFloor;
+                enemy.building=
+                    target.finalFloor>0
+                    ? target.building
+                    : null;
+                enemy.x=target.stair.x;
+                enemy.y=target.stair.y;
             }
 
 
@@ -4123,7 +7365,9 @@ function update(){
 
             if(
                 enemy.cooldown<=0 &&
-                d<650
+                playerDistance<650 &&
+                enemy.floor===player.floor &&
+                hasLineOfSight(enemy.x,enemy.y,player.x,player.y)
             ){
 
                 enemyShoot(
@@ -4149,6 +7393,11 @@ function update(){
             b.y+=b.vy;
 
             b.life--;
+
+            if(blockedByBuilding(b.x,b.y)){
+                b.life=0;
+                return;
+            }
 
 
             if(
@@ -4358,13 +7607,54 @@ function drawMap(){
         }
     );
 
+    gardens.forEach(
+        g=>{
+            ctx.fillStyle="#2b5a31";
+            ctx.fillRect(g.x,g.y,g.w,g.h);
+            ctx.fillStyle="#385f35";
+            for(let x=g.x+12;x<g.x+g.w-8;x+=28){
+                ctx.fillRect(x,g.y+10,10,g.h-20);
+            }
+        }
+    );
+
+    smallStructures.forEach(
+        s=>{
+            ctx.fillStyle="#2b302b";
+            ctx.fillRect(s.x,s.y,s.w,s.h);
+            ctx.strokeStyle="#101410";
+            ctx.lineWidth=6;
+            ctx.strokeRect(s.x,s.y,s.w,s.h);
+            ctx.fillStyle=
+                s.name.includes("Hideout")
+                ? "#6b5131"
+                : "#566157";
+            ctx.fillRect(s.x+10,s.y+10,s.w-20,10);
+        }
+    );
+
+    const playerBuilding=
+        player.floor>0
+        ? player.building
+        : getBuildingAt(player.x,player.y);
+
 
     buildings.forEach(
-        b=>{
+        (b,index)=>{
+
+            const revealInterior=
+                player.floor>0
+                ? playerBuilding===index
+                : isInsideBuilding(player.x,player.y,index);
 
             /* Building interior */
 
-            ctx.fillStyle="#353b36";
+            ctx.fillStyle=
+                revealInterior
+                ? "#353b36"
+                : b.futuristic
+                ? "#111c21"
+                : "#202820";
 
             ctx.fillRect(
                 b.x,
@@ -4381,13 +7671,35 @@ function drawMap(){
             ctx.lineWidth=14;
 
             ctx.strokeRect(b.x,b.y,b.w,b.h);
-            if(b.futuristic){
+            if(b.futuristic && revealInterior){
                 ctx.fillStyle="#8fd3e8"; ctx.font="bold 12px Arial"; ctx.textAlign="center";
-                ctx.fillText("BLACKSITE // LOCKED",b.x+b.w/2,b.y+25);
+                ctx.fillText("BLACKSITE ANNEX",b.x+b.w/2,b.y+25);
                 ctx.fillStyle="#5b7180";
                 ctx.fillRect(b.x+35,b.y+55,b.w-70,4);
             }
 
+            if(revealInterior){
+                ctx.fillStyle="#bfc8b2";
+                ctx.font="bold 11px Arial";
+                ctx.textAlign="center";
+                ctx.fillText(
+                    b.name || "BROWZ BLOCK",
+                    b.x+b.w/2,
+                    b.y+22
+                );
+            }
+
+            if(player.floor>0){
+                ctx.fillStyle="rgba(213,188,106,.08)";
+                ctx.fillRect(b.x+12,b.y+12,b.w-24,b.h-24);
+            }
+
+
+            if(!revealInterior){
+                ctx.fillStyle="rgba(0,0,0,.22)";
+                ctx.fillRect(b.x+12,b.y+12,b.w-24,b.h-24);
+                return;
+            }
 
             /* windows */
 
@@ -4417,6 +7729,56 @@ function drawMap(){
 
             }
 
+        }
+    );
+
+    staircases.forEach(
+        stairs=>{
+            const building=buildings[stairs.building];
+
+            if(
+                player.floor>0
+                ? player.building!==stairs.building
+                : !isInsideBuilding(player.x,player.y,stairs.building)
+            ){
+                return;
+            }
+
+            if(
+                stairs.locked &&
+                building.locked
+            ){
+                ctx.fillStyle="#39515a";
+            }else{
+                ctx.fillStyle="#d8bb68";
+            }
+
+            ctx.save();
+            ctx.translate(stairs.x,stairs.y);
+            ctx.rotate(-.65);
+            ctx.fillRect(-22,-14,44,28);
+            ctx.fillStyle="#171b16";
+
+            for(let i=-14;i<=14;i+=7){
+                ctx.fillRect(i,-12,3,24);
+            }
+
+            ctx.restore();
+
+            if(
+                Math.hypot(stairs.x-player.x,stairs.y-player.y)<95
+            ){
+                ctx.fillStyle="#eee8cf";
+                ctx.font="11px Arial";
+                ctx.textAlign="center";
+                ctx.fillText(
+                    player.floor>0
+                    ?"E: DOWNSTAIRS"
+                    :"E: STAIRS",
+                    stairs.x,
+                    stairs.y-26
+                );
+            }
         }
     );
 
@@ -4567,12 +7929,36 @@ function drawMap(){
 
 }
 
+function drawBuildingVisionMask(){
+    const buildingIndex=
+        player.floor>0
+        ? player.building
+        : getBuildingAt(player.x,player.y);
+
+    if(buildingIndex===null || buildingIndex===-1)
+        return;
+
+    const b=buildings[buildingIndex];
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0,0,WORLD_WIDTH,WORLD_HEIGHT);
+    ctx.rect(b.x+10,b.y+10,b.w-20,b.h-20);
+    ctx.fillStyle="rgba(0,0,0,.94)";
+    ctx.fill("evenodd");
+    ctx.restore();
+}
+
 
 /* =========================================================
    DRAW LOOT BOX
 ========================================================= */
 
 function drawLootBox(box){
+
+    if((box.floor || 0)!==player.floor){
+        return;
+    }
 
     const buildingIndex=buildings.findIndex(
         b=>
@@ -4641,6 +8027,17 @@ function drawLootBox(box){
         56,
         40
     );
+
+    if(box.floor>0){
+        ctx.fillStyle="#d8bb68";
+        ctx.font="bold 10px Arial";
+        ctx.textAlign="center";
+        ctx.fillText(
+            "F"+(box.floor+1),
+            0,
+            -28
+        );
+    }
 
 
     ctx.restore();
@@ -4752,7 +8149,8 @@ function drawCharacter(
     x,
     y,
     angle,
-    enemy=false
+    enemy=false,
+    phase=0
 ){
 
     ctx.save();
@@ -4762,6 +8160,10 @@ function drawCharacter(
         y
     );
 
+    const bob=Math.sin(phase)*2;
+    const stride=Math.sin(phase)*4;
+
+    ctx.translate(0,bob);
 
     /* body */
 
@@ -4785,14 +8187,14 @@ function drawCharacter(
 
     ctx.fillRect(
         -11,
-        7,
+        7+stride*.25,
         8,
         19
     );
 
     ctx.fillRect(
         3,
-        7,
+        7-stride*.25,
         8,
         19
     );
@@ -4864,6 +8266,253 @@ function drawCharacter(
 }
 
 
+function drawNightVisionCone(angle){
+
+    if(selectedRaidTime!=="night")
+        return;
+
+    const px=player.x-camera.x;
+    const py=player.y-camera.y;
+    const range=540;
+    const spread=.43;
+    const rays=96;
+
+    const castRay=rayAngle=>{
+        let distance=30;
+        let lastDistance=distance;
+        let hitDistance=range;
+
+        while(distance<range){
+            const wx=player.x+Math.cos(rayAngle)*distance;
+            const wy=player.y+Math.sin(rayAngle)*distance;
+
+            if(
+                wx<0 ||
+                wy<0 ||
+                wx>WORLD_WIDTH ||
+                wy>WORLD_HEIGHT
+            ){
+                hitDistance=distance;
+                break;
+            }
+
+            if(
+                distance>64 &&
+                blockedByBuilding(wx,wy)
+            ){
+                hitDistance=distance;
+                break;
+            }
+
+            lastDistance=distance;
+            distance+=8;
+        }
+
+        if(hitDistance<range){
+            let low=lastDistance;
+            let high=hitDistance;
+
+            for(let i=0;i<5;i++){
+                const mid=(low+high)/2;
+                const wx=player.x+Math.cos(rayAngle)*mid;
+                const wy=player.y+Math.sin(rayAngle)*mid;
+
+                if(
+                    wx<0 ||
+                    wy<0 ||
+                    wx>WORLD_WIDTH ||
+                    wy>WORLD_HEIGHT ||
+                    (
+                        mid>64 &&
+                        blockedByBuilding(wx,wy)
+                    )
+                ){
+                    high=mid;
+                }else{
+                    low=mid;
+                }
+            }
+
+            distance=low;
+        }else{
+            distance=range;
+        }
+
+        return {
+            x:player.x+Math.cos(rayAngle)*distance-camera.x,
+            y:player.y+Math.sin(rayAngle)*distance-camera.y
+        };
+    };
+
+    const points=[];
+
+    for(let i=0;i<=rays;i++){
+        const t=i/rays;
+        const rayAngle=angle-spread+spread*2*t;
+        points.push(castRay(rayAngle));
+    }
+
+    ctx.save();
+
+    ctx.fillStyle="rgba(0,0,0,.88)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(px,py);
+    points.forEach(
+        point=>{
+            ctx.lineTo(point.x,point.y);
+        }
+    );
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.translate(
+        -camera.x,
+        -camera.y
+    );
+
+    drawMap();
+
+    boxes.forEach(
+        drawLootBox
+    );
+
+    groundLoot.forEach(
+        loot=>{
+            if((loot.floor || 0)!==player.floor)
+                return;
+
+            if(
+                loot.building!==undefined &&
+                player.building!==loot.building
+            ){
+                return;
+            }
+
+            ctx.fillStyle="#dfc44e";
+            ctx.fillRect(
+                loot.x-5,
+                loot.y-5,
+                10,
+                10
+            );
+        }
+    );
+
+    enemies.forEach(
+        enemy=>{
+            if(enemy.floor!==player.floor)
+                return;
+
+            if(enemy.dead){
+                ctx.save();
+                ctx.translate(enemy.x,enemy.y);
+                ctx.rotate(enemy.angle+Math.PI/2);
+                ctx.fillStyle="#3b2927";
+                ctx.fillRect(-24,-9,48,18);
+                ctx.fillStyle="#202420";
+                ctx.fillRect(-17,-13,16,7);
+                ctx.fillRect(4,-13,16,7);
+                ctx.fillStyle="#8f4a40";
+                ctx.beginPath();
+                ctx.arc(0,11,7,0,Math.PI*2);
+                ctx.fill();
+                ctx.restore();
+                return;
+            }
+
+            drawCharacter(
+                enemy.x,
+                enemy.y,
+                enemy.angle,
+                true,
+                enemy.walkPhase || 0
+            );
+        }
+    );
+
+    drawCharacter(
+        player.x,
+        player.y,
+        angle,
+        false,
+        player.walkPhase
+    );
+
+    drawBuildingVisionMask();
+
+    ctx.restore();
+
+    ctx.globalCompositeOperation="source-over";
+
+    ctx.restore();
+
+}
+
+function drawShotOverlay(angle){
+    ctx.save();
+
+    if(muzzleFlash>0){
+        const flicker=.65+muzzleFlashSeed*.55;
+        const length=62+muzzleFlash*9*flicker;
+        const width=5+muzzleFlash*2.2*(1.1-muzzleFlashSeed*.35);
+
+        ctx.translate(
+            player.x-camera.x,
+            player.y-camera.y
+        );
+        ctx.rotate(angle);
+        ctx.fillStyle=
+            muzzleFlash%2===0
+            ? "#fff1a6"
+            : "#ffbf45";
+        ctx.beginPath();
+        ctx.moveTo(length,0);
+        ctx.lineTo(54,-width);
+        ctx.lineTo(63,-1.5);
+        ctx.lineTo(54,width);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    ctx.fillStyle="#ffe68a";
+
+    bullets.forEach(
+        b=>{
+            ctx.beginPath();
+            ctx.arc(
+                b.x-camera.x,
+                b.y-camera.y,
+                3,
+                0,
+                Math.PI*2
+            );
+            ctx.fill();
+        }
+    );
+
+    ctx.fillStyle="#ff6555";
+
+    enemyBullets.forEach(
+        b=>{
+            ctx.beginPath();
+            ctx.arc(
+                b.x-camera.x,
+                b.y-camera.y,
+                3,
+                0,
+                Math.PI*2
+            );
+            ctx.fill();
+        }
+    );
+
+    ctx.restore();
+}
+
+
 /* =========================================================
    DRAW GAME
 ========================================================= */
@@ -4904,6 +8553,15 @@ function draw(){
 
     groundLoot.forEach(
         loot=>{
+            if((loot.floor || 0)!==player.floor)
+                return;
+
+            if(
+                loot.building!==undefined &&
+                player.building!==loot.building
+            ){
+                return;
+            }
 
             ctx.fillStyle=
                 "#dfc44e";
@@ -4923,6 +8581,9 @@ function draw(){
 
     enemies.forEach(
         enemy=>{
+
+            if(enemy.floor!==player.floor)
+                return;
 
             if(enemy.dead){
 
@@ -4967,7 +8628,8 @@ function draw(){
                 enemy.x,
                 enemy.y,
                 enemy.angle,
-                true
+                true,
+                enemy.walkPhase || 0
             );
 
 
@@ -5016,52 +8678,11 @@ function draw(){
         player.x,
         player.y,
         angle,
-        false
+        false,
+        player.walkPhase
     );
 
-
-    /* muzzle flash */
-
-    if(
-        muzzleFlash>0
-    ){
-
-        ctx.save();
-
-        ctx.translate(
-            player.x,
-            player.y
-        );
-
-        ctx.rotate(angle);
-
-        ctx.fillStyle=
-            "#ffd86b";
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            80,
-            0
-        );
-
-        ctx.lineTo(
-            60,
-            -8
-        );
-
-        ctx.lineTo(
-            60,
-            8
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-
-        ctx.restore();
-
-    }
+    drawBuildingVisionMask();
 
 
     /* bullets */
@@ -5106,6 +8727,8 @@ function draw(){
 
         }
     );
+
+    drawBuildingVisionMask();
 
 
     /*
@@ -5152,6 +8775,9 @@ function draw(){
 
     ctx.restore();
 
+
+    drawNightVisionCone(angle);
+    drawShotOverlay(angle);
 
     drawMinimap();
 
@@ -5298,6 +8924,136 @@ function drawMinimap(){
    HUD
 ========================================================= */
 
+let lastHudHTML="";
+let lastHotbarHTML="";
+let lastBodyHudHTML="";
+
+
+function renderHotbar(){
+
+    const bar=document.getElementById("weaponBar");
+
+    if(!bar)
+        return;
+
+    let html="";
+
+    hotbarKeys.forEach(
+        key=>{
+            let itemName="";
+            let slotClass="hotbarSlot";
+
+            if(key==="2"){
+                itemName=equipment.primary?.name || "Primary";
+                if(player.weapon===equipment.primary?.name)
+                    slotClass+=" active";
+            }
+
+            else if(key==="3"){
+                itemName=equipment.secondary?.name || "Secondary";
+                if(player.weapon===equipment.secondary?.name)
+                    slotClass+=" active";
+            }
+
+            else{
+                const item=getHotbarItem(key);
+                itemName=item?.item.name || "Empty";
+
+                if(!item)
+                    slotClass+=" hotbarEmpty";
+            }
+
+            html+=`
+                <div class="${slotClass}">
+                    <div class="hotbarKey">${key}</div>
+                    <div class="hotbarName">${itemName}</div>
+                </div>
+            `;
+        }
+    );
+
+    if(html===lastHotbarHTML)
+        return;
+
+    lastHotbarHTML=html;
+    bar.innerHTML=html;
+
+}
+
+
+function getBodyLimbClass(part){
+
+    const p=bodyParts[part];
+    const percent=p.hp/p.max;
+    let className="bodyLimb ";
+
+    if(part==="head")
+        className+="bodyHead";
+    else if(part==="thorax")
+        className+="bodyThorax";
+    else if(part==="leftArm")
+        className+="bodyLeftArm";
+    else if(part==="rightArm")
+        className+="bodyRightArm";
+    else if(part==="leftLeg")
+        className+="bodyLeftLeg";
+    else
+        className+="bodyRightLeg";
+
+    if(p.blacked)
+        className+=" blacked";
+    else if(percent<.35)
+        className+=" critical";
+    else if(percent<.75)
+        className+=" damaged";
+
+    if(p.bleeding)
+        className+=" bleeding";
+
+    return className;
+
+}
+
+
+function updateBodyHud(){
+
+    const hud=document.getElementById("bodyHud");
+
+    if(!hud)
+        return;
+
+    if(!raidRunning){
+        hud.style.display="none";
+        lastBodyHudHTML="";
+        return;
+    }
+
+    hud.style.display="block";
+
+    const health=totalHealth();
+
+    const html=`
+        <div class="bodyHudTitle">HEALTH</div>
+        <div class="bodyGuy">
+            <div class="${getBodyLimbClass("head")}"></div>
+            <div class="${getBodyLimbClass("thorax")}"></div>
+            <div class="${getBodyLimbClass("leftArm")}"></div>
+            <div class="${getBodyLimbClass("rightArm")}"></div>
+            <div class="${getBodyLimbClass("leftLeg")}"></div>
+            <div class="${getBodyLimbClass("rightLeg")}"></div>
+        </div>
+        <div class="bodyHudText">${Math.round(health.total)} / ${health.max}</div>
+    `;
+
+    if(html===lastBodyHudHTML)
+        return;
+
+    lastBodyHudHTML=html;
+    hud.innerHTML=html;
+
+}
+
+
 function updateHUD(){
 
     const health=
@@ -5306,6 +9062,10 @@ function updateHUD(){
 
     const gun=
         guns[player.weapon];
+
+    const weaponItem=getEquippedWeaponItem();
+    const currentMagazine=
+        weaponItem?.magazine ?? player.magazine;
 
 
     const percentage=
@@ -5317,9 +9077,7 @@ function updateHUD(){
         );
 
 
-    document.getElementById(
-        "hud"
-    ).innerHTML=`
+    const html=`
 
         ❤️ ${Math.round(health.total)}
         / ${health.max}
@@ -5337,7 +9095,7 @@ function updateHUD(){
 
         <br>
 
-        ${player.magazine}
+        ${currentMagazine}
         /
         ${gun.magazine}
 
@@ -5356,7 +9114,26 @@ function updateHUD(){
         👥 Scavs:
         ${Math.ceil(scavTimer/60)}s
 
+        <br>
+
+        🗺 ${raidMapData[selectedRaidMap].name}
+        • ${selectedRaidTime.toUpperCase()}
+
+        <br>
+
+        ${raidMapData[selectedRaidMap].subtitle}
+        • ${player.floor>0 ? "FLOOR "+(player.floor+1) : "STREET"}
+
     `;
+
+    if(html!==lastHudHTML){
+        lastHudHTML=html;
+        document.getElementById(
+            "hud"
+        ).innerHTML=html;
+    }
+
+    updateBodyHud();
 
 }
 
@@ -5506,7 +9283,11 @@ function successfulExtraction(){
 
                 addStashItem(
                     item.name,
-                    item.qty
+                    item.qty,
+                    {
+                        ammo:item.ammo,
+                        durability:item.durability
+                    }
                 );
 
             }
@@ -5538,7 +9319,8 @@ function successfulExtraction(){
 
 function addStashItem(
     name,
-    qty
+    qty,
+    extra={}
 ){
 
     if(
@@ -5629,7 +9411,8 @@ function addStashItem(
 
     stash[slot]={
         name,
-        qty
+        qty,
+        ...extra
     };
 
 
@@ -5663,6 +9446,16 @@ function showResult(
     title,
     text
 ){
+
+    document.body.classList.remove(
+        "inventoryOpen"
+    );
+
+    document.body.classList.remove(
+        "raidActive"
+    );
+
+    updateBodyHud();
 
     document.getElementById(
         "resultTitle"
@@ -5715,50 +9508,77 @@ const traders={
 
     scav:{
         name:"SCAVENGER",
+        face:"☠",
         description:
-            "Cheap supplies.",
+            "Street junk, found ammo and weird favors from Ezra Town.",
+        rep:.18,
         buy:{
             Ammo9:30,
             Ammo556:45,
             Ammo762:55,
+            Pistol9Mag:180,
             Food:80,
-            Bandage:100
+            Bandage:100,
+            Bolts:260,
+            Screws:220
         },
         sell:{
             Ammo9:12,
             Ammo556:22,
             Ammo762:28,
             Food:45,
-            Bandage:60
-        }
+            Bandage:60,
+            Bolts:120,
+            Screws:100,
+            Wires:140
+        },
+        tasks:[
+            {id:"scav_bolts",name:"Loose Hardware",description:"Bring bolts from Browz apartments.",item:"Bolts",qty:3,reward:650,rep:.04,done:false},
+            {id:"scav_screws",name:"Thread Count",description:"Find screws from toolboxes and stores.",item:"Screws",qty:5,reward:820,rep:.05,done:false}
+        ]
     },
 
     medic:{
         name:"FIELD MEDIC",
+        face:"✚",
         description:
-            "Medical supplies.",
+            "Clinic gear, trauma supplies and recovery tasks.",
+        rep:.24,
         buy:{
             Medkit:500,
             Bandage:100,
+            SurgicalKit:1200,
             Painkillers:250,
-            Armor:700
+            Armor:700,
+            Wires:300
         },
         sell:{
             Medkit:300,
             Bandage:50,
+            SurgicalKit:650,
             Painkillers:120,
-            Armor:400
-        }
+            Armor:400,
+            Wires:150
+        },
+        tasks:[
+            {id:"med_wires",name:"Clinic Power",description:"Recover wires for a broken clinic generator.",item:"Wires",qty:4,reward:1100,rep:.06,done:false},
+            {id:"med_bandage",name:"Field Dressing",description:"Stockpile bandages for Browz survivors.",item:"Bandage",qty:6,reward:900,rep:.04,done:false}
+        ]
     },
 
     quartermaster:{
         name:"QUARTERMASTER",
+        face:"■",
         description:
-            "Weapons and equipment.",
+            "Weapons, mags, armor and Blacksite equipment.",
+        rep:.12,
         buy:{
             Pistol:700,
             M4:2800,
             Sniper:5000,
+            Pistol9Mag:180,
+            Gen3M4Mag:420,
+            Sniper762Mag:360,
             Helmet:400,
             Keycard:3000
         },
@@ -5766,9 +9586,66 @@ const traders={
             Pistol:350,
             M4:1400,
             Sniper:2500,
+            Pistol9Mag:90,
+            Gen3M4Mag:210,
+            Sniper762Mag:180,
             Helmet:200,
             Keycard:1800
-        }
+        },
+        tasks:[
+            {id:"qm_gen3",name:"Magazine Trial",description:"Bring M4 Gen 3 magazines for inspection.",item:"Gen3M4Mag",qty:2,reward:1300,rep:.07,done:false},
+            {id:"qm_gpu",name:"Blacksite Spark",description:"Find a GPU in Ezra Town.",item:"GPU",qty:1,reward:2400,rep:.08,done:false}
+        ]
+    },
+
+    mechanic:{
+        name:"MECHANIC",
+        face:"⚙",
+        description:"Parts, repair work and weapon maintenance.",
+        rep:.09,
+        buy:{
+            Bolts:260,
+            Screws:220,
+            Wires:300,
+            Battery:180,
+            SSD:900
+        },
+        sell:{
+            Bolts:130,
+            Screws:110,
+            Wires:150,
+            Battery:90,
+            SSD:420
+        },
+        tasks:[
+            {id:"mech_mix",name:"Street Repair Kit",description:"Bring bolts and screws from Streets of Browz.",item:"Bolts",qty:4,reward:900,rep:.04,done:false,extraItem:"Screws",extraQty:4},
+            {id:"mech_battery",name:"Dead Block",description:"Find a battery for the stairwell lights.",item:"Battery",qty:1,reward:700,rep:.04,done:false}
+        ]
+    },
+
+    broker:{
+        name:"BROKER",
+        face:"$",
+        description:"Valuables, documents and high-risk flips.",
+        rep:.05,
+        buy:{
+            GoldWatch:4500,
+            Jewelry:2800,
+            FlashDrive:1200,
+            Phone:300,
+            GPU:6500
+        },
+        sell:{
+            GoldWatch:2300,
+            Jewelry:1500,
+            FlashDrive:650,
+            Phone:160,
+            GPU:3500
+        },
+        tasks:[
+            {id:"broker_flash",name:"Data Fence",description:"Bring flash drives from offices or hotel rooms.",item:"FlashDrive",qty:2,reward:1800,rep:.05,done:false},
+            {id:"broker_gold",name:"Quiet Luxury",description:"Recover jewelry for a private client.",item:"Jewelry",qty:1,reward:2200,rep:.06,done:false}
+        ]
     }
 
 };
@@ -5777,12 +9654,18 @@ const traders={
 let selectedTrader=
     "scav";
 
+const selectedTraderItems={};
+
 
 function selectTrader(
     name
 ){
 
     selectedTrader=name;
+    selectedTraderItems[name]=
+        selectedTraderItems[name] ||
+        Object.keys(traders[name].buy)[0] ||
+        Object.keys(traders[name].sell)[0];
 
     const t=
         traders[name];
@@ -5804,6 +9687,69 @@ function selectTrader(
 }
 
 
+function getStashCount(name){
+
+    return stash.reduce(
+        (count,item)=>
+            count+
+            (
+                item &&
+                item.name===name
+                ? item.qty || 1
+                : 0
+            ),
+        0
+    );
+
+}
+
+
+function removeStashItems(name,qty){
+
+    for(let i=0;i<stash.length && qty>0;i++){
+        const item=stash[i];
+
+        if(!item || item.name!==name)
+            continue;
+
+        const take=Math.min(item.qty || 1,qty);
+        item.qty=(item.qty || 1)-take;
+        qty-=take;
+
+        if(item.qty<=0)
+            stash[i]=null;
+    }
+
+    return qty<=0;
+
+}
+
+function sellOneStashItem(name,price){
+    const index=
+        stash.findIndex(
+            i=>
+                i &&
+                i.name===name
+        );
+
+    if(index===-1){
+        showMessage("ITEM NOT IN STASH");
+        return false;
+    }
+
+    const item=stash[index];
+
+    if(item.name.startsWith("Ammo") && item.qty>1){
+        item.qty-=1;
+    }else{
+        stash[index]=null;
+    }
+
+    cash+=price;
+    return true;
+}
+
+
 function renderTrades(){
 
     const container=
@@ -5820,192 +9766,239 @@ function renderTrades(){
             selectedTrader
         ];
 
+    const tabs=document.getElementById("traderTabs");
+    const tasks=document.getElementById("traderTasks");
 
-    const buyTitle=
-        document.createElement(
-            "h3"
-        );
+    tabs.innerHTML="";
+    tasks.innerHTML="";
 
-    buyTitle.textContent="BUY";
-
-    container.appendChild(
-        buyTitle
+    Object.entries(traders).forEach(
+        ([key,trader])=>{
+            const tab=document.createElement("button");
+            tab.className="traderTab"+(key===selectedTrader ? " active" : "");
+            tab.innerHTML=`
+                <div class="traderPortrait">${trader.face}</div>
+                <div>
+                    <div class="traderTabName">${trader.name}</div>
+                    <div class="traderTabRep">REP ${trader.rep.toFixed(2)}</div>
+                </div>
+            `;
+            tab.onclick=()=>{
+                selectTrader(key);
+            };
+            tabs.appendChild(tab);
+        }
     );
 
+    document.getElementById("traderRep").innerHTML=`
+        Reputation ${t.rep.toFixed(2)}
+        <div class="repBar">
+            <div class="repBarInner" style="width:${Math.min(100,t.rep*100)}%"></div>
+        </div>
+    `;
 
-    Object.entries(
-        t.buy
-    ).forEach(
-        ([name,price])=>{
-
-            const row=
-                document.createElement(
-                    "div"
+    t.tasks.forEach(
+        task=>{
+            const has=getStashCount(task.item);
+            const extraHas=task.extraItem ? getStashCount(task.extraItem) : 0;
+            const ready=
+                !task.done &&
+                has>=task.qty &&
+                (
+                    !task.extraItem ||
+                    extraHas>=task.extraQty
                 );
 
-            row.className="trade";
-
-
-            row.innerHTML=`
-
-                <img
-                    src="${icons[name]}"
-                >
-
-                <div class="grow">
-
-                    <b>${name}</b>
-
-                    <br>
-
-                    $${price}
-
+            const card=document.createElement("div");
+            card.className="taskCard"+(task.done ? " done" : "");
+            card.innerHTML=`
+                <h3>${task.name}</h3>
+                <p>${task.description}</p>
+                <div class="taskNeed">
+                    <img src="${icons[task.item]}">
+                    <span>${task.item}: ${Math.min(has,task.qty)} / ${task.qty}</span>
                 </div>
-
-                <button>
-                    BUY
+                ${
+                    task.extraItem
+                    ? `
+                        <div class="taskNeed">
+                            <img src="${icons[task.extraItem]}">
+                            <span>${task.extraItem}: ${Math.min(extraHas,task.extraQty)} / ${task.extraQty}</span>
+                        </div>
+                    `
+                    : ""
+                }
+                <div>Reward: $${task.reward} • Rep +${task.rep.toFixed(2)}</div>
+                <button ${ready ? "" : "disabled"}>
+                    ${task.done ? "DONE" : "TURN IN"}
                 </button>
-
             `;
 
-
-            row.querySelector(
-                "button"
-            ).onclick=()=>{
-
-                if(
-                    cash<price
-                ){
-
-                    showMessage(
-                        "NOT ENOUGH MONEY"
-                    );
-
+            card.querySelector("button").onclick=()=>{
+                if(!ready)
                     return;
 
+                removeStashItems(task.item,task.qty);
+
+                if(task.extraItem){
+                    removeStashItems(task.extraItem,task.extraQty);
                 }
 
-
-                if(
-                    !addStashItem(
-                        name,
-                        1
-                    )
-                ){
-
-                    showMessage(
-                        "STASH FULL"
-                    );
-
-                    return;
-
-                }
-
-
-                cash-=price;
-
+                cash+=task.reward;
+                t.rep=Math.min(1,t.rep+task.rep);
+                task.done=true;
                 renderTrades();
                 renderStorage();
-
+                showMessage("TASK COMPLETE: "+task.name);
             };
 
-
-            container.appendChild(
-                row
-            );
-
+            tasks.appendChild(card);
         }
     );
 
 
-    const sellTitle=
-        document.createElement(
-            "h3"
-        );
+    const itemNames=[
+        ...new Set(
+            [
+                ...Object.keys(t.buy),
+                ...Object.keys(t.sell)
+            ]
+        )
+    ];
 
-    sellTitle.textContent=
-        "SELL FROM STASH";
+    if(
+        !selectedTraderItems[selectedTrader] ||
+        !itemNames.includes(selectedTraderItems[selectedTrader])
+    ){
+        selectedTraderItems[selectedTrader]=itemNames[0];
+    }
 
-    container.appendChild(
-        sellTitle
-    );
+    const selectedName=selectedTraderItems[selectedTrader];
+    const market=document.createElement("div");
+    market.className="traderMarket";
 
+    const list=document.createElement("div");
+    list.className="tradeList";
 
-    Object.entries(
-        t.sell
-    ).forEach(
-        ([name,price])=>{
-
-            const row=
-                document.createElement(
-                    "div"
-                );
-
-            row.className="trade";
-
-
-            row.innerHTML=`
-
-                <img
-                    src="${icons[name]}"
-                >
-
-                <div class="grow">
-
+    itemNames.forEach(
+        name=>{
+            const button=document.createElement("button");
+            button.className="tradeItem"+(name===selectedName ? " active" : "");
+            button.innerHTML=`
+                <img src="${icons[name]}">
+                <div>
                     <b>${name}</b>
-
-                    <br>
-
-                    $${price}
-
+                    <small>${getItemType(name)}</small>
                 </div>
-
-                <button>
-                    SELL
-                </button>
-
+                <span>
+                    ${
+                        t.buy[name]
+                        ? "$"+t.buy[name]
+                        : "SELL"
+                    }
+                </span>
             `;
 
-
-            row.querySelector(
-                "button"
-            ).onclick=()=>{
-
-                const index=
-                    stash.findIndex(
-                        i=>
-                            i &&
-                            i.name===name
-                    );
-
-
-                if(index===-1){
-
-                    showMessage(
-                        "ITEM NOT IN STASH"
-                    );
-
-                    return;
-
-                }
-
-
-                stash[index]=null;
-
-                cash+=price;
-
+            button.onclick=()=>{
+                selectedTraderItems[selectedTrader]=name;
                 renderTrades();
-                renderStorage();
-
             };
 
-
-            container.appendChild(
-                row
-            );
-
+            list.appendChild(button);
         }
     );
+
+    const deal=document.createElement("div");
+    deal.className="tradeDeal";
+
+    const buyPrice=t.buy[selectedName];
+    const sellPrice=t.sell[selectedName];
+    const stashCount=getStashCount(selectedName);
+
+    deal.innerHTML=`
+        <div class="tradeDealTop">
+            <img src="${icons[selectedName]}">
+            <div>
+                <h3>${selectedName}</h3>
+                <div>${getItemType(selectedName)}</div>
+            </div>
+        </div>
+        <p>
+            ${
+                itemDescriptions[selectedName] ||
+                "A tradeable raid item."
+            }
+        </p>
+        <div class="dealStats">
+            <div>Buy: ${buyPrice ? "$"+buyPrice : "Not sold"}</div>
+            <div>Sell: ${sellPrice ? "$"+sellPrice : "Not buying"}</div>
+            <div>In stash: ${stashCount}</div>
+            <div>Trader rep: ${t.rep.toFixed(2)}</div>
+        </div>
+        <div class="dealActions">
+            <button id="dealBuy" ${buyPrice ? "" : "disabled"}>BUY</button>
+            <button id="dealSell" ${sellPrice ? "" : "disabled"}>SELL</button>
+        </div>
+    `;
+
+    deal.querySelector("#dealBuy").onclick=()=>{
+        if(!buyPrice)
+            return;
+
+        if(cash<buyPrice){
+            showMessage("NOT ENOUGH MONEY");
+            return;
+        }
+
+        if(
+            !addStashItem(
+                selectedName,
+                1,
+                magazines[selectedName]
+                ? {
+                    ammo:magazines[selectedName].capacity
+                }
+                : selectedName==="Medkit"
+                ? {
+                    durability:100
+                }
+                : selectedName==="SurgicalKit"
+                ? {
+                    durability:1
+                }
+                : {}
+            )
+        ){
+            showMessage("STASH FULL");
+            return;
+        }
+
+        cash-=buyPrice;
+        renderTrades();
+        renderStorage();
+        showMessage("BOUGHT "+selectedName);
+    };
+
+    deal.querySelector("#dealSell").onclick=()=>{
+        if(!sellPrice)
+            return;
+
+        if(sellOneStashItem(selectedName,sellPrice)){
+            renderTrades();
+            renderStorage();
+            showMessage("SOLD "+selectedName);
+        }
+    };
+
+    market.appendChild(list);
+    market.appendChild(deal);
+
+    container.appendChild(
+        document.createElement("h3")
+    );
+
+    container.lastChild.textContent="MARKET";
+    container.appendChild(market);
 
 
     document.getElementById(
@@ -6044,8 +10037,17 @@ const lootPanel=
         "lootPanel"
     );
 
+const raidSetupPanel=
+    document.getElementById(
+        "raidSetupPanel"
+    );
+
 
 function closePanels(){
+    stopLootSearchTimer();
+    stopMagLoad();
+    stopTimedAction();
+    hoveredLootSlot=null;
 
     stashPanel.classList.add(
         "hidden"
@@ -6059,6 +10061,14 @@ function closePanels(){
         "hidden"
     );
 
+    raidSetupPanel.classList.add(
+        "hidden"
+    );
+
+    document.body.classList.remove(
+        "inventoryOpen"
+    );
+
     lootPanel.classList.add(
         "hidden"
     );
@@ -6069,6 +10079,75 @@ function closePanels(){
         "hidden"
     );
 
+    document.getElementById(
+        "inspectPanel"
+    ).classList.add(
+        "hidden"
+    );
+
+}
+
+
+function updateRaidSetup(){
+
+    const data=raidMapData[selectedRaidMap];
+
+    document.querySelectorAll(".mapChoice").forEach(
+        button=>{
+            button.classList.toggle(
+                "active",
+                button.dataset.map===selectedRaidMap
+            );
+        }
+    );
+
+    document.querySelectorAll(".timeButton").forEach(
+        button=>{
+            button.classList.toggle(
+                "active",
+                button.dataset.time===selectedRaidTime
+            );
+        }
+    );
+
+    document.getElementById("selectedMapName").textContent=
+        data.name;
+
+    document.getElementById("selectedMapSubtitle").textContent=
+        data.subtitle;
+
+    document.getElementById("selectedMapDescription").textContent=
+        data.description+
+        (
+            selectedRaidTime==="day"
+            ? " Daylight gives you full visibility, but Scavs can spot you more easily."
+            : " Night deployment limits vision to your weapon light."
+        );
+
+    document.getElementById("selectedRaidTime").textContent=
+        data.minutes+" MIN • "+selectedRaidTime.toUpperCase();
+
+    document.getElementById("selectedRaidRisk").textContent=
+        "RISK: "+data.risk;
+
+    document.getElementById("selectedRaidScavs").textContent=
+        "SCAVS: "+data.scavs;
+
+    const loadout=document.getElementById("selectedLoadoutStatus");
+    const weaponName=
+        equipment.primary?.name ||
+        equipment.secondary?.name;
+
+    if(weaponName){
+        loadout.className="loadoutStatus ready";
+        loadout.textContent=
+            "LOADOUT READY: "+weaponName+" EQUIPPED";
+    }else{
+        loadout.className="loadoutStatus blocked";
+        loadout.textContent=
+            "LOADOUT BLOCKED: EQUIP A PRIMARY OR SECONDARY WEAPON";
+    }
+
 }
 
 
@@ -6076,9 +10155,61 @@ document.getElementById(
     "startRaid"
 ).onclick=()=>{
 
+    mainMenu.classList.add(
+        "hidden"
+    );
+
+    raidSetupPanel.classList.remove(
+        "hidden"
+    );
+
+    updateRaidSetup();
+
+};
+
+
+document.getElementById(
+    "raidSetupBack"
+).onclick=()=>{
+
+    raidSetupPanel.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
+
+};
+
+
+document.getElementById(
+    "raidSetupReady"
+).onclick=()=>{
+
     startRaid();
 
 };
+
+
+document.querySelectorAll(".mapChoice").forEach(
+    button=>{
+        button.onclick=()=>{
+            selectedRaidMap=button.dataset.map;
+            updateRaidSetup();
+        };
+    }
+);
+
+
+document.querySelectorAll(".timeButton").forEach(
+    button=>{
+        button.onclick=()=>{
+            selectedRaidTime=button.dataset.time;
+            updateRaidSetup();
+        };
+    }
+);
 
 
 document.getElementById(
@@ -6109,6 +10240,8 @@ document.getElementById(
     mainMenu.classList.remove(
         "hidden"
     );
+
+    updateRaidSetup();
 
 };
 
@@ -6155,18 +10288,37 @@ document.getElementById(
         "hidden"
     );
 
+    document.body.classList.remove(
+        "inventoryOpen"
+    );
+
 };
 
 
 document.getElementById(
     "closeLoot"
 ).onclick=()=>{
+    stopLootSearchTimer();
+    hoveredLootSlot=null;
 
     lootPanel.classList.add(
         "hidden"
     );
 
     currentBox=null;
+
+};
+
+
+document.getElementById(
+    "closeInspect"
+).onclick=()=>{
+
+    document.getElementById(
+        "inspectPanel"
+    ).classList.add(
+        "hidden"
+    );
 
 };
 
@@ -6202,12 +10354,20 @@ function toggleInventory(){
             "hidden"
         );
 
+        document.body.classList.add(
+            "inventoryOpen"
+        );
+
         renderRaidInventory();
 
     }else{
 
         p.classList.add(
             "hidden"
+        );
+
+        document.body.classList.remove(
+            "inventoryOpen"
         );
 
     }
@@ -6234,6 +10394,8 @@ function renderRaidInventory(){
     const h=totalHealth();
     document.getElementById("inventoryHealth").textContent=
         "Health: "+Math.round(h.total)+"/"+h.max;
+
+    renderHotbar();
 }
 
 /* =========================================================
