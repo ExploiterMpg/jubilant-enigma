@@ -1,0 +1,5957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Extraction Zone</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#101410;
+    color:#eee;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+button{
+    background:#303a31;
+    border:1px solid #647064;
+    color:white;
+    padding:10px 18px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#465246;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.lootHoverPrompt{position:fixed;z-index:35;pointer-events:none;padding:5px 9px;background:#080b08ee;border:1px solid #8c927f;color:#e8e7d1;font-size:11px;letter-spacing:1px;border-radius:2px;transform:translate(12px,12px);display:none;}
+
+/* MAIN MENU */
+
+#mainMenu{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:
+        radial-gradient(circle at center,#283329 0%,#111611 65%);
+}
+
+.menu{
+    width:430px;
+    max-width:90%;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+}
+
+.menu h1{
+    font-size:44px;
+    letter-spacing:5px;
+    margin-bottom:5px;
+}
+
+.menu p{
+    color:#9da89e;
+}
+
+.menu button{
+    width:100%;
+    margin:7px 0;
+}
+
+/* GAME */
+
+canvas{
+    position:absolute;
+    left:0;
+    top:0;
+}
+
+#game{
+    z-index:1;
+}
+
+#minimap{
+    z-index:20;
+    right:15px;
+    left:auto;
+    top:15px;
+    width:240px;
+    height:175px;
+    border:2px solid #788378;
+    background:#111;
+}
+
+/* HUD */
+
+#hud{
+    position:fixed;
+    z-index:30;
+    left:15px;
+    top:15px;
+    min-width:210px;
+    padding:12px;
+    background:#0b0f0bdd;
+    border:1px solid #69736b;
+    border-radius:7px;
+    line-height:1.6;
+}
+
+#healthBar{
+    width:180px;
+    height:8px;
+    background:#321818;
+    margin-top:5px;
+}
+
+#healthBarInner{
+    width:100%;
+    height:100%;
+    background:#54c86a;
+}
+
+#weaponBar{
+    position:fixed;
+    z-index:30;
+    bottom:65px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:8px 14px;
+    background:#0b0f0ddd;
+    border:1px solid #69736b;
+    border-radius:6px;
+}
+
+#help{
+    position:fixed;
+    z-index:30;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:7px 14px;
+    background:#0b0f0ddd;
+    border-radius:6px;
+    font-size:12px;
+}
+
+#message{
+    position:fixed;
+    z-index:500;
+    bottom:105px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:10px 20px;
+    background:#080b08ee;
+    border:1px solid #596259;
+    border-radius:6px;
+}
+
+#message:empty{
+    display:none;
+}
+
+#extractBox{
+    position:fixed;
+    z-index:40;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    padding:14px 25px;
+    background:#092512ee;
+    border:2px solid #4dde70;
+    border-radius:7px;
+    display:none;
+}
+
+/* STORAGE */
+
+#stashPanel{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:#101510;
+    padding:20px;
+    overflow:auto;
+}
+
+.storageLayout{
+    display:flex;
+    gap:25px;
+    align-items:flex-start;
+    min-width:1100px;
+}
+
+.inventorySide{
+    width:560px;
+}
+
+.stashSide{
+    flex:1;
+    min-width:600px;
+}
+
+.storageBox{
+    background:#181e19;
+    border:1px solid #4d574e;
+    border-radius:7px;
+    padding:15px;
+}
+
+.storageTitle{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(5,76px);
+    gap:7px;
+}
+
+.stashGrid{
+    grid-template-columns:repeat(8,76px);
+}
+
+/* EQUIPMENT */
+
+.equipment{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.equipSlot{
+    height:105px;
+    background:#242b25;
+    border:1px solid #59645a;
+    border-radius:6px;
+    position:relative;
+    text-align:center;
+    padding-top:5px;
+}
+
+.equipSlot.wide{
+    grid-column:span 2;
+}
+
+.equipLabel{
+    font-size:11px;
+    color:#aeb7af;
+}
+
+.equipSlot .slot{
+    width:76px;
+    height:76px;
+    margin:4px auto;
+    border:0;
+    background:transparent;
+}
+
+/* ITEM SLOT */
+
+.slot{
+    width:76px;
+    height:76px;
+    background:#252c26;
+    border:1px solid #566157;
+    border-radius:5px;
+    position:relative;
+    user-select:none;
+}
+
+.slot:hover{
+    background:#354036;
+}
+
+.slot.dragOver{
+    border:2px solid #69e58a;
+}
+
+.slot img{
+    width:48px;
+    height:48px;
+    display:block;
+    margin:2px auto;
+}
+
+.slotName{
+    font-size:9px;
+    text-align:center;
+    white-space:nowrap;
+    overflow:hidden;
+    padding:0 2px;
+}
+
+.qty{
+    position:absolute;
+    right:3px;
+    top:3px;
+    background:#080a08;
+    padding:2px 4px;
+    font-size:10px;
+    border-radius:3px;
+}
+
+/* RAID INVENTORY */
+
+#inventoryPanel{
+    position:fixed;
+    z-index:250;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    background:#151b16;
+    border:2px solid #657066;
+    border-radius:8px;
+    padding:20px;
+    width:1100px;
+    max-width:calc(100vw - 30px);
+    max-height:calc(100vh - 30px);
+    overflow:auto;
+}
+
+#inventoryPanel .storageLayout{
+    min-width:0;
+    display:grid;
+    grid-template-columns:minmax(360px,0.9fr) minmax(420px,1.1fr);
+    gap:16px;
+    align-items:start;
+}
+#inventoryPanel .storageBox{min-width:0;overflow:hidden;}
+#inventoryPanel .stashGrid{grid-template-columns:repeat(6,minmax(0,1fr));}
+#inventoryPanel .grid{width:100%;}
+@media(max-width:900px){#inventoryPanel .storageLayout{grid-template-columns:1fr;}#inventoryPanel{width:calc(100vw - 24px);}}
+
+#inventoryPanel .inventorySide,
+#inventoryPanel .stashSide{
+    width:auto;
+    min-width:0;
+}
+
+#inventoryHealth{
+    margin-bottom:15px;
+}
+
+/* LOOT */
+
+#lootPanel{
+    position:fixed;
+    z-index:300;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    background:#151b16;
+    border:2px solid #657066;
+    border-radius:8px;
+    padding:20px;
+    width:930px;
+    max-width:calc(100vw - 30px);
+    max-height:calc(100vh - 30px);
+    overflow:auto;
+}
+
+#lootPanel .lootColumns{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:24px;
+}
+
+#lootPanel .lootColumn{
+    min-width:0;
+}
+
+#lootPanel .lootColumn .grid{
+    grid-template-columns:repeat(5,76px);
+    max-width:100%;
+}
+
+.lootColumns{
+    display:flex;
+    gap:30px;
+}
+
+.lootColumn{
+    flex:1;
+}
+
+/* TRADERS */
+
+#traderPanel{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    background:#111611;
+    padding:25px;
+    overflow:auto;
+}
+
+.trade{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    max-width:700px;
+    margin:7px 0;
+    padding:8px;
+    background:#222922;
+    border:1px solid #4d574f;
+}
+
+.trade img{
+    width:50px;
+    height:50px;
+}
+
+.grow{
+    flex:1;
+}
+
+/* HEALTH PANEL */
+
+#healthPanel{
+    position:fixed;
+    z-index:400;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    background:#151b16;
+    border:2px solid #657066;
+    border-radius:8px;
+    padding:20px;
+    width:400px;
+}
+
+.bodyPart{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:7px 0;
+    padding:6px;
+    background:#232923;
+}
+
+.partBar{
+    width:130px;
+    height:8px;
+    background:#3a1818;
+}
+
+.partBarInner{
+    height:100%;
+    background:#55c86a;
+}
+
+.status{
+    font-size:11px;
+    color:#dca05f;
+}
+
+/* RESULT */
+
+#raidResult{
+    position:fixed;
+    inset:0;
+    z-index:900;
+    background:#000d;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+/* TACTICAL EXTRACTION UI */
+body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
+#mainMenu{background:linear-gradient(90deg,rgba(8,10,9,.98) 0%,rgba(14,18,15,.94) 42%,rgba(9,12,10,.55) 100%),radial-gradient(circle at 72% 45%,#364236 0%,#111510 55%,#080a08 100%);}
+#mainMenu:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.018) 4px),linear-gradient(90deg,transparent 0 70%,rgba(194,173,117,.06) 70% 70.2%,transparent 70.2%);pointer-events:none;}
+#mainMenu .menu{left:54px;top:48px;transform:none;width:390px;max-width:calc(100% - 108px);text-align:left;}
+#mainMenu .menu h1{font-size:42px;letter-spacing:7px;margin:0;color:#d9d9ce;font-weight:700;}
+#mainMenu .menu p{margin:6px 0 28px;color:#8f978b;font-size:11px;letter-spacing:2px;}
+#mainMenu .menu button{height:48px;margin:4px 0;background:#1a211c;border:0;border-left:4px solid #5b665a;border-bottom:1px solid #384038;border-radius:0;text-align:left;padding-left:18px;font-size:13px;letter-spacing:1.5px;}
+#mainMenu .menu button:hover{background:#30382f;border-left-color:#c3a75e;color:#fff;}
+#mainMenu .menuMeta{margin-top:35px;padding-top:14px;border-top:1px solid #3d443d;color:#70786e;font-size:9px;letter-spacing:1.4px;line-height:1.8;}
+.lootHoverPrompt{background:#11150fef;border:1px solid #b6a05f;color:#eee9d4;border-radius:0;font-weight:700;box-shadow:0 3px 12px #0009;}
+#lootPanel{width:min(1040px,calc(100vw - 40px));padding:14px;background:#141815;border:1px solid #667064;border-radius:0;box-shadow:0 20px 60px #000b;overflow:hidden;}
+#lootPanel .lootColumns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start;}
+#lootPanel .lootColumn{background:#0e120f;border:1px solid #3c443d;padding:10px;min-width:0;overflow:hidden;}
+#lootPanel .lootColumn h3{font-size:11px;letter-spacing:1.5px;color:#aeb3a6;margin:0 0 9px;}
+#lootPanel .lootColumn .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;width:100%;max-width:none;}
+#lootPanel .slot{min-width:0;width:auto;height:72px;}
+@media(max-width:820px){#lootPanel .lootColumns{grid-template-columns:1fr;}#lootPanel .lootColumn .grid{grid-template-columns:repeat(5,1fr)}#mainMenu .menu{left:24px;top:30px;max-width:calc(100% - 48px)}}
+
+/* Main-menu tactical backdrop — original CSS scene, no third-party artwork. */
+#mainMenu{
+    isolation:isolate;
+    overflow:hidden;
+    background:
+        radial-gradient(ellipse at 77% 26%, rgba(172,188,153,.20) 0 2%, transparent 19%),
+        radial-gradient(ellipse at 72% 48%, rgba(81,102,75,.38) 0%, rgba(19,27,20,.40) 34%, transparent 63%),
+        linear-gradient(105deg, #060806 0%, #111811 39%, #1a251c 68%, #070a08 100%);
+}
+
+#mainMenu:before{
+    z-index:-1;
+    opacity:.96;
+    background:
+        linear-gradient(180deg, rgba(0,0,0,.05) 0 39%, rgba(9,13,10,.28) 40% 49%, rgba(3,6,4,.82) 79% 100%),
+        radial-gradient(ellipse at 74% 43%, rgba(198,209,174,.11) 0 2%, transparent 18%),
+        radial-gradient(ellipse at 89% 18%, rgba(162,179,139,.08) 0 1px, transparent 2px),
+        repeating-linear-gradient(90deg, transparent 0 7%, rgba(187,203,169,.025) 7.2% 7.45%, transparent 7.7% 14%),
+        repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.016) 4px);
+}
+
+#mainMenu:after{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    left:42%;
+    right:-8%;
+    bottom:0;
+    height:66%;
+    opacity:.9;
+    background:
+        linear-gradient(90deg, transparent 0 8%, rgba(13,18,14,.86) 8% 12%, transparent 12% 15%, rgba(17,23,17,.94) 15% 26%, transparent 26% 30%, rgba(10,15,11,.95) 30% 44%, transparent 44% 49%, rgba(17,23,17,.92) 49% 63%, transparent 63% 68%, rgba(9,13,10,.96) 68% 100%),
+        linear-gradient(168deg, transparent 0 49%, rgba(47,56,45,.7) 49.4% 50.1%, transparent 50.5%),
+        linear-gradient(12deg, transparent 0 49%, rgba(67,76,61,.36) 49.4% 50.1%, transparent 50.5%);
+    clip-path:polygon(0 44%, 7% 37%, 13% 43%, 16% 18%, 24% 16%, 26% 40%, 33% 34%, 36% 8%, 46% 4%, 49% 34%, 57% 34%, 60% 21%, 70% 25%, 74% 43%, 81% 38%, 86% 9%, 94% 12%, 100% 42%, 100% 100%, 0 100%);
+    filter:drop-shadow(0 -2px 18px rgba(135,157,110,.12));
+}
+
+#mainMenu .menu{
+    z-index:2;
+    padding:10px 30px 14px;
+    border-left:1px solid rgba(189,204,167,.18);
+    background:transparent;
+    box-shadow:none;
+}
+
+#mainMenu .menu h1{
+    text-shadow:0 2px 14px #000, 0 0 28px rgba(186,204,158,.14);
+}
+
+#mainMenu .menuMeta{
+    text-shadow:0 1px 4px #000;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= MAIN MENU ================= -->
+
+<div id="mainMenu">
+
+    <div class="menu">
+
+        <h1>EXTRACTION ZONE</h1>
+
+        <p>TACTICAL EXTRACTION • LOOT • SURVIVE</p>
+
+        <button id="startRaid">▶ &nbsp; START RAID</button>
+        <button id="openStash">▣ &nbsp; STASH / INVENTORY</button>
+        <button id="openTraders">$ &nbsp; TRADERS</button>
+
+        <div class="menuMeta">DEPLOYMENT READY &nbsp; • &nbsp; PMC ONLINE<br>VERSION 0.4 &nbsp; • &nbsp; LOCAL RAID SIMULATION</div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= STASH ================= -->
+
+<div id="stashPanel" class="hidden">
+
+    <div class="storageTitle">
+
+        <h1>STASH</h1>
+
+        <button id="stashBack">
+            BACK
+        </button>
+
+    </div>
+
+    <div class="storageLayout">
+
+        <!-- INVENTORY LEFT -->
+
+        <div class="inventorySide">
+
+            <div class="storageBox">
+
+                <h2>CHARACTER</h2>
+
+                <div class="equipment">
+
+                    <div class="equipSlot">
+
+                        <div class="equipLabel">
+                            PRIMARY WEAPON
+                        </div>
+
+                        <div
+                            id="primarySlot"
+                            class="slot"
+                            data-equip="primary"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="equipSlot">
+
+                        <div class="equipLabel">
+                            SECONDARY
+                        </div>
+
+                        <div
+                            id="secondarySlot"
+                            class="slot"
+                            data-equip="secondary"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="equipSlot">
+
+                        <div class="equipLabel">
+                            ARMOR
+                        </div>
+
+                        <div
+                            id="armorSlot"
+                            class="slot"
+                            data-equip="armor"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="equipSlot">
+
+                        <div class="equipLabel">
+                            HELMET
+                        </div>
+
+                        <div
+                            id="helmetSlot"
+                            class="slot"
+                            data-equip="helmet"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="equipSlot wide">
+
+                        <div class="equipLabel">
+                            BACKPACK
+                        </div>
+
+                        <div
+                            id="backpackSlot"
+                            class="slot"
+                            data-equip="backpack"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <h2>BACKPACK — 20 SLOTS</h2>
+
+                <div
+                    id="stashInventoryGrid"
+                    class="grid"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- STASH RIGHT -->
+
+        <div class="stashSide">
+
+            <div class="storageBox">
+
+                <h2>STASH — 60 SLOTS</h2>
+
+                <p>
+                    Drag equipment into your character slots
+                    or items into the backpack.
+                </p>
+
+                <div
+                    id="stashGrid"
+                    class="grid stashGrid"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= TRADERS ================= -->
+
+<div id="traderPanel" class="hidden">
+
+    <button id="traderBack">
+        BACK
+    </button>
+
+    <h1>TRADERS</h1>
+
+    <h2>
+        Cash: $<span id="cash">2500</span>
+    </h2>
+
+    <button onclick="selectTrader('scav')">
+        SCAVENGER
+    </button>
+
+    <button onclick="selectTrader('medic')">
+        FIELD MEDIC
+    </button>
+
+    <button onclick="selectTrader('quartermaster')">
+        QUARTERMASTER
+    </button>
+
+    <h2 id="traderName"></h2>
+
+    <p id="traderDescription"></p>
+
+    <div id="trades"></div>
+
+</div>
+
+
+<!-- ================= RAID INVENTORY ================= -->
+
+<div id="inventoryPanel" class="hidden">
+    <div class="storageTitle">
+        <h1>CHARACTER / INVENTORY</h1>
+        <button id="closeInventory">CLOSE</button>
+    </div>
+    <div class="storageLayout">
+        <div class="inventorySide">
+            <div class="storageBox">
+                <h2>CHARACTER</h2>
+                <div class="equipment">
+                    <div class="equipSlot"><div class="equipLabel">PRIMARY WEAPON</div><div id="raidPrimarySlot" class="slot" data-equip="primary"></div></div>
+                    <div class="equipSlot"><div class="equipLabel">SECONDARY</div><div id="raidSecondarySlot" class="slot" data-equip="secondary"></div></div>
+                    <div class="equipSlot"><div class="equipLabel">ARMOR</div><div id="raidArmorSlot" class="slot" data-equip="armor"></div></div>
+                    <div class="equipSlot"><div class="equipLabel">HELMET</div><div id="raidHelmetSlot" class="slot" data-equip="helmet"></div></div>
+                    <div class="equipSlot wide"><div class="equipLabel">BACKPACK</div><div id="raidBackpackSlot" class="slot" data-equip="backpack"></div></div>
+                </div>
+                <h2>BACKPACK — 20 SLOTS</h2>
+                <div id="raidInventoryGrid" class="grid"></div>
+            </div>
+        </div>
+        <div class="stashSide">
+            <div class="storageBox">
+                <h2>RAID STATUS</h2>
+                <div id="inventoryHealth"></div>
+                <p>Same equipment and backpack system as the stash.</p>
+                <p>Drag weapons, armor, helmet and backpack between the character slots and backpack.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ================= LOOT ================= -->
+
+<div id="lootPanel" class="hidden">
+
+    <button id="closeLoot">
+        CLOSE
+    </button>
+
+    <h2>LOOT CONTAINER</h2>
+
+    <div class="lootColumns">
+
+        <div class="lootColumn">
+
+            <h3>CONTAINER</h3>
+
+            <div
+                id="boxGrid"
+                class="grid"
+            ></div>
+
+        </div>
+
+        <div class="lootColumn">
+
+            <h3>INVENTORY</h3>
+
+            <div
+                id="lootInventoryGrid"
+                class="grid"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= HEALTH ================= -->
+
+<div id="healthPanel" class="hidden">
+
+    <button id="closeHealth">
+        CLOSE
+    </button>
+
+    <h2>HEALTH</h2>
+
+    <div id="healthParts"></div>
+
+</div>
+
+
+<!-- ================= GAME ================= -->
+
+<canvas id="game"></canvas>
+<canvas id="minimap"></canvas>
+
+<div id="hud"></div>
+
+<div id="weaponBar">
+    1 Primary &nbsp; 2 Secondary &nbsp; R Reload
+</div>
+
+<div id="help">
+    WASD Move • Mouse Aim • Left Click Shoot •
+    E Loot • F Quick Loot • I Inventory • H Health • R Reload •
+    Right Click Drop
+</div>
+
+<div id="message"></div>
+<div id="lootHoverPrompt" class="lootHoverPrompt"></div>
+
+<div id="extractBox"></div>
+
+
+<!-- ================= RESULT ================= -->
+
+<div id="raidResult">
+
+    <div>
+
+        <h1 id="resultTitle"></h1>
+
+        <p id="resultText"></p>
+
+        <button onclick="returnMenu()">
+            RETURN TO MENU
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas =
+    document.getElementById("game");
+
+const ctx =
+    canvas.getContext("2d");
+
+const minimap =
+    document.getElementById("minimap");
+
+const mctx =
+    minimap.getContext("2d");
+
+
+function resize(){
+
+    canvas.width =
+        innerWidth;
+
+    canvas.height =
+        innerHeight;
+
+}
+
+resize();
+
+addEventListener(
+    "resize",
+    resize
+);
+
+
+/* =========================================================
+   WORLD
+========================================================= */
+
+const WORLD_WIDTH = 3600;
+const WORLD_HEIGHT = 2600;
+
+const camera = {
+    x:0,
+    y:0
+};
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+const player = {
+
+    x:300,
+    y:1250,
+
+    speed:4,
+
+    kills:0,
+
+    weapon:"Pistol",
+
+    magazine:12,
+
+    spawnProtection:300
+
+};
+
+
+/* =========================================================
+   TARKOV STYLE HEALTH
+========================================================= */
+
+const bodyParts = {
+
+    head:{
+        hp:35,
+        max:35,
+        bleeding:false,
+        blacked:false
+    },
+
+    thorax:{
+        hp:85,
+        max:85,
+        bleeding:false,
+        blacked:false
+    },
+
+    leftArm:{
+        hp:60,
+        max:60,
+        bleeding:false,
+        blacked:false
+    },
+
+    rightArm:{
+        hp:60,
+        max:60,
+        bleeding:false,
+        blacked:false
+    },
+
+    leftLeg:{
+        hp:65,
+        max:65,
+        bleeding:false,
+        blacked:false
+    },
+
+    rightLeg:{
+        hp:65,
+        max:65,
+        bleeding:false,
+        blacked:false
+    }
+
+};
+
+
+function totalHealth(){
+
+    let total=0;
+    let max=0;
+
+    for(const part in bodyParts){
+
+        total +=
+            Math.max(
+                0,
+                bodyParts[part].hp
+            );
+
+        max +=
+            bodyParts[part].max;
+
+    }
+
+    return {
+        total,
+        max
+    };
+
+}
+
+
+function resetHealth(){
+
+    for(const part in bodyParts){
+
+        bodyParts[part].hp =
+            bodyParts[part].max;
+
+        bodyParts[part].bleeding=false;
+        bodyParts[part].blacked=false;
+
+    }
+
+}
+
+
+function damageBodyPart(
+    part,
+    damage
+){
+
+    const body =
+        bodyParts[part];
+
+    if(!body)return;
+
+    body.hp -= damage;
+
+    if(body.hp <= 0){
+
+        body.hp=0;
+
+        body.blacked=true;
+
+    }
+
+    if(
+        damage > 15 &&
+        Math.random() < .18
+    ){
+
+        body.bleeding=true;
+
+    }
+
+}
+
+
+function receiveDamage(damage){
+
+    const parts=[
+        "head",
+        "thorax",
+        "leftArm",
+        "rightArm",
+        "leftLeg",
+        "rightLeg"
+    ];
+
+    const part=
+        parts[
+            Math.floor(
+                Math.random()*parts.length
+            )
+        ];
+
+    damageBodyPart(
+        part,
+        damage
+    );
+
+    /*
+       Thorax/head blacked:
+       player dies.
+    */
+
+    if(
+        bodyParts.head.blacked ||
+        bodyParts.thorax.blacked
+    ){
+
+        playerDead();
+
+    }
+
+}
+
+
+/* =========================================================
+   MOVEMENT
+========================================================= */
+
+const keys={};
+
+const mouse={
+    x:0,
+    y:0,
+    down:false
+};
+
+
+addEventListener(
+    "keydown",
+    e=>{
+
+        keys[
+            e.key.toLowerCase()
+        ]=true;
+
+        if(
+            e.key.toLowerCase()==="i" &&
+            raidRunning
+        ){
+
+            toggleInventory();
+
+        }
+
+        if(
+            e.key.toLowerCase()==="h" &&
+            raidRunning
+        ){
+
+            toggleHealth();
+
+        }
+
+        if(
+            e.key.toLowerCase()==="e" &&
+            raidRunning
+        ){
+
+            interact();
+
+        }
+
+        if(
+            e.key.toLowerCase()==="r" &&
+            raidRunning
+        ){
+
+            reload();
+
+        }
+
+        if(
+            e.key==="1" &&
+            raidRunning
+        ){
+
+            equipRaidWeapon(
+                "primary"
+            );
+
+        }
+
+        if(
+            e.key==="2" &&
+            raidRunning
+        ){
+
+            equipRaidWeapon(
+                "secondary"
+            );
+
+        }
+
+    }
+);
+
+
+addEventListener(
+    "keyup",
+    e=>{
+        keys[
+            e.key.toLowerCase()
+        ]=false;
+    }
+);
+
+
+canvas.addEventListener(
+    "mousemove",
+    e=>{
+
+        mouse.x=e.clientX;
+        mouse.y=e.clientY;
+
+    }
+);
+
+
+canvas.addEventListener(
+    "mousedown",
+    e=>{
+
+        if(e.button===0)
+            mouse.down=true;
+
+    }
+);
+
+
+addEventListener(
+    "mouseup",
+    e=>{
+
+        if(e.button===0)
+            mouse.down=false;
+
+    }
+);
+
+
+/* =========================================================
+   GUNS
+========================================================= */
+
+const guns={
+
+    Pistol:{
+        damage:25,
+        fireRate:16,
+        bulletSpeed:15,
+        magazine:12,
+        ammoType:"Ammo9"
+    },
+
+    M4:{
+        damage:32,
+        fireRate:6,
+        bulletSpeed:17,
+        magazine:30,
+        ammoType:"Ammo556"
+    },
+
+    Sniper:{
+        damage:95,
+        fireRate:55,
+        bulletSpeed:24,
+        magazine:5,
+        ammoType:"Ammo762"
+    }
+
+};
+
+
+/* =========================================================
+   ITEMS
+========================================================= */
+
+const itemValues={
+
+    Ammo9:25,
+    Ammo556:45,
+    Ammo762:55,
+
+    Bandage:100,
+    Medkit:450,
+    Painkillers:250,
+
+    Food:80,
+    Water:60,
+
+    Armor:700,
+    Helmet:400,
+    Backpack:600,
+
+    Battery:150,
+    CPU:1800,
+    GPU:6500,
+    SSD:900,
+
+    FlashDrive:1200,
+    Phone:300,
+
+    Key:500,
+    Keycard:3000,
+
+    GoldWatch:4500,
+    Jewelry:2800,
+
+    Pistol:700,
+    M4:2800,
+    Sniper:5000
+
+};
+
+
+const itemColors={
+
+    Ammo9:"#c5a769",
+    Ammo556:"#b99a58",
+    Ammo762:"#a27e45",
+
+    Bandage:"#ddd0aa",
+    Medkit:"#e1e1e1",
+    Painkillers:"#d0d0c4",
+
+    Food:"#c38d57",
+    Water:"#5d99b0",
+
+    Armor:"#56645a",
+    Helmet:"#4f5951",
+    Backpack:"#574f43",
+
+    Battery:"#75955f",
+
+    CPU:"#a76ad2",
+    GPU:"#51956c",
+    SSD:"#777",
+
+    FlashDrive:"#bda35a",
+    Phone:"#5a6d78",
+
+    Key:"#b6a06a",
+    Keycard:"#d6d6d6",
+
+    GoldWatch:"#d0a943",
+    Jewelry:"#bfc9d0",
+
+    Pistol:"#222",
+    M4:"#242723",
+    Sniper:"#20211e"
+
+};
+
+
+const icons={};
+
+
+function makeIcon(name){
+
+    const c=
+        document.createElement("canvas");
+
+    c.width=64;
+    c.height=64;
+
+    const x=c.getContext("2d");
+
+    x.fillStyle="#202720";
+    x.fillRect(
+        0,0,64,64
+    );
+
+    x.fillStyle=
+        itemColors[name]||"#aaa";
+
+
+    if(
+        name.startsWith("Ammo")
+    ){
+
+        for(
+            let i=0;
+            i<4;
+            i++
+        ){
+
+            x.fillRect(
+                13+i*11,
+                13,
+                7,
+                39
+            );
+
+        }
+
+    }
+
+    else if(
+        name==="Pistol"
+    ){
+
+        x.fillRect(
+            7,25,47,8
+        );
+
+        x.fillRect(
+            20,32,10,21
+        );
+
+    }
+
+    else if(
+        name==="M4"
+    ){
+
+        x.fillRect(
+            6,27,52,7
+        );
+
+        x.fillRect(
+            37,23,16,6
+        );
+
+        x.fillRect(
+            20,34,8,20
+        );
+
+    }
+
+    else if(
+        name==="Sniper"
+    ){
+
+        x.fillRect(
+            4,27,56,6
+        );
+
+        x.fillRect(
+            24,21,30,5
+        );
+
+    }
+
+    else if(
+        name==="Medkit"
+    ){
+
+        x.fillStyle="#ddd";
+
+        x.fillRect(
+            9,16,46,32
+        );
+
+        x.fillStyle="#d33";
+
+        x.fillRect(
+            27,11,10,42
+        );
+
+        x.fillRect(
+            18,27,28,10
+        );
+
+    }
+
+    else if(
+        name==="Armor"
+    ){
+
+        x.beginPath();
+
+        x.moveTo(15,10);
+        x.lineTo(49,10);
+        x.lineTo(54,48);
+        x.lineTo(32,57);
+        x.lineTo(10,48);
+
+        x.closePath();
+        x.fill();
+
+    }
+
+    else{
+
+        x.fillRect(
+            12,15,40,35
+        );
+
+    }
+
+    return c.toDataURL();
+
+}
+
+
+Object.keys(itemValues)
+.forEach(
+    n=>{
+        icons[n]=makeIcon(n);
+    }
+);
+
+
+/* =========================================================
+   INVENTORY
+========================================================= */
+
+const inventory =
+    new Array(20).fill(null);
+
+const stash =
+    new Array(60).fill(null);
+
+
+/* EQUIPMENT */
+
+const equipment={
+
+    primary:null,
+    secondary:null,
+    armor:null,
+    helmet:null,
+    backpack:null
+
+};
+
+
+/* STARTING STASH */
+
+stash[0]={
+    name:"M4",
+    qty:1
+};
+
+stash[1]={
+    name:"Pistol",
+    qty:1
+};
+
+stash[2]={
+    name:"Ammo556",
+    qty:180
+};
+
+stash[3]={
+    name:"Ammo9",
+    qty:120
+};
+
+stash[4]={
+    name:"Ammo762",
+    qty:60
+};
+
+stash[5]={
+    name:"Medkit",
+    qty:2
+};
+
+stash[6]={
+    name:"Bandage",
+    qty:4
+};
+
+stash[7]={
+    name:"Armor",
+    qty:1
+};
+
+stash[8]={
+    name:"Helmet",
+    qty:1
+};
+
+stash[9]={
+    name:"GPU",
+    qty:1
+};
+
+
+/* =========================================================
+   DRAG SYSTEM
+========================================================= */
+
+let dragged=null;
+
+
+function createSlot(
+    item,
+    index,
+    array,
+    type
+){
+
+    const slot=
+        document.createElement("div");
+
+    slot.className="slot";
+
+    if(item){
+
+        slot.draggable=true;
+
+        const img=
+            document.createElement("img");
+
+        img.src=icons[item.name] || icons.Keycard || makeIcon(item.name);
+
+        slot.appendChild(img);
+
+
+        const name=
+            document.createElement("div");
+
+        name.className="slotName";
+        name.textContent=item.name;
+
+        slot.appendChild(name);
+
+
+        if(item.qty>1){
+
+            const qty=
+                document.createElement("div");
+
+            qty.className="qty";
+            qty.textContent=item.qty;
+
+            slot.appendChild(qty);
+
+        }
+
+
+        slot.addEventListener(
+            "dragstart",
+            ()=>{
+
+                dragged={
+                    array,
+                    index,
+                    type
+                };
+
+            }
+        );
+
+
+        slot.addEventListener(
+            "contextmenu",
+            e=>{
+
+                e.preventDefault();
+
+                if(type==="inventory"){
+
+                    dropItem(index);
+
+                }
+
+            }
+        );
+
+    }
+
+
+    slot.addEventListener(
+        "dragover",
+        e=>{
+
+            e.preventDefault();
+
+            slot.classList.add(
+                "dragOver"
+            );
+
+        }
+    );
+
+
+    slot.addEventListener(
+        "dragleave",
+        ()=>{
+
+            slot.classList.remove(
+                "dragOver"
+            );
+
+        }
+    );
+
+
+    slot.addEventListener(
+        "drop",
+        e=>{
+
+            e.preventDefault();
+
+            slot.classList.remove(
+                "dragOver"
+            );
+
+            if(!dragged)return;
+
+            moveItem(
+                dragged,
+                {
+                    array,
+                    index,
+                    type
+                }
+            );
+
+            dragged=null;
+
+        }
+    );
+
+
+    return slot;
+
+}
+
+
+/* =========================================================
+   EQUIPMENT SLOT
+========================================================= */
+
+function createEquipmentSlot(
+    slotElement,
+    slotName
+){
+
+    slotElement.innerHTML="";
+
+    const item=
+        equipment[slotName];
+
+    if(item){
+
+        const s=
+            createSlot(
+                item,
+                -1,
+                equipment,
+                "equipment"
+            );
+
+        s.dataset.equip=slotName;
+
+        s.addEventListener(
+            "dragstart",
+            ()=>{
+                dragged={
+                    array:equipment,
+                    index:slotName,
+                    type:"equipment"
+                };
+            }
+        );
+
+        slotElement.appendChild(s);
+
+    }
+
+
+    slotElement.ondragover=e=>{
+        e.preventDefault();
+
+        slotElement.classList.add(
+            "dragOver"
+        );
+
+    };
+
+
+    slotElement.ondragleave=()=>{
+        slotElement.classList.remove(
+            "dragOver"
+        );
+    };
+
+
+    slotElement.ondrop=e=>{
+
+        e.preventDefault();
+
+        slotElement.classList.remove(
+            "dragOver"
+        );
+
+        if(!dragged)return;
+
+        if(
+            canEquip(
+                dragged.array[dragged.index],
+                slotName
+            )
+        ){
+
+            equipItemFromDrag(
+                dragged,
+                slotName
+            );
+
+        }else{
+
+            showMessage(
+                "THAT ITEM CANNOT GO THERE"
+            );
+
+        }
+
+        dragged=null;
+
+    };
+
+}
+
+
+/* =========================================================
+   EQUIPMENT RULES
+========================================================= */
+
+function canEquip(item,slot){
+
+    if(!item)return false;
+
+    if(
+        slot==="primary" ||
+        slot==="secondary"
+    ){
+
+        return (
+            item.name==="M4" ||
+            item.name==="Sniper" ||
+            item.name==="Pistol"
+        );
+
+    }
+
+    if(slot==="armor")
+        return item.name==="Armor";
+
+    if(slot==="helmet")
+        return item.name==="Helmet";
+
+    if(slot==="backpack")
+        return item.name==="Backpack";
+
+    return false;
+
+}
+
+
+function equipItemFromDrag(
+    source,
+    slotName
+){
+
+    const item=
+        source.array[
+            source.index
+        ];
+
+    if(!item)return;
+
+    if(
+        source.type==="equipment"
+    ){
+
+        const old=
+            equipment[slotName];
+
+        equipment[slotName]=item;
+
+        if(old){
+
+            source.array[
+                source.index
+            ]=old;
+
+        }else{
+
+            source.array[
+                source.index
+            ]=null;
+
+        }
+
+    }else{
+
+        const old=
+            equipment[slotName];
+
+        equipment[slotName]=item;
+
+        source.array[
+            source.index
+        ]=old||null;
+
+    }
+
+    renderStorage();
+
+}
+
+
+/* =========================================================
+   MOVE ITEMS
+========================================================= */
+
+function moveItem(
+    from,
+    to
+){
+
+    const source=
+        from.array[
+            from.index
+        ];
+
+    if(!source)return;
+
+
+    /* EQUIPMENT DESTINATION */
+
+    if(to.type==="equipment"){
+
+        if(
+            !canEquip(
+                source,
+                to.index
+            )
+        ){
+
+            showMessage(
+                "INVALID EQUIPMENT"
+            );
+
+            return;
+
+        }
+
+        equipItemFromDrag(
+            from,
+            to.index
+        );
+
+        return;
+
+    }
+
+
+    const destination=
+        to.array[
+            to.index
+        ];
+
+
+    /* STACK AMMO */
+
+    if(
+        destination &&
+        destination.name===
+        source.name &&
+        source.name.startsWith("Ammo")
+    ){
+
+        const max=240;
+
+        const space=
+            max-destination.qty;
+
+        const amount=
+            Math.min(
+                space,
+                source.qty
+            );
+
+        destination.qty+=amount;
+        source.qty-=amount;
+
+        if(source.qty<=0){
+
+            from.array[
+                from.index
+            ]=null;
+
+        }
+
+        if(
+            from.type==="box" ||
+            to.type==="box"
+        ){
+            renderLoot();
+        }else{
+            renderStorage();
+        }
+
+        return;
+
+    }
+
+
+    /* MOVE */
+
+    if(!destination){
+
+        to.array[
+            to.index
+        ]=source;
+
+        from.array[
+            from.index
+        ]=null;
+
+    }
+
+    /* SWAP */
+
+    else{
+
+        from.array[
+            from.index
+        ]=destination;
+
+        to.array[
+            to.index
+        ]=source;
+
+    }
+
+
+    if(
+        from.type==="box" ||
+        to.type==="box"
+    ){
+        renderLoot();
+    }else{
+        renderStorage();
+    }
+
+}
+
+
+/* =========================================================
+   STORAGE RENDER
+========================================================= */
+
+function renderStorage(){
+
+    const invGrid=
+        document.getElementById(
+            "stashInventoryGrid"
+        );
+
+    const stashGrid=
+        document.getElementById(
+            "stashGrid"
+        );
+
+    invGrid.innerHTML="";
+    stashGrid.innerHTML="";
+
+
+    inventory.forEach(
+        (item,index)=>{
+
+            invGrid.appendChild(
+                createSlot(
+                    item,
+                    index,
+                    inventory,
+                    "inventory"
+                )
+            );
+
+        }
+    );
+
+
+    stash.forEach(
+        (item,index)=>{
+
+            stashGrid.appendChild(
+                createSlot(
+                    item,
+                    index,
+                    stash,
+                    "stash"
+                )
+            );
+
+        }
+    );
+
+
+    createEquipmentSlot(
+        document.getElementById(
+            "primarySlot"
+        ),
+        "primary"
+    );
+
+    createEquipmentSlot(
+        document.getElementById(
+            "secondarySlot"
+        ),
+        "secondary"
+    );
+
+    createEquipmentSlot(
+        document.getElementById(
+            "armorSlot"
+        ),
+        "armor"
+    );
+
+    createEquipmentSlot(
+        document.getElementById(
+            "helmetSlot"
+        ),
+        "helmet"
+    );
+
+    createEquipmentSlot(
+        document.getElementById(
+            "backpackSlot"
+        ),
+        "backpack"
+    );
+
+}
+
+
+/* =========================================================
+   DROP
+========================================================= */
+
+let groundLoot=[];
+
+
+function dropItem(index){
+
+    const item=
+        inventory[index];
+
+    if(!item)return;
+
+
+    groundLoot.push({
+
+        x:
+            player.x+
+            Math.random()*40-
+            20,
+
+        y:
+            player.y+
+            Math.random()*40-
+            20,
+
+        item:{
+            name:item.name,
+            qty:item.qty
+        }
+
+    });
+
+
+    inventory[index]=null;
+
+    renderStorage();
+
+    showMessage(
+        "DROPPED "+item.name
+    );
+
+}
+
+
+/* =========================================================
+   RAID WEAPON
+========================================================= */
+
+function equipRaidWeapon(slot){
+
+    const weapon=
+        equipment[slot];
+
+    if(
+        !weapon ||
+        !guns[weapon.name]
+    ){
+
+        showMessage(
+            "NO WEAPON EQUIPPED"
+        );
+
+        return;
+
+    }
+
+    player.weapon=
+        weapon.name;
+
+    player.magazine=
+        guns[
+            player.weapon
+        ].magazine;
+
+    showMessage(
+        "EQUIPPED "+
+        player.weapon
+    );
+
+}
+
+
+/* =========================================================
+   AMMO
+========================================================= */
+
+function getAmmoCount(type){
+
+    let count=0;
+
+    inventory.forEach(
+        item=>{
+
+            if(
+                item &&
+                item.name===type
+            ){
+
+                count+=item.qty;
+
+            }
+
+        }
+    );
+
+    return count;
+
+}
+
+
+function removeAmmo(
+    type,
+    amount
+){
+
+    for(
+        let i=0;
+        i<inventory.length &&
+        amount>0;
+        i++
+    ){
+
+        const item=
+            inventory[i];
+
+        if(
+            item &&
+            item.name===type
+        ){
+
+            const take=
+                Math.min(
+                    item.qty,
+                    amount
+                );
+
+            item.qty-=take;
+
+            amount-=take;
+
+            if(item.qty<=0){
+
+                inventory[i]=null;
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RELOAD
+========================================================= */
+
+function reload(){
+
+    const gun=
+        guns[player.weapon];
+
+    if(!gun)return;
+
+    const needed=
+        gun.magazine-
+        player.magazine;
+
+    if(needed<=0){
+
+        showMessage(
+            "MAGAZINE FULL"
+        );
+
+        return;
+
+    }
+
+
+    const available=
+        getAmmoCount(
+            gun.ammoType
+        );
+
+    if(available<=0){
+
+        showMessage(
+            "NO AMMO"
+        );
+
+        return;
+
+    }
+
+
+    const amount=
+        Math.min(
+            needed,
+            available
+        );
+
+    removeAmmo(
+        gun.ammoType,
+        amount
+    );
+
+    player.magazine+=
+        amount;
+
+    renderStorage();
+
+    showMessage(
+        "RELOADED"
+    );
+
+}
+
+
+/* =========================================================
+   LOOT
+========================================================= */
+
+const lootTable=[
+
+    ["Ammo9",30],
+    ["Ammo556",25],
+    ["Ammo762",18],
+    ["Bandage",25],
+    ["Food",22],
+    ["Water",22],
+
+    ["Medkit",12],
+    ["Painkillers",10],
+    ["Battery",10],
+    ["SSD",7],
+    ["Phone",9],
+
+    ["Armor",4],
+    ["Helmet",3],
+    ["CPU",3],
+    ["FlashDrive",2],
+    ["Pistol",2],
+
+    ["GPU",0.7],
+    ["Keycard",0.9],
+    ["MilitarySSD",0.25],
+    ["AdvancedGPU",0.15],
+    ["GoldWatch",0.4],
+    ["Jewelry",0.3],
+    ["M4",0.4],
+
+    ["Sniper",0.12]
+
+];
+
+
+function generateHighTierLoot(){
+    const pool=["M4","Sniper","GPU","AdvancedGPU","MilitarySSD","Armor","Helmet","Keycard","GoldWatch","Jewelry","Ammo556","Ammo762"];
+    const out=[];
+    const count=4+Math.floor(Math.random()*4);
+    for(let i=0;i<count;i++){
+        const name=pool[Math.floor(Math.random()*pool.length)];
+        out.push({name,qty:name.startsWith("Ammo")?(60+Math.floor(Math.random()*121)):1});
+    }
+    return out;
+}
+
+function generateLoot(){
+
+    const loot=[];
+
+    const count=
+        1+
+        Math.floor(
+            Math.random()*4
+        );
+
+
+    for(
+        let i=0;
+        i<count;
+        i++
+    ){
+
+        const roll=
+            Math.random()*100;
+
+        let total=0;
+        let selected=null;
+
+
+        for(
+            const entry of lootTable
+        ){
+
+            total+=entry[1];
+
+            if(
+                roll<=total
+            ){
+
+                selected=
+                    entry[0];
+
+                break;
+
+            }
+
+        }
+
+
+        if(!selected){
+
+            selected=
+                lootTable[
+                    Math.floor(
+                        Math.random()*10
+                    )
+                ][0];
+
+        }
+
+
+        let amount=1;
+
+        if(
+            selected.startsWith(
+                "Ammo"
+            )
+        ){
+
+            amount=
+                20+
+                Math.floor(
+                    Math.random()*60
+                );
+
+        }
+
+
+        loot.push({
+
+            name:selected,
+            qty:amount
+
+        });
+
+    }
+
+    return loot;
+
+}
+
+
+/* =========================================================
+   MAP
+========================================================= */
+
+const buildings=[
+
+    {
+        x:600,
+        y:350,
+        w:500,
+        h:330
+    },
+
+    {
+        x:1350,
+        y:250,
+        w:650,
+        h:420
+    },
+
+    {
+        x:2450,
+        y:350,
+        w:700,
+        h:500
+    },
+
+    {
+        x:550,
+        y:1650,
+        w:650,
+        h:420
+    },
+
+    {
+        x:1600,
+        y:1450,
+        w:550,
+        h:500
+    },
+
+    {
+        x:2700,
+        y:1450,
+        w:550,
+        h:550
+    }
+
+];
+
+
+// Locked high-tier research facility. Requires a KEYCARD at its entrance.
+buildings.push({x:2050,y:650,w:420,h:360,futuristic:true,locked:true,name:"BLACKSITE LAB"});
+
+const doors=[
+    {building:0, side:"left",  x:600,  y:515, width:90},
+    {building:1, side:"bottom",x:1675, y:670,  width:90},
+    {building:2, side:"left",  x:2450, y:600,  width:90},
+    {building:3, side:"top",   x:875,  y:1650, width:90},
+    {building:4, side:"right",  x:2150, y:1700, width:90},
+    {building:5, side:"bottom",x:2975, y:2000, width:90},
+    {building:6, side:"bottom",x:2260, y:1010, width:100, locked:true}
+];
+
+
+const roads=[
+
+    {
+        x:0,
+        y:1050,
+        w:3600,
+        h:150
+    },
+
+    {
+        x:1500,
+        y:0,
+        w:180,
+        h:2600
+    },
+
+    {
+        x:2250,
+        y:800,
+        w:1000,
+        h:120
+    }
+
+];
+
+
+const trees=[];
+const bushes=[];
+
+
+for(
+    let i=0;
+    i<190;
+    i++
+){
+
+    trees.push({
+
+        x:
+            100+
+            Math.random()*3400,
+
+        y:
+            100+
+            Math.random()*2400
+
+    });
+
+}
+
+
+function pointInsideBuilding(x,y,margin=38){
+    return buildings.some(b=>x>b.x-margin&&x<b.x+b.w+margin&&y>b.y-margin&&y<b.y+b.h+margin);
+}
+
+for(
+    let i=0;
+    i<170;
+    i++
+){
+    let x,y,attempts=0;
+    do{
+        x=100+Math.random()*3400;
+        y=100+Math.random()*2400;
+        attempts++;
+    }while(pointInsideBuilding(x,y,38)&&attempts<80);
+    if(!pointInsideBuilding(x,y,38)) bushes.push({x,y});
+}
+
+
+const extractions=[
+
+    {
+        x:3300,
+        y:2250,
+        radius:150,
+        name:"SOUTH GATE"
+    },
+
+    {
+        x:3200,
+        y:1200,
+        radius:140,
+        name:"NORTH ROAD"
+    },
+
+    {
+        x:450,
+        y:2350,
+        radius:140,
+        name:"WEST GATE"
+    }
+
+];
+
+
+const fixedBoxes=[
+    {x:760,y:520,type:"wooden",name:"WOODEN CRATE"},
+    {x:980,y:520,type:"military",name:"MILITARY CASE"},
+    {x:1500,y:430,type:"metal",name:"METAL LOCKER"},
+    {x:1800,y:430,type:"supply",name:"SUPPLY CACHE"},
+    {x:2700,y:500,type:"military",name:"MILITARY CASE"},
+    {x:3020,y:600,type:"wooden",name:"WOODEN CRATE"},
+    {x:720,y:1850,type:"supply",name:"SUPPLY CACHE"},
+    {x:1030,y:1900,type:"metal",name:"METAL LOCKER"},
+    {x:1750,y:1650,type:"wooden",name:"WOODEN CRATE"},
+    {x:1960,y:1760,type:"military",name:"MILITARY CASE"},
+    {x:2870,y:1650,type:"metal",name:"METAL LOCKER"},
+    {x:3120,y:1840,type:"supply",name:"SUPPLY CACHE"},
+    {x:2260,y:900,type:"hightech",name:"BLACKSITE CACHE",highTier:true}
+];
+
+
+/* =========================================================
+   RAID
+========================================================= */
+
+let raidRunning=false;
+
+let boxes=[];
+let enemies=[];
+let bullets=[];
+let enemyBullets=[];
+
+let currentBox=null;
+
+let currentExtraction=null;
+let extractionStart=0;
+
+let shootingCooldown=0;
+let scavTimer=3600;
+let muzzleFlash=0;
+
+
+/* =========================================================
+   START RAID
+========================================================= */
+
+function startRaid(){
+
+    /*
+       Make START RAID work even when the player has
+       not manually equipped a weapon yet. Pull the
+       first weapon from the existing stash into the
+       character loadout.
+    */
+    if(
+        !equipment.primary &&
+        !equipment.secondary
+    ){
+        const weaponIndex=stash.findIndex(
+            item=>item && guns[item.name]
+        );
+
+        if(weaponIndex!==-1){
+            equipment.primary=stash[weaponIndex];
+            stash[weaponIndex]=null;
+            renderStorage();
+        }else{
+            showMessage("NO WEAPON IN STASH");
+            return;
+        }
+    }
+
+    document
+        .getElementById(
+            "mainMenu"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+    closePanels();
+
+    raidRunning=true;
+
+    player.x=300;
+    player.y=1250;
+
+    player.kills=0;
+
+    resetHealth();
+
+
+    /*
+       Use primary weapon first.
+    */
+
+    if(
+        equipment.primary
+    ){
+
+        player.weapon=
+            equipment.primary.name;
+
+    }
+
+    else{
+
+        player.weapon=
+            equipment.secondary.name;
+
+    }
+
+
+    player.magazine=
+        guns[
+            player.weapon
+        ].magazine;
+
+
+    player.spawnProtection=300;
+
+
+    boxes=
+        fixedBoxes.map(
+            p=>({
+
+                x:p[0],
+                y:p[1],
+
+                opened:false,
+
+                loot:
+                    generateLoot()
+
+            })
+        );
+
+
+    enemies=[];
+    bullets=[];
+    enemyBullets=[];
+    groundLoot=[];
+
+
+    spawnStartingScavs();
+
+
+    scavTimer=3600;
+
+    renderRaidInventory();
+    renderStorage();
+
+    showMessage(
+        "RAID STARTED"
+    );
+
+}
+
+
+/* =========================================================
+   SCAVS
+========================================================= */
+
+function spawnStartingScavs(){
+
+    const points=[
+
+        {x:850,y:850},
+        {x:1250,y:950},
+        {x:2200,y:850},
+        {x:2900,y:1050},
+        {x:2350,y:1900}
+
+    ];
+
+
+    points.forEach(
+        p=>{
+            spawnScav(
+                p.x,
+                p.y
+            );
+        }
+    );
+
+}
+
+
+function spawnScav(x,y){
+
+    enemies.push({
+
+        x,
+        y,
+
+        hp:100,
+        maxHp:100,
+
+        cooldown:
+            50+
+            Math.random()*100,
+
+        dead:false,
+        opened:false,
+        loot:[],
+
+        angle:0
+
+    });
+
+}
+
+
+/* =========================================================
+   SHOOTING
+========================================================= */
+
+function shoot(){
+
+    const gun=
+        guns[player.weapon];
+
+    if(!gun)return;
+
+
+    if(
+        player.magazine<=0
+    ){
+
+        showMessage(
+            "RELOAD"
+        );
+
+        return;
+
+    }
+
+
+    player.magazine--;
+
+
+    const angle=
+        Math.atan2(
+
+            mouse.y+
+            camera.y-
+            player.y,
+
+            mouse.x+
+            camera.x-
+            player.x
+
+        );
+
+
+    bullets.push({
+
+        x:
+            player.x+
+            Math.cos(angle)*40,
+
+        y:
+            player.y+
+            Math.sin(angle)*40,
+
+        vx:
+            Math.cos(angle)*
+            gun.bulletSpeed,
+
+        vy:
+            Math.sin(angle)*
+            gun.bulletSpeed,
+
+        damage:
+            gun.damage,
+
+        life:120
+
+    });
+
+
+    muzzleFlash=5;
+
+}
+
+
+function enemyShoot(enemy){
+
+    const angle=
+        Math.atan2(
+            player.y-enemy.y,
+            player.x-enemy.x
+        );
+
+
+    enemyBullets.push({
+
+        x:
+            enemy.x+
+            Math.cos(angle)*40,
+
+        y:
+            enemy.y+
+            Math.sin(angle)*40,
+
+        vx:
+            Math.cos(angle)*7,
+
+        vy:
+            Math.sin(angle)*7,
+
+        life:120
+
+    });
+
+}
+
+
+/* =========================================================
+   LOOT INTERACTION
+========================================================= */
+
+function getHoveredLoot(){
+    if(!raidRunning)return null;
+    const wx=mouse.x+camera.x, wy=mouse.y+camera.y;
+    let best=null, bestScore=Infinity;
+    const consider=(kind,obj,radius,requiresProximity=true)=>{
+        if(!obj)return;
+        if(kind==="box"&&obj.opened)return;
+        if(kind==="corpse"&&(!obj.dead||obj.opened))return;
+        const cursorDist=Math.hypot(obj.x-wx,obj.y-wy);
+        const playerDist=Math.hypot(obj.x-player.x,obj.y-player.y);
+        if(cursorDist>radius)return;
+        if(requiresProximity && playerDist>125)return;
+        const score=cursorDist+playerDist*.25;
+        if(score<bestScore){bestScore=score;best={kind,obj};}
+    };
+    enemies.forEach(e=>consider("corpse",e,65));
+    boxes.forEach(b=>consider("box",b,70));
+    groundLoot.forEach(g=>consider("ground",g,34,true));
+    return best;
+}
+
+function quickLoot(){
+    const target=getHoveredLoot();
+    if(!target)return;
+    if(target.kind==="ground"){
+        if(addInventoryItem(target.obj.item.name,target.obj.item.qty)){
+            const i=groundLoot.indexOf(target.obj); if(i!==-1)groundLoot.splice(i,1);
+            renderRaidInventory(); showMessage("QUICK LOOT: "+target.obj.item.name);
+        }else showMessage("BACKPACK FULL");
+        return;
+    }
+    openLootBox(target.obj);
+    document.getElementById("lootPanel").querySelector("h2").textContent=target.kind==="corpse"?"LOOT SCAV":"LOOT CONTAINER";
+}
+
+function updateLootHoverPrompt(){
+    const prompt=document.getElementById("lootHoverPrompt");
+    if(!raidRunning||!document.getElementById("lootPanel").classList.contains("hidden")){prompt.style.display="none";return;}
+    const target=getHoveredLoot();
+    if(!target){prompt.style.display="none";return;}
+    const label=target.kind==="ground" ? ("F  QUICK LOOT  •  "+target.obj.item.name) : "F  QUICK LOOT";
+    prompt.textContent=label; prompt.style.left=(mouse.x+14)+"px"; prompt.style.top=(mouse.y+14)+"px"; prompt.style.display="block";
+}
+
+function interact(){
+    for(const d of doors){
+        if(!d.locked) continue;
+        const b=buildings[d.building];
+        const dx=(d.side==="left"||d.side==="right") ? d.side==="left"?b.x:d.side==="right"?b.x+b.w:d.x : d.x;
+        const dy=(d.side==="top"||d.side==="bottom") ? d.side==="top"?b.y:b.y+b.h : d.y;
+        if(Math.hypot(player.x-dx,player.y-dy)<90){
+            if(hasBlacksiteKeycard()){
+                useBlacksiteKeycard();
+                d.locked=false; b.locked=false; showMessage("BLACKSITE UNLOCKED");
+            }else{showMessage("BLACKSITE KEYCARD REQUIRED");}
+            return;
+        }
+    }
+
+    let closestCorpse=null;
+    let corpseDistance=85;
+
+    enemies.forEach(
+        enemy=>{
+            if(!enemy.dead || enemy.opened)
+                return;
+
+            const d=Math.hypot(
+                enemy.x-player.x,
+                enemy.y-player.y
+            );
+
+            if(d<corpseDistance){
+                corpseDistance=d;
+                closestCorpse=enemy;
+            }
+        }
+    );
+
+    if(closestCorpse){
+        openLootBox(closestCorpse);
+        document.getElementById("lootPanel").querySelector("h2").textContent="LOOT SCAV";
+        return;
+    }
+
+    let closest=null;
+    let distance=85;
+
+
+    boxes.forEach(
+        box=>{
+
+            if(box.opened)return;
+
+            const d=
+                Math.hypot(
+                    box.x-player.x,
+                    box.y-player.y
+                );
+
+            if(d<distance){
+
+                distance=d;
+                closest=box;
+
+            }
+
+        }
+    );
+
+
+    if(closest){
+
+        openLootBox(
+            closest
+        );
+        document.getElementById("lootPanel").querySelector("h2").textContent="LOOT CONTAINER";
+
+        return;
+
+    }
+
+
+    for(
+        let i=0;
+        i<groundLoot.length;
+        i++
+    ){
+
+        const loot=
+            groundLoot[i];
+
+
+        if(
+            Math.hypot(
+                loot.x-player.x,
+                loot.y-player.y
+            )<60
+        ){
+
+            if(
+                addInventoryItem(
+                    loot.item.name,
+                    loot.item.qty
+                )
+            ){
+
+                groundLoot.splice(
+                    i,
+                    1
+                );
+
+                renderRaidInventory();
+
+                showMessage(
+                    "PICKED UP "+
+                    loot.item.name
+                );
+
+            }else{
+
+                showMessage(
+                    "INVENTORY FULL"
+                );
+
+            }
+
+            return;
+
+        }
+
+    }
+
+
+    showMessage(
+        "NOTHING NEARBY"
+    );
+
+}
+
+
+function openLootBox(box){
+
+    currentBox=box;
+
+    box.opened=true;
+
+    document
+        .getElementById(
+            "lootPanel"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+    renderLoot();
+    const title=document.getElementById("lootPanel").querySelector("h2");
+    if(box.highTier) title.textContent="BLACKSITE // HIGH TIER";
+
+}
+
+
+/* =========================================================
+   RAID INVENTORY
+========================================================= */
+
+function addInventoryItem(
+    name,
+    amount=1
+){
+
+    if(
+        name.startsWith("Ammo")
+    ){
+
+        while(
+            amount>0
+        ){
+
+            const stack=
+                inventory.find(
+                    i=>
+                        i &&
+                        i.name===name &&
+                        i.qty<240
+                );
+
+
+            if(stack){
+
+                const add=
+                    Math.min(
+                        240-stack.qty,
+                        amount
+                    );
+
+                stack.qty+=add;
+                amount-=add;
+
+            }
+
+            else{
+
+                const slot=
+                    inventory.findIndex(
+                        i=>!i
+                    );
+
+                if(slot===-1)
+                    return false;
+
+
+                const add=
+                    Math.min(
+                        240,
+                        amount
+                    );
+
+
+                inventory[slot]={
+                    name,
+                    qty:add
+                };
+
+
+                amount-=add;
+
+            }
+
+        }
+
+        return true;
+
+    }
+
+
+    const slot=
+        inventory.findIndex(
+            i=>!i
+        );
+
+
+    if(slot===-1)
+        return false;
+
+
+    inventory[slot]={
+        name,
+        qty:amount
+    };
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   LOOT RENDER
+========================================================= */
+
+function renderLoot(){
+
+    if(!currentBox)
+        return;
+
+
+    const boxGrid=
+        document.getElementById(
+            "boxGrid"
+        );
+
+    const invGrid=
+        document.getElementById(
+            "lootInventoryGrid"
+        );
+
+
+    boxGrid.innerHTML="";
+    invGrid.innerHTML="";
+
+
+    currentBox.loot.forEach(
+        (item,index)=>{
+
+            boxGrid.appendChild(
+                createLootSlot(
+                    item,
+                    index
+                )
+            );
+
+        }
+    );
+
+
+    inventory.forEach(
+        (item,index)=>{
+
+            invGrid.appendChild(
+                createLootSlot(
+                    item,
+                    index,
+                    true
+                )
+            );
+
+        }
+    );
+
+}
+
+
+function createLootSlot(
+    item,
+    index,
+    inventorySide=false
+){
+
+    const slot=
+        document.createElement(
+            "div"
+        );
+
+    slot.className="slot";
+
+
+    if(item){
+
+        slot.draggable=true;
+
+
+        const img=
+            document.createElement(
+                "img"
+            );
+
+        img.src=icons[item.name] || icons.Keycard || makeIcon(item.name);
+
+        slot.appendChild(img);
+
+
+        const n=
+            document.createElement(
+                "div"
+            );
+
+        n.className="slotName";
+        n.textContent=item.name;
+
+        slot.appendChild(n);
+
+
+        if(item.qty>1){
+
+            const q=
+                document.createElement(
+                    "div"
+                );
+
+            q.className="qty";
+            q.textContent=item.qty;
+
+            slot.appendChild(q);
+
+        }
+
+
+        slot.ondragstart=()=>{
+
+            dragged={
+
+                array:
+                    inventorySide
+                    ? inventory
+                    : currentBox.loot,
+
+                index,
+
+                type:
+                    inventorySide
+                    ? "inventory"
+                    : "box"
+
+            };
+
+        };
+
+    }
+
+
+    slot.ondragover=e=>{
+        e.preventDefault();
+
+        slot.classList.add(
+            "dragOver"
+        );
+
+    };
+
+
+    slot.ondragleave=()=>{
+        slot.classList.remove(
+            "dragOver"
+        );
+    };
+
+
+    slot.ondrop=e=>{
+
+        e.preventDefault();
+
+        slot.classList.remove(
+            "dragOver"
+        );
+
+
+        if(!dragged)
+            return;
+
+
+        moveItem(
+            dragged,
+            {
+
+                array:
+                    inventorySide
+                    ? inventory
+                    : currentBox.loot,
+
+                index,
+
+                type:
+                    inventorySide
+                    ? "inventory"
+                    : "box"
+
+            }
+        );
+
+
+        dragged=null;
+
+        renderLoot();
+
+    };
+
+
+    return slot;
+
+}
+
+
+/* =========================================================
+   BUILDING DOORS / COLLISION
+========================================================= */
+
+function isInsideBuilding(x,y,buildingIndex){
+    const b=buildings[buildingIndex];
+    return (
+        x>b.x+14 &&
+        x<b.x+b.w-14 &&
+        y>b.y+14 &&
+        y<b.y+b.h-14
+    );
+}
+
+function hasBlacksiteKeycard(){
+    return !!(equipment.primary?.name==="Keycard" || equipment.secondary?.name==="Keycard" || inventory.some(i=>i?.name==="Keycard"));
+}
+function useBlacksiteKeycard(){
+    if(!hasBlacksiteKeycard()) return false;
+    const idx=inventory.findIndex(i=>i?.name==="Keycard");
+    if(idx!==-1){ inventory[idx]=null; renderRaidInventory(); return true; }
+    if(equipment.primary?.name==="Keycard"){equipment.primary=null;renderRaidInventory();return true;}
+    if(equipment.secondary?.name==="Keycard"){equipment.secondary=null;renderRaidInventory();return true;}
+    return false;
+}
+
+function isDoorOpening(buildingIndex,x,y){
+    const d=doors.find(
+        door=>door.building===buildingIndex
+    );
+    if(!d)return false;
+
+    const b=buildings[buildingIndex];
+    const half=d.width/2;
+    if(d.locked) return false;
+
+    if(d.side==="left" || d.side==="right"){
+        return Math.abs(y-d.y)<=half;
+    }
+
+    return Math.abs(x-d.x)<=half;
+}
+
+function blockedByBuilding(x,y){
+    const radius=18;
+
+    for(let i=0;i<buildings.length;i++){
+        const b=buildings[i];
+
+        const inside=isInsideBuilding(x,y,i);
+
+        if(inside)
+            continue;
+
+        const nearWall=
+            x>b.x-radius &&
+            x<b.x+b.w+radius &&
+            y>b.y-radius &&
+            y<b.y+b.h+radius;
+
+        if(
+            nearWall &&
+            !isDoorOpening(i,x,y)
+        ){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function tryMovePlayer(dx,dy){
+    const nx=player.x+dx;
+    const ny=player.y+dy;
+
+    if(!blockedByBuilding(nx,player.y))
+        player.x=nx;
+
+    if(!blockedByBuilding(player.x,ny))
+        player.y=ny;
+}
+
+
+/* =========================================================
+   UPDATE
+========================================================= */
+
+function update(){
+
+    if(!raidRunning)
+        return;
+
+
+    if(
+        player.spawnProtection>0
+    ){
+
+        player.spawnProtection--;
+
+    }
+
+
+    let dx=0;
+    let dy=0;
+
+
+    if(keys.w)dy--;
+    if(keys.s)dy++;
+    if(keys.a)dx--;
+    if(keys.d)dx++;
+
+
+    if(dx||dy){
+
+        const len=
+            Math.hypot(
+                dx,
+                dy
+            );
+
+        tryMovePlayer(
+            dx/len*player.speed,
+            dy/len*player.speed
+        );
+
+    }
+
+
+    player.x=
+        Math.max(
+            25,
+            Math.min(
+                WORLD_WIDTH-25,
+                player.x
+            )
+        );
+
+
+    player.y=
+        Math.max(
+            25,
+            Math.min(
+                WORLD_HEIGHT-25,
+                player.y
+            )
+        );
+
+
+    camera.x=
+        Math.max(
+            0,
+            Math.min(
+                WORLD_WIDTH-
+                canvas.width,
+
+                player.x-
+                canvas.width/2
+            )
+        );
+
+
+    camera.y=
+        Math.max(
+            0,
+            Math.min(
+                WORLD_HEIGHT-
+                canvas.height,
+
+                player.y-
+                canvas.height/2
+            )
+        );
+
+
+    if(
+        mouse.down &&
+        shootingCooldown<=0
+    ){
+
+        shoot();
+
+        shootingCooldown=
+            guns[
+                player.weapon
+            ].fireRate;
+
+    }
+
+
+    if(
+        shootingCooldown>0
+    ){
+
+        shootingCooldown--;
+
+    }
+
+
+    /* BULLETS */
+
+    bullets.forEach(
+        b=>{
+
+            b.x+=b.vx;
+            b.y+=b.vy;
+
+            b.life--;
+
+
+            enemies.forEach(
+                enemy=>{
+
+                    if(enemy.dead)
+                        return;
+
+
+                    if(
+                        Math.hypot(
+                            enemy.x-b.x,
+                            enemy.y-b.y
+                        )<24
+                    ){
+
+                        enemy.hp-=
+                            b.damage;
+
+                        b.life=0;
+
+
+                        if(
+                            enemy.hp<=0
+                        ){
+
+                            enemy.dead=true;
+
+                            player.kills++;
+
+
+                            enemy.loot=generateLoot();
+                            enemy.opened=false;
+
+                            showMessage(
+                                "SCAV ELIMINATED — LOOTABLE"
+                            );
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    bullets=
+        bullets.filter(
+            b=>b.life>0
+        );
+
+
+    /* ENEMIES */
+
+    enemies.forEach(
+        enemy=>{
+
+            if(enemy.dead)
+                return;
+
+
+            const dx=
+                player.x-
+                enemy.x;
+
+            const dy=
+                player.y-
+                enemy.y;
+
+            const d=
+                Math.hypot(
+                    dx,
+                    dy
+                );
+
+
+            enemy.angle=
+                Math.atan2(
+                    dy,
+                    dx
+                );
+
+
+            if(
+                d<700 &&
+                d>250
+            ){
+
+                enemy.x+=
+                    dx/d*.45;
+
+                enemy.y+=
+                    dy/d*.45;
+
+            }
+
+
+            enemy.cooldown--;
+
+
+            if(
+                enemy.cooldown<=0 &&
+                d<650
+            ){
+
+                enemyShoot(
+                    enemy
+                );
+
+                enemy.cooldown=
+                    80+
+                    Math.random()*100;
+
+            }
+
+        }
+    );
+
+
+    /* ENEMY BULLETS */
+
+    enemyBullets.forEach(
+        b=>{
+
+            b.x+=b.vx;
+            b.y+=b.vy;
+
+            b.life--;
+
+
+            if(
+                Math.hypot(
+                    b.x-player.x,
+                    b.y-player.y
+                )<22
+            ){
+
+                if(
+                    player.spawnProtection<=0
+                ){
+
+                    receiveDamage(
+                        10
+                    );
+
+                }
+
+                b.life=0;
+
+            }
+
+        }
+    );
+
+
+    enemyBullets=
+        enemyBullets.filter(
+            b=>b.life>0
+        );
+
+
+    /* BLEEDING */
+
+    for(
+        const part in bodyParts
+    ){
+
+        const p=
+            bodyParts[part];
+
+
+        if(
+            p.bleeding &&
+            p.hp>0
+        ){
+
+            p.hp-=
+                .025;
+
+            if(
+                p.hp<=0
+            ){
+
+                p.hp=0;
+
+                p.blacked=true;
+
+            }
+
+        }
+
+    }
+
+
+    /* SCAV TIMER */
+
+    scavTimer--;
+
+
+    if(
+        scavTimer<=0
+    ){
+
+        spawnScavs();
+
+        scavTimer=3600;
+
+    }
+
+
+    /* EXTRACTION */
+
+    let extraction=null;
+
+
+    extractions.forEach(
+        e=>{
+
+            if(
+                Math.hypot(
+                    player.x-e.x,
+                    player.y-e.y
+                )<
+                e.radius
+            ){
+
+                extraction=e;
+
+            }
+
+        }
+    );
+
+
+    const extractBox=
+        document.getElementById(
+            "extractBox"
+        );
+
+
+    if(extraction){
+
+        if(
+            currentExtraction!==
+            extraction
+        ){
+
+            currentExtraction=
+                extraction;
+
+            extractionStart=
+                Date.now();
+
+        }
+
+
+        const remaining=
+            Math.max(
+                0,
+                5000-
+                (
+                    Date.now()-
+                    extractionStart
+                )
+            );
+
+
+        extractBox.style.display=
+            "block";
+
+
+        extractBox.textContent=
+            "EXTRACTING — "+
+            (
+                remaining/1000
+            ).toFixed(1)+
+            "s";
+
+
+        if(
+            remaining<=0
+        ){
+
+            successfulExtraction();
+
+        }
+
+    }
+
+    else{
+
+        currentExtraction=null;
+        extractionStart=0;
+
+        extractBox.style.display=
+            "none";
+
+    }
+
+
+    if(muzzleFlash>0)
+        muzzleFlash--;
+
+}
+
+
+/* =========================================================
+   DRAW MAP
+========================================================= */
+
+function drawMap(){
+
+    ctx.fillStyle="#304532";
+
+    ctx.fillRect(
+        0,
+        0,
+        WORLD_WIDTH,
+        WORLD_HEIGHT
+    );
+
+
+    roads.forEach(
+        r=>{
+
+            ctx.fillStyle="#4b4d47";
+
+            ctx.fillRect(
+                r.x,
+                r.y,
+                r.w,
+                r.h
+            );
+
+        }
+    );
+
+
+    buildings.forEach(
+        b=>{
+
+            /* Building interior */
+
+            ctx.fillStyle="#353b36";
+
+            ctx.fillRect(
+                b.x,
+                b.y,
+                b.w,
+                b.h
+            );
+
+
+            /* walls */
+
+            ctx.strokeStyle="#111511";
+
+            ctx.lineWidth=14;
+
+            ctx.strokeRect(b.x,b.y,b.w,b.h);
+            if(b.futuristic){
+                ctx.fillStyle="#8fd3e8"; ctx.font="bold 12px Arial"; ctx.textAlign="center";
+                ctx.fillText("BLACKSITE // LOCKED",b.x+b.w/2,b.y+25);
+                ctx.fillStyle="#5b7180";
+                ctx.fillRect(b.x+35,b.y+55,b.w-70,4);
+            }
+
+
+            /* windows */
+
+            ctx.fillStyle="#7e9a9a";
+
+
+            for(
+                let x=b.x+35;
+                x<b.x+b.w-25;
+                x+=65
+            ){
+
+                for(
+                    let y=b.y+35;
+                    y<b.y+b.h-20;
+                    y+=70
+                ){
+
+                    ctx.fillRect(
+                        x,
+                        y,
+                        18,
+                        10
+                    );
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* doors */
+
+    doors.forEach(
+        d=>{
+            const b=buildings[d.building];
+
+            ctx.fillStyle=d.locked ? "#55a6bd" : "#9b7447";
+            ctx.strokeStyle="#241b14";
+            ctx.lineWidth=4;
+
+            if(d.side==="left" || d.side==="right"){
+                ctx.fillRect(
+                    d.side==="left" ? b.x-4 : b.x+b.w-4,
+                    d.y-d.width/2,
+                    8,
+                    d.width
+                );
+                ctx.strokeRect(
+                    d.side==="left" ? b.x-4 : b.x+b.w-4,
+                    d.y-d.width/2,
+                    8,
+                    d.width
+                );
+            }else{
+                ctx.fillRect(
+                    d.x-d.width/2,
+                    d.side==="top" ? b.y-4 : b.y+b.h-4,
+                    d.width,
+                    8
+                );
+                ctx.strokeRect(
+                    d.x-d.width/2,
+                    d.side==="top" ? b.y-4 : b.y+b.h-4,
+                    d.width,
+                    8
+                );
+            }
+        }
+    );
+
+
+    /* trees */
+
+    trees.forEach(
+        t=>{
+
+            ctx.fillStyle="#19271b";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                t.x,
+                t.y,
+                20,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+
+            ctx.fillStyle="#3d5d3f";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                t.x-5,
+                t.y-8,
+                14,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+        }
+    );
+
+
+    /* bushes */
+
+    bushes.forEach(
+        b=>{
+
+            ctx.fillStyle="#244428";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                b.x,
+                b.y,
+                13,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+            ctx.beginPath();
+
+            ctx.arc(
+                b.x+9,
+                b.y+2,
+                9,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+        }
+    );
+
+
+    /* extraction */
+
+    extractions.forEach(
+        e=>{
+
+            ctx.beginPath();
+
+            ctx.arc(
+                e.x,
+                e.y,
+                e.radius,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fillStyle=
+                "rgba(60,220,100,.12)";
+
+            ctx.fill();
+
+            ctx.strokeStyle=
+                "#55e67b";
+
+            ctx.lineWidth=4;
+
+            ctx.stroke();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DRAW LOOT BOX
+========================================================= */
+
+function drawLootBox(box){
+
+    const buildingIndex=buildings.findIndex(
+        b=>
+            box.x>b.x &&
+            box.x<b.x+b.w &&
+            box.y>b.y &&
+            box.y<b.y+b.h
+    );
+
+    if(
+        buildingIndex!==-1 &&
+        !isInsideBuilding(
+            player.x,
+            player.y,
+            buildingIndex
+        )
+    ){
+        return;
+    }
+
+    ctx.save();
+
+    ctx.translate(
+        box.x,
+        box.y
+    );
+
+
+    ctx.globalAlpha=1;
+    ctx.shadowColor="rgba(0,0,0,.75)";
+    ctx.shadowBlur=8;
+    ctx.globalAlpha=1;
+    const boxStyles={
+        wooden:["#a66a35","#6e4428"],
+        military:["#4b554b","#252b26"],
+        metal:["#74766d","#41443e"],
+        supply:["#b07d38","#6c4928"],
+        hightech:["#60758a","#24333e"]
+    };
+    const style=boxStyles[box.type]||boxStyles.wooden;
+    ctx.fillStyle=box.opened?"#514638":style[0];
+    ctx.fillRect(-28,-20,56,40);
+    ctx.shadowBlur=0;
+
+
+    ctx.fillStyle=style[1];
+
+    ctx.fillRect(-28,-5,56,7);
+
+
+    ctx.fillRect(
+        -5,
+        -20,
+        8,
+        40
+    );
+
+
+    ctx.strokeStyle="#2c2017";
+
+    ctx.lineWidth=3;
+
+    ctx.strokeRect(
+        -28,
+        -20,
+        56,
+        40
+    );
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   DRAW GUN
+========================================================= */
+
+function drawGun(
+    weapon
+){
+
+    ctx.fillStyle="#181a18";
+
+
+    if(
+        weapon==="Pistol"
+    ){
+
+        ctx.fillRect(
+            8,-4,30,7
+        );
+
+        ctx.fillRect(
+            34,-3,12,4
+        );
+
+        ctx.fillStyle="#292522";
+
+        ctx.fillRect(
+            14,3,9,18
+        );
+
+    }
+
+
+    else if(
+        weapon==="M4"
+    ){
+
+        ctx.fillRect(
+            5,-5,35,10
+        );
+
+        ctx.fillRect(
+            32,-4,30,8
+        );
+
+        ctx.fillRect(
+            60,-2,18,4
+        );
+
+        ctx.fillRect(
+            -17,-4,23,7
+        );
+
+        ctx.fillRect(
+            25,4,8,19
+        );
+
+        ctx.fillRect(
+            10,5,8,16
+        );
+
+    }
+
+
+    else if(
+        weapon==="Sniper"
+    ){
+
+        ctx.fillRect(
+            3,-5,50,9
+        );
+
+        ctx.fillRect(
+            50,-3,65,5
+        );
+
+        ctx.fillRect(
+            24,-12,28,6
+        );
+
+        ctx.fillStyle="#49392c";
+
+        ctx.fillRect(
+            -25,-5,30,9
+        );
+
+        ctx.fillStyle="#292622";
+
+        ctx.fillRect(
+            12,4,9,19
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CHARACTER
+========================================================= */
+
+function drawCharacter(
+    x,
+    y,
+    angle,
+    enemy=false
+){
+
+    ctx.save();
+
+    ctx.translate(
+        x,
+        y
+    );
+
+
+    /* body */
+
+    ctx.fillStyle=
+        enemy
+        ?"#51352f"
+        :"#405044";
+
+
+    ctx.fillRect(
+        -14,
+        -13,
+        28,
+        28
+    );
+
+
+    /* legs */
+
+    ctx.fillStyle="#202620";
+
+    ctx.fillRect(
+        -11,
+        7,
+        8,
+        19
+    );
+
+    ctx.fillRect(
+        3,
+        7,
+        8,
+        19
+    );
+
+
+    /* head */
+
+    ctx.fillStyle=
+        enemy
+        ?"#a45e4e"
+        :"#c78369";
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        -21,
+        10,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* helmet */
+
+    ctx.fillStyle=
+        enemy
+        ?"#202520"
+        :"#2d3931";
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        -22,
+        11,
+        Math.PI,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* gun */
+
+    ctx.save();
+
+    ctx.rotate(
+        angle
+    );
+
+
+    drawGun(
+        enemy
+        ?"M4"
+        :player.weapon
+    );
+
+
+    ctx.restore();
+
+
+    ctx.restore();
+
+}
+
+
+/* =========================================================
+   DRAW GAME
+========================================================= */
+
+function draw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    if(!raidRunning)
+        return;
+
+
+    ctx.save();
+
+    ctx.translate(
+        -camera.x,
+        -camera.y
+    );
+
+
+    drawMap();
+
+
+    boxes.forEach(
+        drawLootBox
+    );
+
+    updateLootHoverPrompt();
+
+
+    /* ground loot */
+
+    groundLoot.forEach(
+        loot=>{
+
+            ctx.fillStyle=
+                "#dfc44e";
+
+            ctx.fillRect(
+                loot.x-5,
+                loot.y-5,
+                10,
+                10
+            );
+
+        }
+    );
+
+
+    /* enemies / dead scav corpses */
+
+    enemies.forEach(
+        enemy=>{
+
+            if(enemy.dead){
+
+                ctx.save();
+                ctx.translate(enemy.x,enemy.y);
+                ctx.rotate(enemy.angle+Math.PI/2);
+
+                ctx.fillStyle="#3b2927";
+                ctx.fillRect(-24,-9,48,18);
+
+                ctx.fillStyle="#202420";
+                ctx.fillRect(-17,-13,16,7);
+                ctx.fillRect(4,-13,16,7);
+
+                ctx.fillStyle="#8f4a40";
+                ctx.beginPath();
+                ctx.arc(0,11,7,0,Math.PI*2);
+                ctx.fill();
+
+                ctx.strokeStyle="#151815";
+                ctx.lineWidth=3;
+                ctx.strokeRect(-24,-9,48,18);
+
+                ctx.restore();
+
+                if(!enemy.opened){
+                    ctx.fillStyle="#e2c65a";
+                    ctx.font="11px Arial";
+                    ctx.textAlign="center";
+                    ctx.fillText(
+                        "E: LOOT",
+                        enemy.x,
+                        enemy.y-22
+                    );
+                }
+
+                return;
+            }
+
+
+            drawCharacter(
+                enemy.x,
+                enemy.y,
+                enemy.angle,
+                true
+            );
+
+
+            ctx.fillStyle="#111";
+
+            ctx.fillRect(
+                enemy.x-22,
+                enemy.y-38,
+                44,
+                5
+            );
+
+
+            ctx.fillStyle="#59d46b";
+
+            ctx.fillRect(
+                enemy.x-22,
+                enemy.y-38,
+                44*
+                enemy.hp/
+                enemy.maxHp,
+                5
+            );
+
+        }
+    );
+
+
+    /* player */
+
+    const angle=
+        Math.atan2(
+
+            mouse.y+
+            camera.y-
+            player.y,
+
+            mouse.x+
+            camera.x-
+            player.x
+
+        );
+
+
+    drawCharacter(
+        player.x,
+        player.y,
+        angle,
+        false
+    );
+
+
+    /* muzzle flash */
+
+    if(
+        muzzleFlash>0
+    ){
+
+        ctx.save();
+
+        ctx.translate(
+            player.x,
+            player.y
+        );
+
+        ctx.rotate(angle);
+
+        ctx.fillStyle=
+            "#ffd86b";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            80,
+            0
+        );
+
+        ctx.lineTo(
+            60,
+            -8
+        );
+
+        ctx.lineTo(
+            60,
+            8
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        ctx.restore();
+
+    }
+
+
+    /* bullets */
+
+    ctx.fillStyle="#ffe68a";
+
+    bullets.forEach(
+        b=>{
+
+            ctx.beginPath();
+
+            ctx.arc(
+                b.x,
+                b.y,
+                3,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+        }
+    );
+
+
+    ctx.fillStyle="#ff6555";
+
+    enemyBullets.forEach(
+        b=>{
+
+            ctx.beginPath();
+
+            ctx.arc(
+                b.x,
+                b.y,
+                3,
+                0,
+                Math.PI*2
+            );
+
+            ctx.fill();
+
+        }
+    );
+
+
+    /*
+       Semi-transparent roof when inside.
+    */
+
+    const inside=
+        buildings.find(
+            b=>
+                player.x>b.x &&
+                player.x<b.x+b.w &&
+                player.y>b.y &&
+                player.y<b.y+b.h
+        );
+
+
+    if(inside){
+
+        ctx.fillStyle=
+            "rgba(35,42,37,.48)";
+
+        ctx.fillRect(
+            inside.x,
+            inside.y,
+            inside.w,
+            inside.h
+        );
+
+
+        ctx.strokeStyle=
+            "rgba(150,160,150,.6)";
+
+        ctx.lineWidth=3;
+
+        ctx.strokeRect(
+            inside.x,
+            inside.y,
+            inside.w,
+            inside.h
+        );
+
+    }
+
+
+    ctx.restore();
+
+
+    drawMinimap();
+
+    updateHUD();
+
+}
+
+
+/* =========================================================
+   MINIMAP
+========================================================= */
+
+function drawMinimap(){
+
+    mctx.clearRect(
+        0,
+        0,
+        240,
+        175
+    );
+
+
+    mctx.fillStyle="#172018";
+
+    mctx.fillRect(
+        0,
+        0,
+        240,
+        175
+    );
+
+
+    buildings.forEach(
+        b=>{
+
+            mctx.fillStyle=
+                "#606860";
+
+            mctx.fillRect(
+
+                b.x/
+                WORLD_WIDTH*
+                240,
+
+                b.y/
+                WORLD_HEIGHT*
+                175,
+
+                b.w/
+                WORLD_WIDTH*
+                240,
+
+                b.h/
+                WORLD_HEIGHT*
+                175
+
+            );
+
+        }
+    );
+
+
+    extractions.forEach(
+        e=>{
+
+            mctx.fillStyle=
+                "#53e77a";
+
+            mctx.fillRect(
+
+                e.x/
+                WORLD_WIDTH*
+                240-3,
+
+                e.y/
+                WORLD_HEIGHT*
+                175-3,
+
+                6,
+                6
+
+            );
+
+        }
+    );
+
+
+    enemies.forEach(
+        e=>{
+
+            if(e.dead)
+                return;
+
+            mctx.fillStyle=
+                "#e74c4c";
+
+            mctx.fillRect(
+
+                e.x/
+                WORLD_WIDTH*
+                240-2,
+
+                e.y/
+                WORLD_HEIGHT*
+                175-2,
+
+                4,
+                4
+
+            );
+
+        }
+    );
+
+
+    mctx.fillStyle=
+        "#59aaff";
+
+
+    mctx.beginPath();
+
+    mctx.arc(
+
+        player.x/
+        WORLD_WIDTH*
+        240,
+
+        player.y/
+        WORLD_HEIGHT*
+        175,
+
+        4,
+        0,
+        Math.PI*2
+
+    );
+
+    mctx.fill();
+
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD(){
+
+    const health=
+        totalHealth();
+
+
+    const gun=
+        guns[player.weapon];
+
+
+    const percentage=
+        Math.max(
+            0,
+            health.total/
+            health.max*
+            100
+        );
+
+
+    document.getElementById(
+        "hud"
+    ).innerHTML=`
+
+        ❤️ ${Math.round(health.total)}
+        / ${health.max}
+
+        <div id="healthBar">
+            <div
+                id="healthBarInner"
+                style="width:${percentage}%"
+            ></div>
+        </div>
+
+        <br>
+
+        🔫 ${player.weapon}
+
+        <br>
+
+        ${player.magazine}
+        /
+        ${gun.magazine}
+
+        <br>
+
+        📦 Reserve:
+        ${getAmmoCount(gun.ammoType)}
+
+        <br>
+
+        ☠ Kills:
+        ${player.kills}
+
+        <br>
+
+        👥 Scavs:
+        ${Math.ceil(scavTimer/60)}s
+
+    `;
+
+}
+
+
+/* =========================================================
+   HEALTH UI
+========================================================= */
+
+function renderHealth(){
+
+    const container=
+        document.getElementById(
+            "healthParts"
+        );
+
+    container.innerHTML="";
+
+
+    const names={
+
+        head:"HEAD",
+        thorax:"THORAX",
+        leftArm:"LEFT ARM",
+        rightArm:"RIGHT ARM",
+        leftLeg:"LEFT LEG",
+        rightLeg:"RIGHT LEG"
+
+    };
+
+
+    for(
+        const part in bodyParts
+    ){
+
+        const p=
+            bodyParts[part];
+
+
+        const row=
+            document.createElement(
+                "div"
+            );
+
+        row.className=
+            "bodyPart";
+
+
+        const percent=
+            p.hp/
+            p.max*
+            100;
+
+
+        row.innerHTML=`
+
+            <b style="width:90px">
+                ${names[part]}
+            </b>
+
+            <div class="partBar">
+
+                <div
+                    class="partBarInner"
+                    style="width:${percent}%"
+                ></div>
+
+            </div>
+
+            <span>
+                ${Math.round(p.hp)}
+                /
+                ${p.max}
+            </span>
+
+            ${
+                p.bleeding
+                ?'<span class="status">BLEED</span>'
+                :""
+            }
+
+            ${
+                p.blacked
+                ?'<span class="status">BLACKED</span>'
+                :""
+            }
+
+        `;
+
+
+        container.appendChild(
+            row
+        );
+
+    }
+
+}
+
+
+function toggleHealth(){
+
+    const panel=
+        document.getElementById(
+            "healthPanel"
+        );
+
+
+    if(
+        panel.classList.contains(
+            "hidden"
+        )
+    ){
+
+        renderHealth();
+
+        panel.classList.remove(
+            "hidden"
+        );
+
+    }else{
+
+        panel.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   RAID RESULT
+========================================================= */
+
+function successfulExtraction(){
+
+    raidRunning=false;
+
+    /*
+       Move surviving backpack
+       contents to stash.
+    */
+
+    inventory.forEach(
+        item=>{
+
+            if(item){
+
+                addStashItem(
+                    item.name,
+                    item.qty
+                );
+
+            }
+
+        }
+    );
+
+
+    inventory.fill(null);
+
+
+    document.getElementById(
+        "extractBox"
+    ).style.display="none";
+
+
+    showResult(
+        "RAID SUCCESSFUL",
+        "You extracted with "+
+        player.kills+
+        " kills."
+    );
+
+
+    renderStorage();
+
+}
+
+
+function addStashItem(
+    name,
+    qty
+){
+
+    if(
+        name.startsWith("Ammo")
+    ){
+
+        let stack=
+            stash.find(
+                i=>
+                    i &&
+                    i.name===name &&
+                    i.qty<240
+            );
+
+
+        while(
+            qty>0
+        ){
+
+            if(!stack){
+
+                const slot=
+                    stash.findIndex(
+                        i=>!i
+                    );
+
+                if(slot===-1)
+                    return false;
+
+
+                const amount=
+                    Math.min(
+                        240,
+                        qty
+                    );
+
+
+                stash[slot]={
+                    name,
+                    qty:amount
+                };
+
+
+                qty-=amount;
+
+                stack=null;
+
+            }
+
+            else{
+
+                const amount=
+                    Math.min(
+                        240-stack.qty,
+                        qty
+                    );
+
+                stack.qty+=amount;
+
+                qty-=amount;
+
+                if(
+                    stack.qty>=240
+                ){
+
+                    stack=null;
+
+                }
+
+            }
+
+        }
+
+        return true;
+
+    }
+
+
+    const slot=
+        stash.findIndex(
+            i=>!i
+        );
+
+
+    if(slot===-1)
+        return false;
+
+
+    stash[slot]={
+        name,
+        qty
+    };
+
+
+    return true;
+
+}
+
+
+function playerDead(){
+
+    if(!raidRunning)
+        return;
+
+    raidRunning=false;
+
+    inventory.fill(null);
+
+    showResult(
+        "RAID FAILED",
+        "You died and lost your raid inventory."
+    );
+
+}
+
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+function showResult(
+    title,
+    text
+){
+
+    document.getElementById(
+        "resultTitle"
+    ).textContent=title;
+
+
+    document.getElementById(
+        "resultText"
+    ).textContent=text;
+
+
+    document.getElementById(
+        "raidResult"
+    ).style.display=
+        "flex";
+
+}
+
+
+function returnMenu(){
+
+    document.getElementById(
+        "raidResult"
+    ).style.display=
+        "none";
+
+
+    closePanels();
+
+
+    document.getElementById(
+        "mainMenu"
+    ).classList.remove(
+        "hidden"
+    );
+
+
+    renderStorage();
+
+}
+
+
+/* =========================================================
+   TRADERS
+========================================================= */
+
+let cash=2500;
+
+const traders={
+
+    scav:{
+        name:"SCAVENGER",
+        description:
+            "Cheap supplies.",
+        buy:{
+            Ammo9:30,
+            Ammo556:45,
+            Ammo762:55,
+            Food:80,
+            Bandage:100
+        },
+        sell:{
+            Ammo9:12,
+            Ammo556:22,
+            Ammo762:28,
+            Food:45,
+            Bandage:60
+        }
+    },
+
+    medic:{
+        name:"FIELD MEDIC",
+        description:
+            "Medical supplies.",
+        buy:{
+            Medkit:500,
+            Bandage:100,
+            Painkillers:250,
+            Armor:700
+        },
+        sell:{
+            Medkit:300,
+            Bandage:50,
+            Painkillers:120,
+            Armor:400
+        }
+    },
+
+    quartermaster:{
+        name:"QUARTERMASTER",
+        description:
+            "Weapons and equipment.",
+        buy:{
+            Pistol:700,
+            M4:2800,
+            Sniper:5000,
+            Helmet:400,
+            Keycard:3000
+        },
+        sell:{
+            Pistol:350,
+            M4:1400,
+            Sniper:2500,
+            Helmet:200,
+            Keycard:1800
+        }
+    }
+
+};
+
+
+let selectedTrader=
+    "scav";
+
+
+function selectTrader(
+    name
+){
+
+    selectedTrader=name;
+
+    const t=
+        traders[name];
+
+
+    document.getElementById(
+        "traderName"
+    ).textContent=t.name;
+
+
+    document.getElementById(
+        "traderDescription"
+    ).textContent=
+        t.description;
+
+
+    renderTrades();
+
+}
+
+
+function renderTrades(){
+
+    const container=
+        document.getElementById(
+            "trades"
+        );
+
+
+    container.innerHTML="";
+
+
+    const t=
+        traders[
+            selectedTrader
+        ];
+
+
+    const buyTitle=
+        document.createElement(
+            "h3"
+        );
+
+    buyTitle.textContent="BUY";
+
+    container.appendChild(
+        buyTitle
+    );
+
+
+    Object.entries(
+        t.buy
+    ).forEach(
+        ([name,price])=>{
+
+            const row=
+                document.createElement(
+                    "div"
+                );
+
+            row.className="trade";
+
+
+            row.innerHTML=`
+
+                <img
+                    src="${icons[name]}"
+                >
+
+                <div class="grow">
+
+                    <b>${name}</b>
+
+                    <br>
+
+                    $${price}
+
+                </div>
+
+                <button>
+                    BUY
+                </button>
+
+            `;
+
+
+            row.querySelector(
+                "button"
+            ).onclick=()=>{
+
+                if(
+                    cash<price
+                ){
+
+                    showMessage(
+                        "NOT ENOUGH MONEY"
+                    );
+
+                    return;
+
+                }
+
+
+                if(
+                    !addStashItem(
+                        name,
+                        1
+                    )
+                ){
+
+                    showMessage(
+                        "STASH FULL"
+                    );
+
+                    return;
+
+                }
+
+
+                cash-=price;
+
+                renderTrades();
+                renderStorage();
+
+            };
+
+
+            container.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    const sellTitle=
+        document.createElement(
+            "h3"
+        );
+
+    sellTitle.textContent=
+        "SELL FROM STASH";
+
+    container.appendChild(
+        sellTitle
+    );
+
+
+    Object.entries(
+        t.sell
+    ).forEach(
+        ([name,price])=>{
+
+            const row=
+                document.createElement(
+                    "div"
+                );
+
+            row.className="trade";
+
+
+            row.innerHTML=`
+
+                <img
+                    src="${icons[name]}"
+                >
+
+                <div class="grow">
+
+                    <b>${name}</b>
+
+                    <br>
+
+                    $${price}
+
+                </div>
+
+                <button>
+                    SELL
+                </button>
+
+            `;
+
+
+            row.querySelector(
+                "button"
+            ).onclick=()=>{
+
+                const index=
+                    stash.findIndex(
+                        i=>
+                            i &&
+                            i.name===name
+                    );
+
+
+                if(index===-1){
+
+                    showMessage(
+                        "ITEM NOT IN STASH"
+                    );
+
+                    return;
+
+                }
+
+
+                stash[index]=null;
+
+                cash+=price;
+
+                renderTrades();
+                renderStorage();
+
+            };
+
+
+            container.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    document.getElementById(
+        "cash"
+    ).textContent=cash;
+
+}
+
+
+/* =========================================================
+   MENU / PANELS
+========================================================= */
+
+const mainMenu=
+    document.getElementById(
+        "mainMenu"
+    );
+
+const stashPanel=
+    document.getElementById(
+        "stashPanel"
+    );
+
+const traderPanel=
+    document.getElementById(
+        "traderPanel"
+    );
+
+const inventoryPanel=
+    document.getElementById(
+        "inventoryPanel"
+    );
+
+const lootPanel=
+    document.getElementById(
+        "lootPanel"
+    );
+
+
+function closePanels(){
+
+    stashPanel.classList.add(
+        "hidden"
+    );
+
+    traderPanel.classList.add(
+        "hidden"
+    );
+
+    inventoryPanel.classList.add(
+        "hidden"
+    );
+
+    lootPanel.classList.add(
+        "hidden"
+    );
+
+    document.getElementById(
+        "healthPanel"
+    ).classList.add(
+        "hidden"
+    );
+
+}
+
+
+document.getElementById(
+    "startRaid"
+).onclick=()=>{
+
+    startRaid();
+
+};
+
+
+document.getElementById(
+    "openStash"
+).onclick=()=>{
+
+    mainMenu.classList.add(
+        "hidden"
+    );
+
+    stashPanel.classList.remove(
+        "hidden"
+    );
+
+    renderStorage();
+
+};
+
+
+document.getElementById(
+    "stashBack"
+).onclick=()=>{
+
+    stashPanel.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
+
+};
+
+
+document.getElementById(
+    "openTraders"
+).onclick=()=>{
+
+    mainMenu.classList.add(
+        "hidden"
+    );
+
+    traderPanel.classList.remove(
+        "hidden"
+    );
+
+    selectTrader(
+        "scav"
+    );
+
+};
+
+
+document.getElementById(
+    "traderBack"
+).onclick=()=>{
+
+    traderPanel.classList.add(
+        "hidden"
+    );
+
+    mainMenu.classList.remove(
+        "hidden"
+    );
+
+};
+
+
+document.getElementById(
+    "closeInventory"
+).onclick=()=>{
+
+    inventoryPanel.classList.add(
+        "hidden"
+    );
+
+};
+
+
+document.getElementById(
+    "closeLoot"
+).onclick=()=>{
+
+    lootPanel.classList.add(
+        "hidden"
+    );
+
+    currentBox=null;
+
+};
+
+
+document.getElementById(
+    "closeHealth"
+).onclick=()=>{
+
+    document.getElementById(
+        "healthPanel"
+    ).classList.add(
+        "hidden"
+    );
+
+};
+
+
+function toggleInventory(){
+
+    const p=
+        document.getElementById(
+            "inventoryPanel"
+        );
+
+
+    if(
+        p.classList.contains(
+            "hidden"
+        )
+    ){
+
+        p.classList.remove(
+            "hidden"
+        );
+
+        renderRaidInventory();
+
+    }else{
+
+        p.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+function renderRaidInventory(){
+
+    const grid=document.getElementById("raidInventoryGrid");
+    grid.innerHTML="";
+
+    inventory.forEach((item,index)=>{
+        grid.appendChild(createSlot(item,index,inventory,"inventory"));
+    });
+
+    // Raid uses the exact same equipment slots and drag/drop rules as Stash.
+    createEquipmentSlot(document.getElementById("raidPrimarySlot"),"primary");
+    createEquipmentSlot(document.getElementById("raidSecondarySlot"),"secondary");
+    createEquipmentSlot(document.getElementById("raidArmorSlot"),"armor");
+    createEquipmentSlot(document.getElementById("raidHelmetSlot"),"helmet");
+    createEquipmentSlot(document.getElementById("raidBackpackSlot"),"backpack");
+
+    const h=totalHealth();
+    document.getElementById("inventoryHealth").textContent=
+        "Health: "+Math.round(h.total)+"/"+h.max;
+}
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+let messageTimeout;
+
+
+function showMessage(
+    text
+){
+
+    const m=
+        document.getElementById(
+            "message"
+        );
+
+
+    m.textContent=text;
+
+
+    clearTimeout(
+        messageTimeout
+    );
+
+
+    messageTimeout=
+        setTimeout(
+            ()=>{
+                m.textContent="";
+            },
+            1800
+        );
+
+}
+
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+function loop(){
+
+    update();
+
+    draw();
+
+    requestAnimationFrame(
+        loop
+    );
+
+}
+
+
+renderStorage();
+
+selectTrader(
+    "scav"
+);
+
+loop();
+
+</script>
+
+</body>
+</html>
