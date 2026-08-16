@@ -473,13 +473,15 @@ canvas{
 
 /* TACTICAL EXTRACTION UI */
 body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
-#mainMenu{background:linear-gradient(90deg,rgba(8,10,9,.98) 0%,rgba(14,18,15,.94) 42%,rgba(9,12,10,.55) 100%),radial-gradient(circle at 72% 45%,#364236 0%,#111510 55%,#080a08 100%);}
-#mainMenu:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.018) 4px),linear-gradient(90deg,transparent 0 70%,rgba(194,173,117,.06) 70% 70.2%,transparent 70.2%);pointer-events:none;}
-#mainMenu .menu{left:54px;top:48px;transform:none;width:390px;max-width:calc(100% - 108px);text-align:left;}
-#mainMenu .menu h1{font-size:42px;letter-spacing:7px;margin:0;color:#d9d9ce;font-weight:700;}
+#mainMenu{background:#020604;overflow:hidden;}
+#menuAsciiCanvas{position:absolute;inset:0;z-index:0;width:100%;height:100%;display:block;background:#020604;}
+#mainMenu:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(4,6,5,.97) 0%,rgba(6,9,7,.83) 27%,rgba(6,11,8,.22) 50%,rgba(2,5,4,0) 100%),repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.012) 4px),linear-gradient(90deg,transparent 0 70%,rgba(194,173,117,.045) 70% 70.2%,transparent 70.2%);pointer-events:none;}
+#mainMenu:after{content:"";position:absolute;inset:0;z-index:2;background:radial-gradient(circle at 76% 42%,transparent 0%,rgba(0,0,0,.02) 34%,rgba(0,0,0,.2) 100%);pointer-events:none;mix-blend-mode:multiply;}
+#mainMenu .menu{left:54px;top:48px;transform:none;width:390px;max-width:calc(100% - 108px);text-align:left;z-index:3;}
+#mainMenu .menu h1{font-size:42px;letter-spacing:7px;margin:0;color:#e3e4d8;font-weight:700;text-shadow:0 2px 0 #000,0 0 18px rgba(0,255,102,.14);}
 #mainMenu .menu p{margin:6px 0 28px;color:#8f978b;font-size:11px;letter-spacing:2px;}
-#mainMenu .menu button{height:48px;margin:4px 0;background:#1a211c;border:0;border-left:4px solid #5b665a;border-bottom:1px solid #384038;border-radius:0;text-align:left;padding-left:18px;font-size:13px;letter-spacing:1.5px;}
-#mainMenu .menu button:hover{background:#30382f;border-left-color:#c3a75e;color:#fff;}
+#mainMenu .menu button{height:48px;margin:4px 0;background:rgba(16,23,18,.84);border:0;border-left:4px solid #5b665a;border-bottom:1px solid #384038;border-radius:0;text-align:left;padding-left:18px;font-size:13px;letter-spacing:1.5px;box-shadow:0 10px 28px #0008;backdrop-filter:blur(2px);}
+#mainMenu .menu button:hover{background:rgba(48,56,47,.92);border-left-color:#00ff66;color:#fff;}
 #mainMenu .menuMeta{margin-top:35px;padding-top:14px;border-top:1px solid #3d443d;color:#70786e;font-size:9px;letter-spacing:1.4px;line-height:1.8;}
 .lootHoverPrompt{background:#11150fef;border:1px solid #b6a05f;color:#eee9d4;border-radius:0;font-weight:700;box-shadow:0 3px 12px #0009;}
 #lootPanel{width:min(1040px,calc(100vw - 40px));padding:14px;background:#141815;border:1px solid #667064;border-radius:0;box-shadow:0 20px 60px #000b;overflow:hidden;}
@@ -497,6 +499,8 @@ body{font-family:Arial,Helvetica,sans-serif;background:#0b0e0c;color:#d8d9ce;}
 <!-- ================= MAIN MENU ================= -->
 
 <div id="mainMenu">
+
+    <canvas id="menuAsciiCanvas"></canvas>
 
     <div class="menu">
 
@@ -849,6 +853,10 @@ function resize(){
     canvas.height =
         innerHeight;
 
+    if(window.menuAsciiBackground){
+        window.menuAsciiBackground.resize();
+    }
+
 }
 
 resize();
@@ -857,6 +865,1720 @@ addEventListener(
     "resize",
     resize
 );
+
+
+/* =========================================================
+   MAIN MENU ASCII BACKGROUND
+========================================================= */
+
+const MENU_ASCII_CONFIG={
+    effectMode:"vhs",
+    renderMode:"characters",
+    bgMode:"solid",
+    bgBlur:12,
+    bgOpacity:90,
+    cellSize:14,
+    coverage:96,
+    invert:false,
+    styleBlend:"source-over",
+    charSet:"binary",
+    customChars:"",
+    brightness:18,
+    contrast:132,
+    edgeEmphasis:40,
+    density:0,
+    toneCurve:[
+        {x:0,y:0},
+        {x:1,y:1}
+    ],
+    tint:"#00ff66",
+    tintOpacity:68,
+    overlayBlend:"overlay",
+    saturation:100,
+    grayscale:0,
+    blurType:"off",
+    blurAmount:35,
+    pfx:{
+        vignette:{enabled:true,intensity:22},
+        scanLines:{enabled:true,intensity:18},
+        chromatic:{enabled:false,intensity:15},
+        bloom:{enabled:true,intensity:36},
+        filmGrain:{enabled:true,intensity:28},
+        glitch:{enabled:true,intensity:16},
+        pixelate:{enabled:false,intensity:15},
+        halftone:{enabled:false,intensity:20},
+        filmDust:{enabled:false,intensity:20}
+    },
+    animated:true,
+    animStyle:"flicker",
+    animSpeed:{enabled:true,intensity:100},
+    animIntensity:{enabled:true,intensity:60},
+    lights:{enabled:false,points:[]},
+    mask:{enabled:false,invert:false,dataUrl:null}
+};
+
+const MENU_ASCII_SOURCE_IMAGE=
+    "assets/browserov-menu-source.png";
+
+
+function createMenuAsciiBackground(){
+
+    const menuCanvas=
+        document.getElementById(
+            "menuAsciiCanvas"
+        );
+
+    const menuElement=
+        document.getElementById(
+            "mainMenu"
+        );
+
+    const menuCtx=
+        menuCanvas.getContext(
+            "2d"
+        );
+
+    const sourceImage=
+        new Image();
+
+    const sourceCanvas=
+        document.createElement(
+            "canvas"
+        );
+
+    const sourceCtx=
+        sourceCanvas.getContext(
+            "2d",
+            {willReadFrequently:true}
+        );
+
+    const workCanvas=
+        document.createElement(
+            "canvas"
+        );
+
+    const workCtx=
+        workCanvas.getContext(
+            "2d"
+        );
+
+    const scratchCanvas=
+        document.createElement(
+            "canvas"
+        );
+
+    const scratchCtx=
+        scratchCanvas.getContext(
+            "2d"
+        );
+
+    let width=0;
+    let height=0;
+    let dpr=1;
+    let imageReady=false;
+    let maskImage=null;
+
+
+    function resizeMenuAscii(){
+
+        width=
+            Math.max(
+                1,
+                innerWidth
+            );
+
+        height=
+            Math.max(
+                1,
+                innerHeight
+            );
+
+        dpr=
+            Math.min(
+                2,
+                window.devicePixelRatio||1
+            );
+
+        menuCanvas.width=
+            Math.floor(
+                width*dpr
+            );
+
+        menuCanvas.height=
+            Math.floor(
+                height*dpr
+            );
+
+        menuCanvas.style.width=
+            width+"px";
+
+        menuCanvas.style.height=
+            height+"px";
+
+        menuCtx.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+        );
+
+        [
+            sourceCanvas,
+            workCanvas,
+            scratchCanvas
+        ].forEach(
+            c=>{
+                c.width=width;
+                c.height=height;
+            }
+        );
+
+        drawSourcePhoto();
+
+    }
+
+
+    function drawSourcePhoto(){
+
+        sourceCtx.clearRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+        if(
+            !imageReady ||
+            !width ||
+            !height
+        ){
+            return;
+        }
+
+        const imageRatio=
+            sourceImage.width/
+            sourceImage.height;
+
+        const canvasRatio=
+            width/
+            height;
+
+        let drawWidth=width;
+        let drawHeight=height;
+        let drawX=0;
+        let drawY=0;
+
+        if(
+            imageRatio>canvasRatio
+        ){
+            drawHeight=height;
+            drawWidth=height*imageRatio;
+            drawX=(width-drawWidth)/2;
+        }else{
+            drawWidth=width;
+            drawHeight=width/imageRatio;
+            drawY=(height-drawHeight)/2;
+        }
+
+        sourceCtx.drawImage(
+            sourceImage,
+            drawX,
+            drawY,
+            drawWidth,
+            drawHeight
+        );
+
+    }
+
+
+    function drawMenuBackground(config){
+
+        workCtx.save();
+        workCtx.clearRect(0,0,width,height);
+
+        const bgAlpha=
+            clamp(
+                config.bgOpacity/100,
+                0,
+                1
+            );
+
+        if(
+            config.bgMode==="blurred"
+        ){
+            workCtx.globalAlpha=bgAlpha;
+            workCtx.filter=
+                "blur("+config.bgBlur+"px)";
+            workCtx.drawImage(
+                sourceCanvas,
+                -config.bgBlur,
+                -config.bgBlur,
+                width+config.bgBlur*2,
+                height+config.bgBlur*2
+            );
+            workCtx.filter="none";
+        }else if(
+            config.bgMode==="original"
+        ){
+            workCtx.globalAlpha=bgAlpha;
+            workCtx.drawImage(sourceCanvas,0,0);
+        }else if(
+            config.bgMode==="solid"
+        ){
+            workCtx.globalAlpha=1;
+            workCtx.fillStyle=
+                "rgba(1,7,4,"+bgAlpha+")";
+            workCtx.fillRect(0,0,width,height);
+        }
+
+        workCtx.globalAlpha=.22;
+        workCtx.drawImage(sourceCanvas,0,0);
+        workCtx.restore();
+
+    }
+
+
+    function renderAsciiFrame(now){
+
+        if(
+            !imageReady ||
+            menuElement.classList.contains("hidden")
+        ){
+            requestAnimationFrame(
+                renderAsciiFrame
+            );
+            return;
+        }
+
+        const config=
+            MENU_ASCII_CONFIG;
+
+        const speed=
+            config.animSpeed.enabled?
+                config.animSpeed.intensity/100:
+                0;
+
+        const intensity=
+            config.animIntensity.enabled?
+                config.animIntensity.intensity/100:
+                0;
+
+        const time=
+            now*.001*speed;
+
+        if(
+            config.effectMode==="vhs"
+        ){
+            renderVhsFrame(
+                time,
+                intensity
+            );
+
+            requestAnimationFrame(
+                renderAsciiFrame
+            );
+            return;
+        }
+
+        drawMenuBackground(
+            config
+        );
+
+        const imageData=
+            sourceCtx.getImageData(
+                0,
+                0,
+                width,
+                height
+            );
+
+        drawCellField(
+            imageData.data,
+            config,
+            time,
+            intensity
+        );
+
+        applyColorBlur(
+            config
+        );
+
+        applyPostEffects(
+            config,
+            time
+        );
+
+        applyLights(
+            config
+        );
+
+        applyMaskReveal(
+            config
+        );
+
+        menuCtx.clearRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+        menuCtx.drawImage(
+            workCanvas,
+            0,
+            0
+        );
+
+        requestAnimationFrame(
+            renderAsciiFrame
+        );
+
+    }
+
+
+    function renderVhsFrame(
+        time,
+        intensity
+    ){
+
+        workCtx.save();
+        workCtx.clearRect(0,0,width,height);
+        workCtx.filter=
+            "contrast(1.1) saturate(.78) brightness(.72)";
+        workCtx.drawImage(sourceCanvas,0,0);
+        workCtx.filter="none";
+        workCtx.restore();
+
+        drawVhsChromaticDrift(
+            time,
+            intensity
+        );
+
+        drawVhsTrackingSlices(
+            time,
+            intensity
+        );
+
+        drawVhsScanlines(
+            time
+        );
+
+        drawVhsStatic(
+            time
+        );
+
+        drawVhsNoiseBands(
+            time
+        );
+
+        drawVhsVignette();
+
+        menuCtx.clearRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+        menuCtx.drawImage(
+            workCanvas,
+            0,
+            0
+        );
+
+    }
+
+
+    function drawVhsChromaticDrift(
+        time,
+        intensity
+    ){
+
+        scratchCtx.clearRect(0,0,width,height);
+        scratchCtx.drawImage(workCanvas,0,0);
+
+        const drift=
+            2+
+            Math.sin(time*2.7)*2+
+            intensity*3;
+
+        workCtx.save();
+        workCtx.globalCompositeOperation="screen";
+        workCtx.globalAlpha=.18;
+        workCtx.filter="sepia(1) saturate(7) hue-rotate(135deg)";
+        workCtx.drawImage(scratchCanvas,drift,0);
+        workCtx.filter="sepia(1) saturate(7) hue-rotate(300deg)";
+        workCtx.drawImage(scratchCanvas,-drift*.8,0);
+        workCtx.restore();
+
+    }
+
+
+    function drawVhsTrackingSlices(
+        time,
+        intensity
+    ){
+
+        scratchCtx.clearRect(0,0,width,height);
+        scratchCtx.drawImage(workCanvas,0,0);
+
+        const sliceCount=
+            16;
+
+        for(let i=0;i<sliceCount;i++){
+            const seed=
+                Math.floor(time*12);
+
+            const y=
+                Math.floor(
+                    cellNoise(i,19,seed)*height
+                );
+
+            const h=
+                3+
+                Math.floor(
+                    cellNoise(i,29,seed)*28
+                );
+
+            const wobble=
+                Math.sin(time*10+i*1.7)*5+
+                (
+                    cellNoise(i,37,seed)-.5
+                )*
+                26*intensity;
+
+            workCtx.drawImage(
+                scratchCanvas,
+                0,
+                y,
+                width,
+                h,
+                wobble,
+                y,
+                width,
+                h
+            );
+        }
+
+    }
+
+
+    function drawVhsScanlines(time){
+
+        workCtx.save();
+
+        for(let y=0;y<height;y+=3){
+            const pulse=
+                .12+
+                Math.sin(y*.08+time*8)*.035;
+
+            workCtx.fillStyle=
+                "rgba(0,0,0,"+pulse+")";
+            workCtx.fillRect(0,y,width,1);
+        }
+
+        const sweepY=
+            (time*120)%height;
+
+        const gradient=
+            workCtx.createLinearGradient(
+                0,
+                sweepY-45,
+                0,
+                sweepY+45
+            );
+
+        gradient.addColorStop(0,"rgba(255,255,255,0)");
+        gradient.addColorStop(.5,"rgba(210,255,220,.08)");
+        gradient.addColorStop(1,"rgba(255,255,255,0)");
+        workCtx.fillStyle=gradient;
+        workCtx.fillRect(0,sweepY-45,width,90);
+
+        workCtx.restore();
+
+    }
+
+
+    function drawVhsStatic(time){
+
+        workCtx.save();
+
+        const specks=
+            Math.floor(
+                width*height/900
+            );
+
+        for(let i=0;i<specks;i++){
+            const x=
+                Math.floor(
+                    cellNoise(i,101,Math.floor(time*30))*width
+                );
+            const y=
+                Math.floor(
+                    cellNoise(i,113,Math.floor(time*30))*height
+                );
+            const alpha=
+                cellNoise(i,127,Math.floor(time*30))*.2;
+            workCtx.fillStyle=
+                "rgba(225,255,230,"+alpha+")";
+            workCtx.fillRect(x,y,1,1);
+        }
+
+        workCtx.restore();
+
+    }
+
+
+    function drawVhsNoiseBands(time){
+
+        workCtx.save();
+
+        const trackingY=
+            height*.72+
+            Math.sin(time*1.9)*height*.08;
+
+        for(let i=0;i<5;i++){
+            const y=
+                trackingY+
+                i*5+
+                Math.sin(time*16+i)*6;
+
+            workCtx.fillStyle=
+                "rgba(180,255,205,"+
+                (.04+i*.012)+
+                ")";
+            workCtx.fillRect(0,y,width,2);
+        }
+
+        for(let i=0;i<3;i++){
+            const y=
+                cellNoise(
+                    i,
+                    151,
+                    Math.floor(time*6)
+                )*
+                height;
+
+            workCtx.fillStyle=
+                "rgba(0,0,0,.18)";
+            workCtx.fillRect(0,y,width,10);
+        }
+
+        workCtx.restore();
+
+    }
+
+
+    function drawVhsVignette(){
+
+        const gradient=
+            workCtx.createRadialGradient(
+                width*.6,
+                height*.45,
+                Math.min(width,height)*.18,
+                width*.6,
+                height*.45,
+                Math.max(width,height)*.72
+            );
+
+        gradient.addColorStop(0,"rgba(0,0,0,0)");
+        gradient.addColorStop(.68,"rgba(0,0,0,.12)");
+        gradient.addColorStop(1,"rgba(0,0,0,.62)");
+        workCtx.fillStyle=gradient;
+        workCtx.fillRect(0,0,width,height);
+
+        const sideFade=
+            workCtx.createLinearGradient(
+                0,
+                0,
+                width*.48,
+                0
+            );
+
+        sideFade.addColorStop(0,"rgba(0,0,0,.7)");
+        sideFade.addColorStop(.58,"rgba(0,0,0,.28)");
+        sideFade.addColorStop(1,"rgba(0,0,0,0)");
+        workCtx.fillStyle=sideFade;
+        workCtx.fillRect(0,0,width*.48,height);
+
+    }
+
+
+    function drawCellField(
+        data,
+        config,
+        time,
+        intensity
+    ){
+
+        const cell=
+            config.cellSize;
+
+        const cols=
+            Math.ceil(
+                width/cell
+            );
+
+        const rows=
+            Math.ceil(
+                height/cell
+            );
+
+        const luminanceMap=
+            new Array(
+                cols*rows
+            );
+
+        const colorMap=
+            new Array(
+                cols*rows
+            );
+
+        for(let row=0;row<rows;row++){
+            for(let col=0;col<cols;col++){
+                const sample=
+                    sampleCell(
+                        data,
+                        col*cell,
+                        row*cell,
+                        cell
+                    );
+
+                const adjusted=
+                    adjustColor(
+                        sample,
+                        config
+                    );
+
+                luminanceMap[
+                    row*cols+col
+                ]=
+                    adjusted.lum;
+
+                colorMap[
+                    row*cols+col
+                ]=
+                    adjusted;
+            }
+        }
+
+        workCtx.save();
+        workCtx.globalCompositeOperation=
+            config.styleBlend||"source-over";
+        workCtx.textAlign="center";
+        workCtx.textBaseline="middle";
+
+        for(let row=0;row<rows;row++){
+            for(let col=0;col<cols;col++){
+                const coverageNoise=
+                    cellNoise(
+                        col,
+                        row,
+                        Math.floor(time*8)
+                    );
+
+                if(
+                    coverageNoise>
+                    config.coverage/100
+                ){
+                    continue;
+                }
+
+                const index=
+                    row*cols+col;
+
+                let lum=
+                    luminanceMap[index];
+
+                const left=
+                    col>0?
+                        luminanceMap[index-1]:
+                        lum;
+
+                const up=
+                    row>0?
+                        luminanceMap[index-cols]:
+                        lum;
+
+                const edge=
+                    Math.abs(lum-left)+
+                    Math.abs(lum-up);
+
+                lum=
+                    clamp(
+                        lum+
+                        edge*(config.edgeEmphasis/100),
+                        0,
+                        1
+                    );
+
+                if(config.invert){
+                    lum=1-lum;
+                }
+
+                lum=
+                    applyToneCurve(
+                        lum,
+                        config.toneCurve
+                    );
+
+                const flicker=
+                    getAnimationValue(
+                        config.animStyle,
+                        col,
+                        row,
+                        time,
+                        intensity
+                    );
+
+                const color=
+                    colorMap[index];
+
+                drawRenderCell(
+                    workCtx,
+                    config,
+                    col,
+                    row,
+                    cell,
+                    clamp(lum+flicker,0,1),
+                    color,
+                    time
+                );
+            }
+        }
+
+        workCtx.restore();
+
+    }
+
+
+    function sampleCell(
+        data,
+        startX,
+        startY,
+        size
+    ){
+
+        const step=
+            Math.max(
+                2,
+                Math.floor(size/4)
+            );
+
+        let r=0;
+        let g=0;
+        let b=0;
+        let count=0;
+
+        for(
+            let y=startY;
+            y<Math.min(startY+size,height);
+            y+=step
+        ){
+            for(
+                let x=startX;
+                x<Math.min(startX+size,width);
+                x+=step
+            ){
+                const pixel=
+                    (Math.floor(y)*width+
+                    Math.floor(x))*4;
+
+                r+=data[pixel];
+                g+=data[pixel+1];
+                b+=data[pixel+2];
+                count++;
+            }
+        }
+
+        return {
+            r:r/count,
+            g:g/count,
+            b:b/count
+        };
+
+    }
+
+
+    function adjustColor(
+        color,
+        config
+    ){
+
+        let r=color.r+config.brightness;
+        let g=color.g+config.brightness;
+        let b=color.b+config.brightness;
+
+        const contrast=
+            config.contrast/100;
+
+        r=(r-128)*contrast+128;
+        g=(g-128)*contrast+128;
+        b=(b-128)*contrast+128;
+
+        const gray=
+            getLuminance(r,g,b);
+
+        const saturation=
+            config.saturation/100;
+
+        r=gray+(r-gray)*saturation;
+        g=gray+(g-gray)*saturation;
+        b=gray+(b-gray)*saturation;
+
+        const grayscale=
+            config.grayscale/100;
+
+        r=r+(gray-r)*grayscale;
+        g=g+(gray-g)*grayscale;
+        b=b+(gray-b)*grayscale;
+
+        const tint=
+            hexToRgb(
+                config.tint
+            );
+
+        const tintAmount=
+            config.tintOpacity/100;
+
+        const blended=
+            blendTint(
+                {r,g,b},
+                tint,
+                config.overlayBlend
+            );
+
+        r=r+(blended.r-r)*tintAmount;
+        g=g+(blended.g-g)*tintAmount;
+        b=b+(blended.b-b)*tintAmount;
+
+        r=clamp(r,0,255);
+        g=clamp(g,0,255);
+        b=clamp(b,0,255);
+
+        return {
+            r,
+            g,
+            b,
+            lum:getLuminance(r,g,b)/255
+        };
+
+    }
+
+
+    function drawRenderCell(
+        targetCtx,
+        config,
+        col,
+        row,
+        cell,
+        lum,
+        color,
+        time
+    ){
+
+        const x=
+            col*cell+
+            cell/2;
+
+        const y=
+            row*cell+
+            cell/2;
+
+        const size=
+            cell*(
+                .25+
+                lum*.9+
+                config.density*.006
+            );
+
+        const alpha=
+            clamp(
+                .34+lum*.96,
+                0,
+                1
+            );
+
+        targetCtx.fillStyle=
+            "rgba("+
+            Math.round(color.r)+","+
+            Math.round(color.g)+","+
+            Math.round(color.b)+","+
+            alpha+
+            ")";
+
+        targetCtx.strokeStyle=
+            targetCtx.fillStyle;
+
+        targetCtx.lineWidth=
+            Math.max(
+                1,
+                cell*.08
+            );
+
+        const mode=
+            config.renderMode;
+
+        if(mode==="characters"){
+            const chars=
+                getCharacters(
+                    config
+                );
+
+            const glyphIndex=
+                Math.floor(
+                    clamp(lum,0,1)*
+                    (chars.length-1)
+                );
+
+            const shift=
+                Math.floor(
+                    cellNoise(col,row,Math.floor(time*20))*2
+                );
+
+            const glyph=
+                chars[
+                    (glyphIndex+shift)%chars.length
+                ];
+
+            targetCtx.font=
+                "700 "+
+                Math.max(9,size)+"px Courier New, monospace";
+
+            targetCtx.fillText(
+                glyph,
+                x,
+                y
+            );
+            return;
+        }
+
+        if(
+            mode==="hexdump" ||
+            mode==="matrix" ||
+            mode==="braille"
+        ){
+            const sets={
+                hexdump:"0123456789ABCDEF",
+                matrix:"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                braille:"\u2801\u2803\u2807\u2817\u2837\u28FF"
+            };
+
+            const chars=
+                sets[mode];
+
+            const fall=
+                mode==="matrix"?
+                    (time*70+col*11)%height:
+                    0;
+
+            targetCtx.font=
+                "700 "+
+                Math.max(8,size)+"px Courier New, monospace";
+
+            targetCtx.fillStyle=
+                mode==="matrix"?
+                    "rgba(0,255,102,"+alpha+")":
+                    targetCtx.fillStyle;
+
+            targetCtx.fillText(
+                chars[
+                    Math.floor(cellNoise(col,row,Math.floor(time*16))*chars.length)
+                ],
+                x,
+                mode==="matrix"?
+                    (y+fall)%height:
+                    y
+            );
+            return;
+        }
+
+        if(
+            mode==="mosaic" ||
+            mode==="pixel" ||
+            mode==="dither" ||
+            mode==="lego"
+        ){
+            targetCtx.fillRect(
+                col*cell,
+                row*cell,
+                cell,
+                cell
+            );
+
+            if(mode==="lego"){
+                targetCtx.globalAlpha=
+                    alpha*.65;
+                targetCtx.beginPath();
+                targetCtx.arc(x,y,size*.2,0,Math.PI*2);
+                targetCtx.fill();
+                targetCtx.globalAlpha=1;
+            }
+            return;
+        }
+
+        if(mode==="dots"||mode==="disco"){
+            targetCtx.beginPath();
+            targetCtx.arc(x,y,size*.42,0,Math.PI*2);
+            targetCtx.fill();
+            return;
+        }
+
+        if(mode==="bubbles"||mode==="rings"){
+            targetCtx.beginPath();
+            targetCtx.arc(x,y,size*.45,0,Math.PI*2);
+            targetCtx.stroke();
+            return;
+        }
+
+        if(mode==="cross"){
+            targetCtx.beginPath();
+            targetCtx.moveTo(x-size*.42,y);
+            targetCtx.lineTo(x+size*.42,y);
+            targetCtx.moveTo(x,y-size*.42);
+            targetCtx.lineTo(x,y+size*.42);
+            targetCtx.stroke();
+            return;
+        }
+
+        if(mode==="diamond"){
+            targetCtx.beginPath();
+            targetCtx.moveTo(x,y-size*.5);
+            targetCtx.lineTo(x+size*.5,y);
+            targetCtx.lineTo(x,y+size*.5);
+            targetCtx.lineTo(x-size*.5,y);
+            targetCtx.closePath();
+            targetCtx.fill();
+            return;
+        }
+
+        if(mode==="voxel"){
+            targetCtx.fillRect(x-size*.34,y-size*.34,size*.68,size*.68);
+            targetCtx.strokeRect(x-size*.5,y-size*.5,size,size);
+            return;
+        }
+
+        if(mode==="lines"||mode==="diagonal"||mode==="hatch"){
+            targetCtx.beginPath();
+            targetCtx.moveTo(
+                mode==="lines"?x-size*.45:x-size*.45,
+                mode==="lines"?y:y+size*.45
+            );
+            targetCtx.lineTo(
+                mode==="lines"?x+size*.45:x+size*.45,
+                mode==="lines"?y:y-size*.45
+            );
+            if(mode==="hatch"&&lum>.46){
+                targetCtx.moveTo(x-size*.45,y-size*.45);
+                targetCtx.lineTo(x+size*.45,y+size*.45);
+            }
+            targetCtx.stroke();
+            return;
+        }
+
+        if(mode==="halfblocks"){
+            targetCtx.fillRect(x-size*.35,y-size*.48,size*.7,size*.45);
+            if(lum>.48){
+                targetCtx.globalAlpha=alpha*.55;
+                targetCtx.fillRect(x-size*.35,y+size*.06,size*.7,size*.42);
+                targetCtx.globalAlpha=1;
+            }
+            return;
+        }
+
+        if(mode==="hearts"||mode==="stars"){
+            targetCtx.font=
+                "700 "+
+                Math.max(9,size)+"px Arial, sans-serif";
+            targetCtx.fillText(
+                mode==="hearts"?"\u2665":"\u2605",
+                x,
+                y
+            );
+            return;
+        }
+
+        if(mode==="hexagons"){
+            drawRegularPolygon(targetCtx,x,y,size*.48,6,Math.PI/6,true);
+            return;
+        }
+
+        if(mode==="triangles"){
+            drawRegularPolygon(targetCtx,x,y,size*.54,3,-Math.PI/2,true);
+            return;
+        }
+
+        if(mode==="contour"){
+            targetCtx.beginPath();
+            targetCtx.arc(
+                x,
+                y,
+                size*.4,
+                lum*Math.PI,
+                lum*Math.PI+Math.PI*1.3
+            );
+            targetCtx.stroke();
+            return;
+        }
+
+        if(mode==="mixed"){
+            const modes=[
+                "characters",
+                "dots",
+                "diamond",
+                "lines"
+            ];
+
+            drawRenderCell(
+                targetCtx,
+                {...config,renderMode:modes[(col+row)%modes.length]},
+                col,
+                row,
+                cell,
+                lum,
+                color,
+                time
+            );
+        }
+
+    }
+
+
+    function applyColorBlur(config){
+
+        if(
+            config.blurType==="off" ||
+            config.blurAmount<=0
+        ){
+            return;
+        }
+
+        scratchCtx.clearRect(0,0,width,height);
+        scratchCtx.filter=
+            "blur("+
+            Math.max(1,config.blurAmount*.08)+
+            "px)";
+        scratchCtx.drawImage(workCanvas,0,0);
+        scratchCtx.filter="none";
+        workCtx.clearRect(0,0,width,height);
+        workCtx.drawImage(scratchCanvas,0,0);
+
+    }
+
+
+    function applyPostEffects(config,time){
+
+        const pfx=
+            config.pfx;
+
+        if(pfx.bloom.enabled){
+            scratchCtx.clearRect(0,0,width,height);
+            scratchCtx.filter=
+                "blur("+
+                (6+pfx.bloom.intensity*.16)+
+                "px)";
+            scratchCtx.globalAlpha=
+                pfx.bloom.intensity/100*.55;
+            scratchCtx.drawImage(workCanvas,0,0);
+            scratchCtx.filter="none";
+            scratchCtx.globalAlpha=1;
+
+            workCtx.save();
+            workCtx.globalCompositeOperation="lighter";
+            workCtx.drawImage(scratchCanvas,0,0);
+            workCtx.restore();
+        }
+
+        if(pfx.chromatic.enabled){
+            scratchCtx.clearRect(0,0,width,height);
+            scratchCtx.drawImage(workCanvas,0,0);
+            workCtx.save();
+            workCtx.globalCompositeOperation="screen";
+            workCtx.globalAlpha=pfx.chromatic.intensity/100*.25;
+            workCtx.drawImage(scratchCanvas,2,0);
+            workCtx.drawImage(scratchCanvas,-2,0);
+            workCtx.restore();
+        }
+
+        if(pfx.pixelate.enabled){
+            const scale=
+                Math.max(
+                    3,
+                    Math.floor(pfx.pixelate.intensity*.25)
+                );
+
+            scratchCtx.imageSmoothingEnabled=false;
+            scratchCtx.clearRect(0,0,width,height);
+            scratchCtx.drawImage(
+                workCanvas,
+                0,
+                0,
+                Math.ceil(width/scale),
+                Math.ceil(height/scale)
+            );
+            workCtx.imageSmoothingEnabled=false;
+            workCtx.drawImage(
+                scratchCanvas,
+                0,
+                0,
+                Math.ceil(width/scale),
+                Math.ceil(height/scale),
+                0,
+                0,
+                width,
+                height
+            );
+            workCtx.imageSmoothingEnabled=true;
+            scratchCtx.imageSmoothingEnabled=true;
+        }
+
+        if(pfx.halftone.enabled){
+            workCtx.save();
+            workCtx.globalCompositeOperation="multiply";
+            workCtx.fillStyle=
+                "rgba(0,0,0,"+
+                pfx.halftone.intensity/100*.16+
+                ")";
+            for(let y=0;y<height;y+=8){
+                for(let x=(y%16);x<width;x+=16){
+                    workCtx.beginPath();
+                    workCtx.arc(x,y,2,0,Math.PI*2);
+                    workCtx.fill();
+                }
+            }
+            workCtx.restore();
+        }
+
+        if(pfx.scanLines.enabled){
+            workCtx.save();
+            workCtx.fillStyle=
+                "rgba(0,0,0,"+
+                pfx.scanLines.intensity/100*.22+
+                ")";
+            for(let y=0;y<height;y+=4){
+                workCtx.fillRect(0,y,width,1);
+            }
+            workCtx.restore();
+        }
+
+        if(pfx.glitch.enabled){
+            const active=
+                Math.sin(time*18)>.72;
+
+            if(active){
+                scratchCtx.clearRect(0,0,width,height);
+                scratchCtx.drawImage(workCanvas,0,0);
+                const strips=
+                    2+Math.floor(pfx.glitch.intensity/9);
+
+                for(let i=0;i<strips;i++){
+                    const y=
+                        Math.floor(
+                            cellNoise(i,33,Math.floor(time*22))*height
+                        );
+
+                    const h=
+                        4+
+                        Math.floor(
+                            cellNoise(i,44,Math.floor(time*22))*18
+                        );
+
+                    const offset=
+                        (
+                            cellNoise(i,55,Math.floor(time*22))-.5
+                        )*
+                        pfx.glitch.intensity*2.2;
+
+                    workCtx.drawImage(
+                        scratchCanvas,
+                        0,
+                        y,
+                        width,
+                        h,
+                        offset,
+                        y,
+                        width,
+                        h
+                    );
+                }
+            }
+        }
+
+        if(pfx.filmGrain.enabled){
+            workCtx.save();
+            const dots=
+                Math.floor(
+                    width*height*
+                    pfx.filmGrain.intensity/
+                    65000
+                );
+
+            for(let i=0;i<dots;i++){
+                const x=
+                    Math.floor(
+                        cellNoise(i,11,Math.floor(time*50))*width
+                    );
+                const y=
+                    Math.floor(
+                        cellNoise(i,23,Math.floor(time*50))*height
+                    );
+                const alpha=
+                    cellNoise(i,31,Math.floor(time*50))*.22;
+                workCtx.fillStyle=
+                    "rgba(255,255,255,"+alpha+")";
+                workCtx.fillRect(x,y,1,1);
+            }
+            workCtx.restore();
+        }
+
+        if(pfx.filmDust.enabled){
+            workCtx.save();
+            workCtx.fillStyle=
+                "rgba(221,255,225,"+
+                pfx.filmDust.intensity/100*.45+
+                ")";
+            for(let i=0;i<pfx.filmDust.intensity;i++){
+                const x=cellNoise(i,61,Math.floor(time*8))*width;
+                const y=cellNoise(i,71,Math.floor(time*8))*height;
+                workCtx.fillRect(x,y,1.5,1.5);
+            }
+            workCtx.restore();
+        }
+
+        if(pfx.vignette.enabled){
+            const gradient=
+                workCtx.createRadialGradient(
+                    width*.58,
+                    height*.44,
+                    Math.min(width,height)*.12,
+                    width*.58,
+                    height*.44,
+                    Math.max(width,height)*.72
+                );
+
+            gradient.addColorStop(0,"rgba(0,0,0,0)");
+            gradient.addColorStop(
+                1,
+                "rgba(0,0,0,"+
+                pfx.vignette.intensity/100*.88+
+                ")"
+            );
+
+            workCtx.fillStyle=gradient;
+            workCtx.fillRect(0,0,width,height);
+        }
+
+    }
+
+
+    function applyLights(config){
+
+        if(
+            !config.lights.enabled ||
+            !config.lights.points.length
+        ){
+            return;
+        }
+
+        workCtx.save();
+        workCtx.globalCompositeOperation="screen";
+
+        config.lights.points.forEach(
+            point=>{
+                const x=point.x*width;
+                const y=point.y*height;
+                const radius=point.radius*Math.max(width,height);
+                const gradient=workCtx.createRadialGradient(x,y,0,x,y,radius);
+                gradient.addColorStop(
+                    0,
+                    "rgba(0,255,102,"+point.intensity+")"
+                );
+                gradient.addColorStop(1,"rgba(0,255,102,0)");
+                workCtx.fillStyle=gradient;
+                workCtx.fillRect(x-radius,y-radius,radius*2,radius*2);
+            }
+        );
+
+        workCtx.restore();
+
+    }
+
+
+    function applyMaskReveal(config){
+
+        if(
+            !config.mask.enabled ||
+            !config.mask.dataUrl
+        ){
+            return;
+        }
+
+        if(
+            !maskImage ||
+            maskImage.src!==config.mask.dataUrl
+        ){
+            maskImage=new Image();
+            maskImage.src=config.mask.dataUrl;
+            return;
+        }
+
+        if(!maskImage.complete){
+            return;
+        }
+
+        scratchCtx.clearRect(0,0,width,height);
+        scratchCtx.drawImage(sourceCanvas,0,0);
+        scratchCtx.globalCompositeOperation=
+            config.mask.invert?
+                "destination-out":
+                "destination-in";
+        scratchCtx.drawImage(maskImage,0,0,width,height);
+        scratchCtx.globalCompositeOperation="source-over";
+
+        workCtx.drawImage(scratchCanvas,0,0);
+
+    }
+
+
+    function getAnimationValue(
+        style,
+        col,
+        row,
+        time,
+        intensity
+    ){
+
+        if(!MENU_ASCII_CONFIG.animated){
+            return 0;
+        }
+
+        if(style==="wave"){
+            return Math.sin(time*4+col*.35)*.18*intensity;
+        }
+
+        if(style==="pulse"){
+            return Math.sin(time*5)*.2*intensity;
+        }
+
+        if(style==="shimmer"){
+            return (
+                cellNoise(col,row,Math.floor(time*18))-.5
+            )*.24*intensity;
+        }
+
+        if(style==="ripple"){
+            const dx=col-48;
+            const dy=row-26;
+            return Math.sin(Math.sqrt(dx*dx+dy*dy)*.45-time*8)*.18*intensity;
+        }
+
+        return (
+            cellNoise(col,row,Math.floor(time*30))-.5
+        )*.3*intensity;
+
+    }
+
+
+    function getCharacters(config){
+
+        if(
+            config.customChars
+        ){
+            return config.customChars;
+        }
+
+        const sets={
+            binary:"01",
+            blocks:" .:-=+*#%@",
+            code:"01<>/{}[]$#",
+            dense:" .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+        };
+
+        return sets[config.charSet]||sets.binary;
+
+    }
+
+
+    function drawRegularPolygon(
+        targetCtx,
+        x,
+        y,
+        radius,
+        sides,
+        offset,
+        fill
+    ){
+
+        targetCtx.beginPath();
+
+        for(let i=0;i<sides;i++){
+            const angle=
+                offset+
+                Math.PI*2*i/sides;
+
+            const px=
+                x+
+                Math.cos(angle)*radius;
+
+            const py=
+                y+
+                Math.sin(angle)*radius;
+
+            if(i===0){
+                targetCtx.moveTo(px,py);
+            }else{
+                targetCtx.lineTo(px,py);
+            }
+        }
+
+        targetCtx.closePath();
+
+        if(fill){
+            targetCtx.fill();
+        }else{
+            targetCtx.stroke();
+        }
+
+    }
+
+
+    function blendTint(base,tint,mode){
+
+        if(mode==="multiply"){
+            return {
+                r:base.r*tint.r/255,
+                g:base.g*tint.g/255,
+                b:base.b*tint.b/255
+            };
+        }
+
+        if(mode==="screen"){
+            return {
+                r:255-(255-base.r)*(255-tint.r)/255,
+                g:255-(255-base.g)*(255-tint.g)/255,
+                b:255-(255-base.b)*(255-tint.b)/255
+            };
+        }
+
+        if(mode==="overlay"){
+            return {
+                r:overlayChannel(base.r,tint.r),
+                g:overlayChannel(base.g,tint.g),
+                b:overlayChannel(base.b,tint.b)
+            };
+        }
+
+        return tint;
+
+    }
+
+
+    function overlayChannel(base,blend){
+        return base<128?
+            2*base*blend/255:
+            255-2*(255-base)*(255-blend)/255;
+    }
+
+
+    function applyToneCurve(
+        value,
+        curve
+    ){
+
+        if(
+            !curve ||
+            curve.length<2
+        ){
+            return value;
+        }
+
+        const start=curve[0];
+        const end=curve[curve.length-1];
+        const t=
+            clamp(
+                (value-start.x)/(end.x-start.x||1),
+                0,
+                1
+            );
+
+        return start.y+(end.y-start.y)*t;
+
+    }
+
+
+    function hexToRgb(hex){
+
+        const raw=
+            hex.replace("#","");
+
+        const int=
+            parseInt(raw,16);
+
+        return {
+            r:(int>>16)&255,
+            g:(int>>8)&255,
+            b:int&255
+        };
+
+    }
+
+
+    function getLuminance(r,g,b){
+        return r*.2126+g*.7152+b*.0722;
+    }
+
+
+    function cellNoise(x,y,seed){
+        const value=
+            Math.sin(
+                x*127.1+
+                y*311.7+
+                seed*74.7
+            )*43758.5453;
+        return value-Math.floor(value);
+    }
+
+
+    function clamp(value,min,max){
+        return Math.max(
+            min,
+            Math.min(max,value)
+        );
+    }
+
+
+    sourceImage.onload=()=>{
+        imageReady=true;
+        resizeMenuAscii();
+    };
+
+    sourceImage.src=
+        MENU_ASCII_SOURCE_IMAGE;
+
+    if(
+        sourceImage.complete &&
+        sourceImage.naturalWidth
+    ){
+        imageReady=true;
+    }
+
+    resizeMenuAscii();
+
+    requestAnimationFrame(
+        renderAsciiFrame
+    );
+
+    return {
+        resize:resizeMenuAscii
+    };
+
+}
+
+
+window.menuAsciiBackground=
+    createMenuAsciiBackground();
 
 
 /* =========================================================
