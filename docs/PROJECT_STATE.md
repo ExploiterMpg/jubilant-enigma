@@ -29,24 +29,11 @@ Latest known pushed commit:
 
 - `8832b8b Expand raid gameplay systems`
 
-Known uncommitted docs at this checkpoint:
+Known local work after latest push:
 
-- `docs/GAME_DESIGN.md`
-- `docs/SESSION_HANDOFF.md`
-- `docs/PROJECT_MEMORY.md`
-- `docs/PROJECT_STATE.md`
-- `docs/prd/README.md`
-- `docs/prd/PRD-0001-core-extraction-zone.md`
-- `docs/adr/README.md`
-- `docs/adr/ADR-0001-persistence-and-save-system.md`
-- `docs/adr/ADR-0002-ai-pathfinding.md`
-- `docs/adr/ADR-0003-boss-hideout.md`
-- `docs/adr/ADR-0004-content-data-architecture.md`
-- `docs/adr/ADR-0005-economy-and-progression-balance.md`
-- `docs/adr/ADR-0006-medical-system-depth.md`
-- `docs/adr/ADR-0007-map-expansion-and-verticality.md`
-- `docs/adr/ADR-0008-audio-asset-pipeline.md`
-- `docs/adr/ADR-0009-context-memory-and-checkpoint-system.md`
+- `5840298 Add project memory checkpoint workflow`
+- `35cb663 Require sub-agent review for implementation chunks`
+- First-pass LocalStorage profile persistence and persistence docs. Run `git log --oneline origin/main..main` for the exact local commit list.
 
 Important workflow:
 
@@ -70,6 +57,7 @@ Implemented systems include:
 - Multi-building top-down map with doors, stairs, floors, gardens, containers, desk loot, and hideout shell.
 - Outside roof occlusion and indoor-only visibility masks.
 - Player equipment, stash, backpack, raid inventory, hotbar, and draggable item inspection.
+- Versioned LocalStorage profile save/load for stash, inventory, equipment, cash, selected raid settings, hotbar assignments, trader rep/task completion, and body-part health.
 - Actual magazines and ammo types.
 - Timed reloads and round-by-round magazine loading.
 - Body-part health, bleeding, medkit durability, timed healing, and Surgical Kit usage.
@@ -94,6 +82,8 @@ Implemented systems include:
 - Reloading takes 3 seconds.
 - Surgical Kits take 10 seconds and repair blacked non-lethal limbs.
 - Quick loot applies only to revealed items inside an opened container.
+- Profile/progression persistence uses browser LocalStorage first; backend saves are out of scope for now.
+- The first persistence pass does not resume the full generated mid-raid world.
 
 ## Open / unfinished decisions
 
@@ -101,7 +91,7 @@ See ADRs for details.
 
 High-priority unfinished areas:
 
-- Browser LocalStorage persistence and profile migration.
+- Persistence polish: reset/export/import UI and future profile migrations.
 - More robust Scav navigation/pathfinding.
 - Economy balance and trader progression.
 - Medical penalties for blacked limbs.
@@ -125,11 +115,13 @@ Commit the checkpoint updates locally when complete. Do not push.
 
 ## Recommended next implementation task
 
-Add the actual browser save/profile system:
+Add persistence polish:
 
-- LocalStorage profile with `profileVersion`.
-- Save/load stash, cash, equipment, backpack inventory, trader rep/tasks, settings, and hotbar.
-- Add export/import/reset later.
+- Reset profile button.
+- Export/import profile JSON.
+- Profile migration helpers before changing save schema.
+
+Or, if gameplay feel is higher priority, improve Scav navigation with explicit map/door/stair route nodes.
 
 Reference:
 

@@ -182,6 +182,25 @@ Traders should provide:
 - tasks requiring found items,
 - rewards/progression hooks.
 
+### Persistence
+
+The player profile should survive browser reloads without a backend.
+
+The current LocalStorage profile saves:
+
+- stash,
+- backpack/raid inventory,
+- equipment,
+- cash,
+- selected raid map/time,
+- selected trader UI state,
+- hotbar assignments,
+- trader reputation,
+- trader task completion,
+- body-part health state.
+
+The first persistence pass does not need to resume a fully generated active raid world.
+
 ## Acceptance criteria
 
 - A player can start from hub, enter a raid, loot, fight, and extract.
@@ -192,6 +211,7 @@ Traders should provide:
 - Reloading and magazine preservation behave correctly.
 - Health items have timers and correct constraints.
 - Scavs can threaten players inside buildings and upstairs.
+- Reloading the page preserves profile progression through LocalStorage.
 
 ## Related docs
 

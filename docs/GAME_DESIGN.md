@@ -52,9 +52,11 @@ The implementation is intentionally simple:
 
 Current persistence state:
 
-- Stash, cash, trader rep, completed tasks, equipment, and inventory are in-memory only.
-- Refreshing the page resets progression.
-- Persistence is not yet solved; see ADRs.
+- A versioned browser `localStorage` profile is implemented.
+- The profile saves stash, raid/backpack inventory, equipment, cash, selected raid map/time, selected trader UI state, hotbar assignments, trader rep/task completion, and body-part health state.
+- Saves are debounced so frequent inventory/UI updates do not constantly write to storage.
+- The current save system preserves player profile/progression, but it does not yet resume every mid-raid world object such as Scavs, loot boxes, loose ground loot, bullets, or exact raid timer state.
+- Export/import/reset controls are still future work; see ADRs.
 
 ## 4. Current game modes / flow
 

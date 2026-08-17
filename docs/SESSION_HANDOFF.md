@@ -11,24 +11,13 @@ Latest pushed commit on `main` from this session:
 
 - `8832b8b Expand raid gameplay systems`
 
-Current uncommitted local files:
+Local work after latest push:
 
-- `app/docs/GAME_DESIGN.md`
-- `app/docs/SESSION_HANDOFF.md`
-- `app/docs/PROJECT_MEMORY.md`
-- `app/docs/PROJECT_STATE.md`
-- `app/docs/prd/README.md`
-- `app/docs/prd/PRD-0001-core-extraction-zone.md`
-- `app/docs/adr/README.md`
-- `app/docs/adr/ADR-0001-persistence-and-save-system.md`
-- `app/docs/adr/ADR-0002-ai-pathfinding.md`
-- `app/docs/adr/ADR-0003-boss-hideout.md`
-- `app/docs/adr/ADR-0004-content-data-architecture.md`
-- `app/docs/adr/ADR-0005-economy-and-progression-balance.md`
-- `app/docs/adr/ADR-0006-medical-system-depth.md`
-- `app/docs/adr/ADR-0007-map-expansion-and-verticality.md`
-- `app/docs/adr/ADR-0008-audio-asset-pipeline.md`
-- `app/docs/adr/ADR-0009-context-memory-and-checkpoint-system.md`
+- Project memory/checkpoint workflow docs.
+- Mandatory sub-agent implementation review workflow docs.
+- First-pass LocalStorage profile persistence and persistence docs.
+
+Run `git status --short --branch` and `git log --oneline origin/main..main` for the exact current local state.
 
 Important user workflow rule:
 
@@ -62,6 +51,7 @@ Major gameplay systems now implemented:
 - Hovered quick-loot inside containers.
 - Lootable Scav corpses.
 - Traders with rep, tasks, buy/sell detail panel.
+- Versioned LocalStorage profile save/load for stash, inventory, equipment, cash, selected raid settings, hotbar assignments, trader rep/task completion, and body-part health.
 - Keycard / Blacksite access loop.
 - Special Blacksite high-tier crate.
 - Desk/ground loot with keycard chance.
@@ -72,27 +62,15 @@ Major gameplay systems now implemented:
 - Simple walking animation.
 - Procedural sounds.
 
-## Newly added documentation
+## Documentation / memory state
 
-The following docs were created after the last GitHub push and are currently uncommitted:
+The project memory docs exist and should be kept current:
 
-- `docs/GAME_DESIGN.md`
-  - Main settled game design document.
-  - Use this as the design anchor for future sessions.
-
-- `docs/PROJECT_MEMORY.md`
-  - Defines the `/checkpoint` command protocol and docs-as-memory workflow.
-
-- `docs/PROJECT_STATE.md`
-  - Fast current-state snapshot for fresh Codex sessions.
-  - Read this first in the next session.
-
-- `docs/prd/`
-  - Product requirement documents.
-  - PRDs capture user-facing requirements and acceptance criteria.
-
-- `docs/adr/`
-  - Separate architecture/design decision records for unfinished or undecided systems.
+- `docs/GAME_DESIGN.md` is the settled design anchor.
+- `docs/PROJECT_MEMORY.md` defines the `/checkpoint` workflow.
+- `docs/PROJECT_STATE.md` is the fast fresh-session snapshot.
+- `docs/prd/` captures player-facing requirements.
+- `docs/adr/` captures architecture and implementation decisions.
 
 This file, `docs/SESSION_HANDOFF.md`, is meant to be the quick-start handoff for the next Codex chat.
 
@@ -129,25 +107,18 @@ Reference:
 
 ## Known unfinished work / next-session tasks
 
-### 1. Persistence / save system
+### 1. Persistence polish
 
 Current state:
 
-- Stash, cash, trader rep, completed tasks, inventory, equipment, and settings are in-memory only.
-- Refreshing the page resets progress.
+- First-pass LocalStorage profile persistence is implemented.
+- It saves player profile/progression state, not the full generated mid-raid world.
 
 Recommended next step:
 
-- Add a LocalStorage profile save with versioning.
-- Save:
-  - Stash
-  - Inventory
-  - Equipment
-  - Cash
-  - Trader rep
-  - Trader task completion
-  - Settings such as selected raid time
-- Add reset/export/import later.
+- Add reset profile, export profile, and import profile controls.
+- Add profile migration helpers before changing item/profile schema.
+- Decide later whether full mid-raid resume is worth the complexity.
 
 Reference:
 

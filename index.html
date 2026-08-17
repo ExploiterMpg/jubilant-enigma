@@ -2373,6 +2373,8 @@ function damageBodyPart(
 
     }
 
+    scheduleProfileSave();
+
 }
 
 
@@ -4383,6 +4385,7 @@ function renderStorage(){
     );
 
     renderHotbar();
+    scheduleProfileSave();
 
 }
 
@@ -5822,6 +5825,7 @@ function shoot(){
 
     weaponItem.magazine--;
     player.magazine=weaponItem.magazine;
+    scheduleProfileSave();
 
 
     const angle=
@@ -9657,6 +9661,433 @@ let selectedTrader=
 const selectedTraderItems={};
 
 
+/* =========================================================
+   PROFILE SAVE / LOAD
+========================================================= */
+
+const PROFILE_SAVE_KEY="extraction-zone-profile-v1";
+const PROFILE_VERSION=1;
+let profileLoaded=false;
+let profileSaveTimer=null;
+
+
+function cloneItemForSave(item){
+
+    if(!item)
+        return null;
+
+    const saved={
+        name:item.name,
+        qty:item.qty || 1
+    };
+
+    if(typeof item.ammo==="number")
+        saved.ammo=item.ammo;
+
+    if(typeof item.durability==="number")
+        saved.durability=item.durability;
+
+    if(typeof item.magazine==="number")
+        saved.magazine=item.magazine;
+
+    if(item.magType)
+        saved.magType=item.magType;
+
+    return saved;
+
+}
+
+
+function cloneArrayForSave(array){
+
+    return array.map(
+        item=>cloneItemForSave(item)
+    );
+
+}
+
+
+function cloneEquipmentForSave(){
+
+    const saved={};
+
+    Object.keys(equipment).forEach(
+        slot=>{
+            saved[slot]=cloneItemForSave(equipment[slot]);
+        }
+    );
+
+    return saved;
+
+}
+
+
+function cloneBodyForSave(){
+
+    const saved={};
+
+    Object.entries(bodyParts).forEach(
+        ([part,data])=>{
+            saved[part]={
+                hp:data.hp,
+                max:data.max,
+                bleeding:!!data.bleeding,
+                blacked:!!data.blacked
+            };
+        }
+    );
+
+    return saved;
+
+}
+
+
+function cloneTradersForSave(){
+
+    const saved={};
+
+    Object.entries(traders).forEach(
+        ([key,trader])=>{
+            saved[key]={
+                rep:trader.rep,
+                tasks:trader.tasks.map(
+                    task=>({
+                        id:task.id,
+                        done:!!task.done
+                    })
+                )
+            };
+        }
+    );
+
+    return saved;
+
+}
+
+
+function collectProfile(){
+
+    syncCurrentMagazine();
+
+    return {
+        profileVersion:PROFILE_VERSION,
+        savedAt:new Date().toISOString(),
+        cash,
+        selectedRaidMap,
+        selectedRaidTime,
+        selectedTrader,
+        player:{
+            weapon:player.weapon,
+            weaponSlot:player.weaponSlot,
+            magazine:player.magazine
+        },
+        selectedTraderItems:{...selectedTraderItems},
+        inventory:cloneArrayForSave(inventory),
+        stash:cloneArrayForSave(stash),
+        equipment:cloneEquipmentForSave(),
+        hotbarAssignments:JSON.parse(
+            JSON.stringify(hotbarAssignments)
+        ),
+        traders:cloneTradersForSave(),
+        bodyParts:cloneBodyForSave()
+    };
+
+}
+
+
+function scheduleProfileSave(){
+
+    if(!profileLoaded)
+        return;
+
+    clearTimeout(profileSaveTimer);
+
+    profileSaveTimer=setTimeout(
+        saveProfile,
+        250
+    );
+
+}
+
+
+function saveProfile(){
+
+    if(!profileLoaded)
+        return;
+
+    try{
+        localStorage.setItem(
+            PROFILE_SAVE_KEY,
+            JSON.stringify(collectProfile())
+        );
+    }catch(error){
+        console.warn(
+            "Extraction Zone profile save failed",
+            error
+        );
+    }
+
+}
+
+
+function restoreArray(target,saved){
+
+    if(!Array.isArray(saved))
+        return;
+
+    target.fill(null);
+
+    saved.slice(0,target.length).forEach(
+        (item,index)=>{
+            target[index]=cloneItemForSave(item);
+        }
+    );
+
+}
+
+
+function restoreEquipment(saved){
+
+    if(!saved || typeof saved!=="object")
+        return;
+
+    Object.keys(equipment).forEach(
+        slot=>{
+            equipment[slot]=cloneItemForSave(saved[slot]);
+        }
+    );
+
+}
+
+
+function restoreHotbar(saved){
+
+    Object.keys(hotbarAssignments).forEach(
+        key=>{
+            delete hotbarAssignments[key];
+        }
+    );
+
+    if(!saved || typeof saved!=="object")
+        return;
+
+    hotbarKeys.forEach(
+        key=>{
+            const assignment=saved[key];
+
+            if(
+                assignment &&
+                Number.isInteger(assignment.index) &&
+                typeof assignment.name==="string" &&
+                key!=="2" &&
+                key!=="3"
+            ){
+                hotbarAssignments[key]={
+                    index:assignment.index,
+                    name:assignment.name
+                };
+            }
+        }
+    );
+
+}
+
+
+function restoreTraderState(saved){
+
+    if(!saved || typeof saved!=="object")
+        return;
+
+    Object.entries(saved).forEach(
+        ([key,state])=>{
+            const trader=traders[key];
+
+            if(!trader || !state)
+                return;
+
+            if(typeof state.rep==="number"){
+                trader.rep=Math.max(
+                    0,
+                    Math.min(1,state.rep)
+                );
+            }
+
+            if(Array.isArray(state.tasks)){
+                state.tasks.forEach(
+                    savedTask=>{
+                        const task=trader.tasks.find(
+                            t=>t.id===savedTask.id
+                        );
+
+                        if(task)
+                            task.done=!!savedTask.done;
+                    }
+                );
+            }
+        }
+    );
+
+}
+
+
+function restoreBodyParts(saved){
+
+    if(!saved || typeof saved!=="object")
+        return;
+
+    Object.entries(saved).forEach(
+        ([part,data])=>{
+            if(!bodyParts[part] || !data)
+                return;
+
+            bodyParts[part].hp=
+                typeof data.hp==="number"
+                ? Math.max(0,Math.min(bodyParts[part].max,data.hp))
+                : bodyParts[part].hp;
+
+            bodyParts[part].bleeding=!!data.bleeding;
+            bodyParts[part].blacked=!!data.blacked;
+        }
+    );
+
+}
+
+
+function loadProfile(){
+
+    try{
+        const raw=localStorage.getItem(PROFILE_SAVE_KEY);
+
+        if(!raw){
+            profileLoaded=true;
+            return;
+        }
+
+        const saved=JSON.parse(raw);
+
+        if(
+            !saved ||
+            saved.profileVersion!==PROFILE_VERSION
+        ){
+            profileLoaded=true;
+            return;
+        }
+
+        cash=
+            typeof saved.cash==="number"
+            ? Math.max(0,Math.floor(saved.cash))
+            : cash;
+
+        if(
+            saved.selectedRaidMap &&
+            raidMapData[saved.selectedRaidMap]
+        ){
+            selectedRaidMap=saved.selectedRaidMap;
+        }
+
+        if(
+            saved.selectedRaidTime==="day" ||
+            saved.selectedRaidTime==="night"
+        ){
+            selectedRaidTime=saved.selectedRaidTime;
+        }
+
+        if(
+            saved.selectedTrader &&
+            traders[saved.selectedTrader]
+        ){
+            selectedTrader=saved.selectedTrader;
+        }
+
+        Object.keys(selectedTraderItems).forEach(
+            key=>{
+                delete selectedTraderItems[key];
+            }
+        );
+
+        if(
+            saved.selectedTraderItems &&
+            typeof saved.selectedTraderItems==="object"
+        ){
+            Object.assign(
+                selectedTraderItems,
+                saved.selectedTraderItems
+            );
+        }
+
+        restoreArray(inventory,saved.inventory);
+        restoreArray(stash,saved.stash);
+        restoreEquipment(saved.equipment);
+        restoreHotbar(saved.hotbarAssignments);
+        restoreTraderState(saved.traders);
+        restoreBodyParts(saved.bodyParts);
+
+        const savedWeaponSlot=
+            saved.player &&
+            (
+                saved.player.weaponSlot==="primary" ||
+                saved.player.weaponSlot==="secondary"
+            )
+            ? saved.player.weaponSlot
+            : null;
+
+        const savedPlayerMagazine=
+            saved.player &&
+            typeof saved.player.magazine==="number"
+            ? Math.max(0,Math.floor(saved.player.magazine))
+            : null;
+
+        const preferredSlot=
+            savedWeaponSlot &&
+            equipment[savedWeaponSlot] &&
+            guns[equipment[savedWeaponSlot].name]
+            ? savedWeaponSlot
+            : equipment.primary
+            ? "primary"
+            : equipment.secondary
+            ? "secondary"
+            : null;
+
+        if(preferredSlot && guns[equipment[preferredSlot].name]){
+            player.weapon=equipment[preferredSlot].name;
+            player.weaponSlot=preferredSlot;
+
+            const restoredMagazine=
+                typeof equipment[preferredSlot].magazine==="number"
+                ? equipment[preferredSlot].magazine
+                : savedWeaponSlot===preferredSlot &&
+                    savedPlayerMagazine!==null
+                ? savedPlayerMagazine
+                : guns[player.weapon].magazine;
+
+            player.magazine=
+                Math.min(
+                    guns[player.weapon].magazine,
+                    restoredMagazine
+                );
+
+            equipment[preferredSlot].magazine=player.magazine;
+
+            if(!equipment[preferredSlot].magType){
+                equipment[preferredSlot].magType=
+                    guns[player.weapon].magType;
+            }
+        }
+
+        profileLoaded=true;
+        showMessage("PROFILE LOADED");
+
+    }catch(error){
+        console.warn(
+            "Extraction Zone profile load failed",
+            error
+        );
+        profileLoaded=true;
+    }
+
+}
+
+
 function selectTrader(
     name
 ){
@@ -10005,6 +10436,8 @@ function renderTrades(){
         "cash"
     ).textContent=cash;
 
+    scheduleProfileSave();
+
 }
 
 
@@ -10147,6 +10580,8 @@ function updateRaidSetup(){
         loadout.textContent=
             "LOADOUT BLOCKED: EQUIP A PRIMARY OR SECONDARY WEAPON";
     }
+
+    scheduleProfileSave();
 
 }
 
@@ -10396,6 +10831,7 @@ function renderRaidInventory(){
         "Health: "+Math.round(h.total)+"/"+h.max;
 
     renderHotbar();
+    scheduleProfileSave();
 }
 
 /* =========================================================
@@ -10451,10 +10887,12 @@ function loop(){
 }
 
 
+loadProfile();
+
 renderStorage();
 
 selectTrader(
-    "scav"
+    selectedTrader
 );
 
 loop();

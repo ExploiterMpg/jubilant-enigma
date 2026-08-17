@@ -1,18 +1,45 @@
 # ADR-0001 — Persistence and Save System
 
-Status: Proposed
+Status: Accepted / Implemented first pass
 
 ## Context
 
-The current game stores stash, inventory, cash, trader reputation, trader task completion, equipment, health, and raid state in memory.
+The game’s long-term extraction loop depends on persistence. Stash, raid/backpack inventory, equipment, cash, trader reputation, task completion, selected raid settings, hotbar bindings, and health state should survive browser reloads.
 
-Refreshing the browser resets progress.
+The first implementation pass now saves player profile/progression in browser storage. It does not yet resume a full generated raid world.
 
-The game’s long-term extraction loop depends on persistence, but persistence has not been implemented yet.
+## Decision
 
-## Decision needed
+Use browser `localStorage` as the first persistence layer.
 
-Choose how progression should be saved.
+Current key:
+
+- `extraction-zone-profile-v1`
+
+Current version:
+
+- `profileVersion: 1`
+
+Saved fields:
+
+- cash,
+- selected raid map,
+- selected raid time,
+- selected trader and selected market item UI state,
+- stash,
+- backpack/raid inventory,
+- equipment,
+- equipped weapon magazine state,
+- hotbar assignments,
+- trader reputation,
+- trader task completion,
+- body-part health state.
+
+Implementation choice:
+
+- Use `scheduleProfileSave()` as a debounced autosave layer.
+- Use tolerant loading: no save, bad JSON, or wrong version falls back to the hardcoded starter profile instead of breaking startup.
+- Do not persist complete mid-raid world state yet.
 
 ## Options
 
@@ -62,15 +89,14 @@ Cons:
 
 ## Recommendation
 
-Start with LocalStorage plus optional JSON export/import.
+Start with LocalStorage plus optional JSON export/import later.
 
 Do not add a backend until the single-player loop is stable.
 
 ## Follow-up work
 
-- Define a `profileVersion`.
-- Save stash, inventory, equipment, cash, trader rep/tasks, and settings.
 - Add migration helpers.
 - Add reset profile button.
 - Add export/import buttons.
-
+- Decide whether mid-raid world resume should be supported.
+- If mid-raid resume is added, persist generated containers, revealed/search state, loose ground loot, Scav state, corpse loot, player position/floor/building, raid timer, and extraction state.
