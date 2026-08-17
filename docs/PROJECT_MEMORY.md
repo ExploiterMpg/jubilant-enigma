@@ -52,7 +52,8 @@ The agent must:
 7. Update or create ADRs in `docs/adr/` for architecture, implementation, data-model, algorithmic, persistence, AI, rendering, or workflow decisions.
 8. Preserve undecided or unfinished topics as `Proposed` or `Deferred` ADRs rather than burying them in prose.
 9. Run a lightweight syntax/smoke check when practical.
-10. Report:
+10. If implementation code changed, run a mandatory code review by a sub-agent before the chunk is considered complete.
+11. Report:
     - files updated,
     - current git status,
     - whether anything remains uncommitted,
@@ -138,11 +139,13 @@ A fresh Codex agent should:
 5. Inspect `git status --short`.
 6. Expect completed chunks of work to be committed locally.
 7. Never push unless the user explicitly asks to push.
+8. After implementation changes, require a sub-agent code review before committing the chunk.
 
 ## User workflow rules to preserve
 
 - Each completed chunk of work should be automatically committed locally.
 - Commits should be made on `main` unless the user explicitly asks for a different branch.
+- After implementation changes, run a mandatory code review by a sub-agent before committing the chunk.
 - Do not push automatically.
 - The user will push manually unless they explicitly ask Codex to push.
 - `/checkpoint` saves project memory and should be committed locally as its own chunk when complete.

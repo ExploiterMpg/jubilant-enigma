@@ -597,6 +597,7 @@ User instruction:
 
 - Each completed chunk of work should be automatically committed locally.
 - Commits should be made on `main` unless the user explicitly asks for a different branch.
+- After implementation changes, run a mandatory code review by a sub-agent before committing the chunk.
 - Do not push automatically.
 - The user will push manually unless they explicitly ask Codex to push.
 
@@ -604,7 +605,7 @@ Recent committed state:
 
 - Commit `8832b8b Expand raid gameplay systems` was pushed to `main`.
 
-Documentation and implementation chunks should be committed locally after completion, but not pushed automatically.
+Documentation and implementation chunks should be committed locally after completion, but not pushed automatically. Implementation chunks require a sub-agent code review before commit.
 
 ## 21. Project memory / checkpoint workflow
 

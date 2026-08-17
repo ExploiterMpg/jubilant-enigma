@@ -105,6 +105,7 @@ The user’s standing rule remains:
 
 - Each completed chunk of work should be automatically committed locally.
 - Commit to `main` unless the user explicitly asks for a different branch.
+- After implementation changes, run a mandatory code review by a sub-agent before committing the chunk.
 - Do not push automatically.
 - The user will push manually unless they explicitly ask Codex to push.
 

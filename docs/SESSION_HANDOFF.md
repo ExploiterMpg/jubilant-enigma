@@ -34,6 +34,7 @@ Important user workflow rule:
 
 - Each completed chunk of work should be automatically committed locally.
 - Commits should be made on `main` unless the user explicitly asks for a different branch.
+- After implementation changes, run a mandatory code review by a sub-agent before committing the chunk.
 - Do not push automatically.
 - The user will push manually unless they explicitly ask Codex to push.
 
@@ -115,7 +116,8 @@ Required behavior:
 4. Update or create PRDs in `docs/prd/` for player-facing feature requirements.
 5. Update or create ADRs in `docs/adr/` for architecture, algorithms, data models, implementation choices, or unfinished decisions.
 6. Run a lightweight syntax/smoke check when practical.
-7. Report updated files and current git status.
+7. If implementation code changed, run a mandatory code review by a sub-agent before committing the chunk.
+8. Report updated files and current git status.
 
 After `/checkpoint` updates are complete, commit them locally as the checkpoint chunk. Do not push.
 
@@ -376,6 +378,8 @@ Only push when the user explicitly asks Codex to push.
 If the next chat continues development, the best next feature is:
 
 1. Read `docs/PROJECT_STATE.md`.
-2. Work in small chunks and commit each completed chunk locally.
-3. Add LocalStorage persistence.
-4. Then QA/fix any visibility/AI bugs caused by the newer building occlusion and map expansion.
+2. Work in small chunks.
+3. After implementation chunks, run a mandatory sub-agent code review.
+4. Commit each completed chunk locally.
+5. Add LocalStorage persistence.
+6. Then QA/fix any visibility/AI bugs caused by the newer building occlusion and map expansion.
